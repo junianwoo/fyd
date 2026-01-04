@@ -36,6 +36,24 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { fetchResources, deleteResource, updateResource, Resource } from "@/lib/resources";
 
+// Category color mapping using brand colors
+const getCategoryStyles = (category: string): string => {
+  switch (category) {
+    case "Healthcare News":
+      return "bg-secondary text-secondary-foreground"; // Bright Teal
+    case "How-To Guides":
+      return "bg-primary text-primary-foreground"; // Deep Teal
+    case "Success Stories":
+      return "bg-accent text-accent-foreground"; // Warm Orange
+    case "Product Updates":
+      return "bg-muted text-muted-foreground"; // Neutral gray
+    case "General Topics":
+      return "bg-primary/80 text-primary-foreground"; // Deep Teal variant
+    default:
+      return "bg-secondary text-secondary-foreground";
+  }
+};
+
 export default function AdminResources() {
   const { toast } = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
@@ -185,7 +203,7 @@ export default function AdminResources() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{resource.category}</Badge>
+                      <Badge className={getCategoryStyles(resource.category)}>{resource.category}</Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant={resource.published ? "default" : "outline"}>
