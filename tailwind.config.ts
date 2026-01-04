@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ["Cactus Classical Serif", "Georgia", "serif"],
+        serif: ["Newsreader", "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {
