@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
@@ -9,7 +11,8 @@ import { Upload, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 export function AdminDoctorImport() {
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<{ success: boolean; inserted: number; total: number; errors?: string[] } | null>(null);
+  const [importMode, setImportMode] = useState<"append" | "replace">("append");
+  const [result, setResult] = useState<{ success: boolean; inserted: number; skipped: number; total: number; errors?: string[] } | null>(null);
   const { toast } = useToast();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +22,14 @@ export function AdminDoctorImport() {
     if (!file.name.endsWith(".csv")) {
       toast({ title: "Please upload a CSV file", variant: "destructive" });
       return;
+    }
+
+    // Confirm if replacing
+    if (importMode === "replace") {
+      const confirmed = window.confirm(
+        "This will DELETE all existing doctors and replace them with the CSV data. Are you sure?"
+      );
+      if (!confirmed) return;
     }
 
     setImporting(true);
@@ -32,7 +43,7 @@ export function AdminDoctorImport() {
 
       // Call the edge function
       const { data, error } = await supabase.functions.invoke("import-doctors", {
-        body: { csvContent: content, clearExisting: true },
+        body: { csvContent: content, clearExisting: importMode === "replace" },
       });
 
       setProgress(100);
@@ -46,7 +57,7 @@ export function AdminDoctorImport() {
       if (data.success) {
         toast({
           title: "Import successful!",
-          description: `${data.inserted} of ${data.total} doctors imported.`,
+          description: `${data.inserted} doctors imported${data.skipped > 0 ? `, ${data.skipped} skipped (duplicates)` : ""}.`,
         });
       } else {
         toast({
@@ -62,7 +73,7 @@ export function AdminDoctorImport() {
         description: errorMessage,
         variant: "destructive",
       });
-      setResult({ success: false, inserted: 0, total: 0, errors: [errorMessage] });
+      setResult({ success: false, inserted: 0, skipped: 0, total: 0, errors: [errorMessage] });
     } finally {
       setImporting(false);
     }
@@ -80,6 +91,31 @@ export function AdminDoctorImport() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Import Mode Selection */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Import Mode</Label>
+          <RadioGroup
+            value={importMode}
+            onValueChange={(value) => setImportMode(value as "append" | "replace")}
+            className="flex gap-6"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="append" id="append" />
+              <Label htmlFor="append" className="font-normal cursor-pointer">
+                <span className="font-medium">Append</span>
+                <span className="text-muted-foreground ml-1">(add new doctors, skip duplicates)</span>
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="replace" id="replace" />
+              <Label htmlFor="replace" className="font-normal cursor-pointer">
+                <span className="font-medium">Replace</span>
+                <span className="text-muted-foreground ml-1">(delete all existing, then import)</span>
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         <div className="flex items-center gap-4">
           <input
             type="file"
@@ -119,7 +155,9 @@ export function AdminDoctorImport() {
               </span>
             </div>
             <p className={`text-sm ${result.success ? "text-green-700" : "text-red-700"}`}>
-              {result.inserted} of {result.total} doctors imported successfully.
+              {result.inserted} doctors imported
+              {result.skipped > 0 && `, ${result.skipped} skipped (duplicates)`}
+              {result.total > 0 && ` out of ${result.total} in CSV`}.
             </p>
             {result.errors && result.errors.length > 0 && (
               <div className="mt-2">
