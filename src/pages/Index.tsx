@@ -10,16 +10,16 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative bg-background py-20 md:py-32 overflow-hidden">
         {/* Hero background image */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 z-0">
           <img 
             src={heroImage} 
             alt="" 
-            className="w-full h-full object-cover opacity-15"
+            className="w-full h-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         </div>
         
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               Find Your Family Doctor
