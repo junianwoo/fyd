@@ -166,8 +166,49 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_updates: {
+        Row: {
+          count: number
+          created_at: string | null
+          doctor_id: string
+          id: string
+          ip_addresses: string[]
+          status: Database["public"]["Enums"]["accepting_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          count?: number
+          created_at?: string | null
+          doctor_id: string
+          id?: string
+          ip_addresses?: string[]
+          status: Database["public"]["Enums"]["accepting_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          count?: number
+          created_at?: string | null
+          doctor_id?: string
+          id?: string
+          ip_addresses?: string[]
+          status?: Database["public"]["Enums"]["accepting_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_updates_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          assisted_expires_at: string | null
+          assisted_reason: string | null
+          assisted_renewed_count: number | null
           created_at: string | null
           email: string
           id: string
@@ -179,6 +220,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assisted_expires_at?: string | null
+          assisted_reason?: string | null
+          assisted_renewed_count?: number | null
           created_at?: string | null
           email: string
           id?: string
@@ -190,6 +234,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assisted_expires_at?: string | null
+          assisted_reason?: string | null
+          assisted_renewed_count?: number | null
           created_at?: string | null
           email?: string
           id?: string
@@ -201,6 +248,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      verification_tokens: {
+        Row: {
+          created_at: string | null
+          doctor_id: string
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          doctor_id: string
+          email: string
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          doctor_id?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_tokens_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
