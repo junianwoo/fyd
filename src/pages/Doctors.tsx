@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { MapPin, Phone, Calendar, ExternalLink, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,16 +12,19 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { DoctorMap } from "@/components/DoctorMap";
 import { fetchDoctors, searchDoctors, Doctor, DoctorStatus } from "@/lib/doctors";
 
 export default function Doctors() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialQuery = searchParams.get("search") || "";
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<DoctorStatus | "all">("all");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | undefined>();
 
   useEffect(() => {
     const loadDoctors = async () => {
@@ -58,20 +61,25 @@ export default function Doctors() {
     });
   };
 
+  const handleDoctorSelect = (doctorId: string) => {
+    setSelectedDoctorId(doctorId);
+    // Scroll to doctor card
+    const element = document.getElementById(`doctor-${doctorId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Map Placeholder */}
+      {/* Map Section */}
       <div className="bg-background-alt border-b border-border">
-        <div className="h-64 md:h-80 flex items-center justify-center bg-secondary/10">
-          <div className="text-center p-8">
-            <MapPin className="h-12 w-12 text-secondary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">Interactive Map Coming Soon</h3>
-            <p className="text-muted-foreground text-sm max-w-md">
-              We're integrating Google Maps to show doctor locations. 
-              For now, browse the list below.
-            </p>
-          </div>
-        </div>
+        <DoctorMap 
+          doctors={filteredDoctors} 
+          selectedDoctorId={selectedDoctorId}
+          onDoctorSelect={handleDoctorSelect}
+          className="h-64 md:h-80"
+        />
       </div>
 
       {/* Filters Section */}
@@ -137,7 +145,14 @@ export default function Doctors() {
         ) : (
           <div className="grid gap-4">
             {filteredDoctors.map((doctor) => (
-              <Card key={doctor.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <Card 
+                key={doctor.id} 
+                id={`doctor-${doctor.id}`}
+                className={`overflow-hidden hover:shadow-md transition-all cursor-pointer ${
+                  selectedDoctorId === doctor.id ? "ring-2 ring-secondary shadow-lg" : ""
+                }`}
+                onClick={() => setSelectedDoctorId(doctor.id)}
+              >
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     {/* Status Badge - Mobile */}
@@ -168,6 +183,7 @@ export default function Doctors() {
                             <a 
                               href={`tel:${doctor.phone.replace(/[^0-9]/g, "")}`}
                               className="flex items-center gap-2 text-secondary hover:text-primary transition-colors"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <Phone className="h-4 w-4 flex-shrink-0" />
                               <span>{doctor.phone}</span>
@@ -186,7 +202,7 @@ export default function Doctors() {
                         </div>
 
                         <div className="hidden md:block">
-                          <Button variant="outline" size="sm" asChild>
+                          <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
                             <Link to={`/doctors/${doctor.id}`}>
                               View Details
                               <ExternalLink className="h-3 w-3 ml-2" />
@@ -198,7 +214,7 @@ export default function Doctors() {
 
                     {/* Mobile View Details Button */}
                     <div className="p-4 pt-0 md:hidden">
-                      <Button variant="outline" className="w-full" asChild>
+                      <Button variant="outline" className="w-full" asChild onClick={(e) => e.stopPropagation()}>
                         <Link to={`/doctors/${doctor.id}`}>
                           View Details
                         </Link>
