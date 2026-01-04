@@ -85,6 +85,41 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
     };
   }, [apiKey]);
 
+  // Custom map styles based on FindYourDoctor brand colors
+  const brandMapStyles: google.maps.MapTypeStyle[] = [
+    // Water - Primary teal
+    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#0F4C5C" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#F3FBFA" }] },
+    
+    // Land/landscape - Light teal background  
+    { featureType: "landscape", elementType: "geometry.fill", stylers: [{ color: "#F3FBFA" }] },
+    { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#E8F6F5" }] },
+    
+    // Parks - Soft teal green
+    { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#C5E8E5" }] },
+    
+    // Roads - White with subtle styling
+    { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
+    { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#00A6A6" }, { weight: 1 }] },
+    { featureType: "road.arterial", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
+    { featureType: "road.local", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
+    
+    // Labels - Text color matching brand
+    { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#102A43" }] },
+    { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#FFFFFF" }, { weight: 2 }] },
+    
+    // POI - Subtle styling
+    { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#D6F0EE" }] },
+    { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.medical", elementType: "geometry.fill", stylers: [{ color: "#00A6A6" }] },
+    
+    // Transit - Secondary teal
+    { featureType: "transit", elementType: "geometry.fill", stylers: [{ color: "#B8E0DD" }] },
+    
+    // Administrative boundaries
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#0F4C5C" }, { weight: 0.5 }] },
+  ];
+
   // Initialize map
   useEffect(() => {
     if (loading || error || !mapRef.current || !window.google?.maps) return;
@@ -95,7 +130,7 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
     mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
       center: defaultCenter,
       zoom: 10,
-      mapId: "doctor-finder-map",
+      styles: brandMapStyles,
       disableDefaultUI: false,
       zoomControl: true,
       mapTypeControl: false,
