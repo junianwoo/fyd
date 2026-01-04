@@ -166,11 +166,6 @@ export default function ResourceDetail() {
       <section className="pb-16 md:pb-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            {/* Excerpt */}
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              {resource.excerpt}
-            </p>
-
             {/* Main Content */}
             {resource.content && (
               <div className="prose prose-lg max-w-none">
