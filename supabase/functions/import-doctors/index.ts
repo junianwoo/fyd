@@ -177,9 +177,9 @@ Deno.serve(async (req) => {
     const csvDoctors = parseCSV(csvContent);
     console.log(`Parsed ${csvDoctors.length} doctors from CSV`);
 
-    // Clear existing doctors if requested
+    // Clear existing doctors if requested (replace mode)
     if (clearExisting) {
-      console.log("Clearing existing doctors...");
+      console.log("Clearing existing doctors (replace mode)...");
       const { error: deleteError } = await supabase
         .from("doctors")
         .delete()
@@ -195,15 +195,46 @@ Deno.serve(async (req) => {
       console.log("Existing doctors cleared");
     }
 
+    // Get existing CPSO numbers to avoid duplicates (append mode)
+    let existingCpsoNumbers = new Set<string>();
+    if (!clearExisting) {
+      console.log("Fetching existing CPSO numbers for duplicate detection...");
+      const { data: existingDocs } = await supabase
+        .from("doctors")
+        .select("cpso_number")
+        .not("cpso_number", "is", null);
+      
+      if (existingDocs) {
+        existingCpsoNumbers = new Set(existingDocs.map(d => d.cpso_number).filter(Boolean));
+        console.log(`Found ${existingCpsoNumbers.size} existing doctors with CPSO numbers`);
+      }
+    }
+
     // Transform and insert doctors in batches
     const batchSize = 100;
     let inserted = 0;
+    let skipped = 0;
     let errors: string[] = [];
 
     for (let i = 0; i < csvDoctors.length; i += batchSize) {
       const batch = csvDoctors.slice(i, i + batchSize);
       
-      const transformedBatch = batch.map((doc) => ({
+      // Filter out duplicates in append mode
+      const filteredBatch = clearExisting 
+        ? batch 
+        : batch.filter(doc => {
+            if (existingCpsoNumbers.has(doc.cpso_number)) {
+              skipped++;
+              return false;
+            }
+            return true;
+          });
+      
+      if (filteredBatch.length === 0) {
+        continue;
+      }
+      
+      const transformedBatch = filteredBatch.map((doc) => ({
         cpso_number: doc.cpso_number,
         full_name: formatName(doc.full_name),
         clinic_name: extractClinicName(doc.address, doc.full_name),
@@ -241,6 +272,7 @@ Deno.serve(async (req) => {
     const result = {
       success: errors.length === 0,
       inserted,
+      skipped,
       total: csvDoctors.length,
       errors: errors.length > 0 ? errors : undefined,
     };
