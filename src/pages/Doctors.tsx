@@ -78,7 +78,7 @@ export default function Doctors() {
           doctors={filteredDoctors} 
           selectedDoctorId={selectedDoctorId}
           onDoctorSelect={handleDoctorSelect}
-          className="h-64 md:h-80"
+          className="h-96 md:h-[30rem]"
         />
       </div>
 
