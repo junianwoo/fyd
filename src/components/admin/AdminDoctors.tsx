@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { 
+import { AdminDoctorImport } from "./AdminDoctorImport";
+import {
   Stethoscope, 
   Search, 
   Loader2,
@@ -75,6 +76,11 @@ export default function AdminDoctors() {
   const loadDoctors = async () => {
     setLoading(true);
     
+    // Get total count first
+    const { count: totalCount } = await supabase
+      .from("doctors")
+      .select("*", { count: "exact", head: true });
+    
     const { data, error } = await supabase
       .from("doctors")
       .select("*")
@@ -84,7 +90,7 @@ export default function AdminDoctors() {
     if (!error && data) {
       setDoctors(data);
       setStats({
-        total: data.length,
+        total: totalCount || data.length,
         accepting: data.filter(d => d.accepting_status === "accepting").length,
         notAccepting: data.filter(d => d.accepting_status === "not_accepting").length,
         waitlist: data.filter(d => d.accepting_status === "waitlist").length,
@@ -194,6 +200,9 @@ export default function AdminDoctors() {
 
   return (
     <div className="space-y-6">
+      {/* Import Section */}
+      <AdminDoctorImport />
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <Card>
