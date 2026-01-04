@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cactus+Classical+Serif&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -109,8 +109,8 @@
     @apply bg-background text-foreground font-sans;
   }
 
-  h1, h2 {
-    @apply font-serif;
+  h1, h2, h3 {
+    @apply font-serif font-normal;
   }
 }
 

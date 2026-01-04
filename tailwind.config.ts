@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ["Lora", "Georgia", "serif"],
+        serif: ["Cactus Classical Serif", "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {

@@ -14,14 +14,14 @@ export default function Index() {
           <img 
             src={heroImage} 
             alt="" 
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
               Find Your Family Doctor
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10">
@@ -39,7 +39,7 @@ export default function Index() {
       <section className="bg-background py-20 md:py-24 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+            <h2 className="text-3xl md:text-4xl text-primary mb-6">
               The Doctor Shortage Is Getting Worse
             </h2>
           </div>
@@ -79,7 +79,7 @@ export default function Index() {
       <section className="bg-background-alt py-20 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            <h2 className="text-3xl md:text-4xl text-primary mb-4">
               Find Doctors. Get Alerted. Stop Searching.
             </h2>
           </div>
@@ -131,7 +131,7 @@ export default function Index() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/10 mb-6">
               <Heart className="h-8 w-8 text-secondary" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+            <h2 className="text-3xl md:text-4xl text-primary mb-6">
               Built by the Community. For the Community.
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -150,7 +150,7 @@ export default function Index() {
       <section className="bg-background-alt py-20 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            <h2 className="text-3xl md:text-4xl text-primary mb-4">
               Stop Waiting. Start Finding.
             </h2>
             <p className="text-lg text-muted-foreground mb-10">
