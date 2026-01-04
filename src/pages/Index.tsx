@@ -20,7 +20,7 @@ export default function Index() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-white mb-6">
               Find Your Family Doctor
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10">
