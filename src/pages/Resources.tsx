@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Clock, Search, Loader2 } from "lucide-react";
+import { ArrowRight, Clock, Search, Loader2, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -112,13 +112,25 @@ export default function Resources() {
                     <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Recent</h3>
                     <div className="space-y-3">
                       {recentResources.map((resource) => (
-                        <Link
-                          key={resource.id}
-                          to={`/resources/${resource.slug}`}
-                          className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
-                        >
-                          {resource.title}
-                        </Link>
+                        resource.category === "Healthcare News" && resource.content ? (
+                          <a
+                            key={resource.id}
+                            href={resource.content}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
+                          >
+                            {resource.title}
+                          </a>
+                        ) : (
+                          <Link
+                            key={resource.id}
+                            to={`/resources/${resource.slug}`}
+                            className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
+                          >
+                            {resource.title}
+                          </Link>
+                        )
                       ))}
                     </div>
                   </div>
@@ -169,38 +181,66 @@ export default function Resources() {
                 </div>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2">
-                  {filteredResources.map((resource) => (
-                    <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Badge variant="secondary">{resource.category}</Badge>
-                          <span className="flex items-center text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {resource.read_time}
-                          </span>
-                        </div>
-                        <h2 className="text-lg text-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
-                          <Link to={`/resources/${resource.slug}`}>
-                            {resource.title}
-                          </Link>
-                        </h2>
-                        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                          {resource.excerpt}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">
-                            {formatDate(resource.published_at || resource.created_at)}
-                          </span>
-                          <Link 
-                            to={`/resources/${resource.slug}`}
-                            className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
-                          >
-                            Read More <ArrowRight className="h-3 w-3 ml-1" />
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {filteredResources.map((resource) => {
+                    const isExternalNews = resource.category === "Healthcare News" && resource.content;
+                    
+                    return (
+                      <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Badge variant="secondary">{resource.category}</Badge>
+                            {isExternalNews ? (
+                              <span className="flex items-center text-xs text-muted-foreground">
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                External
+                              </span>
+                            ) : (
+                              <span className="flex items-center text-xs text-muted-foreground">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {resource.read_time}
+                              </span>
+                            )}
+                          </div>
+                          <h2 className="text-lg text-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
+                            {isExternalNews ? (
+                              <a href={resource.content!} target="_blank" rel="noopener noreferrer">
+                                {resource.title}
+                              </a>
+                            ) : (
+                              <Link to={`/resources/${resource.slug}`}>
+                                {resource.title}
+                              </Link>
+                            )}
+                          </h2>
+                          <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                            {resource.excerpt}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(resource.published_at || resource.created_at)}
+                            </span>
+                            {isExternalNews ? (
+                              <a 
+                                href={resource.content!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
+                              >
+                                Read Article <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            ) : (
+                              <Link 
+                                to={`/resources/${resource.slug}`}
+                                className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
+                              >
+                                Read More <ArrowRight className="h-3 w-3 ml-1" />
+                              </Link>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </div>
