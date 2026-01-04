@@ -6,6 +6,7 @@ export type DoctorStatus = Database["public"]["Enums"]["accepting_status"];
 
 export interface Doctor {
   id: string;
+  cpsoNumber?: string;
   fullName: string;
   clinicName: string;
   address: string;
@@ -31,6 +32,7 @@ export interface Doctor {
 export function mapDoctorRowToDoctor(row: DoctorRow): Doctor {
   return {
     id: row.id,
+    cpsoNumber: (row as DoctorRow & { cpso_number?: string }).cpso_number || undefined,
     fullName: row.full_name,
     clinicName: row.clinic_name,
     address: row.address,

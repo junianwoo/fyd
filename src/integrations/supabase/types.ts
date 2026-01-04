@@ -92,6 +92,7 @@ export type Database = {
           claimed_by_doctor: boolean | null
           clinic_name: string
           community_report_count: number | null
+          cpso_number: string | null
           created_at: string | null
           email: string | null
           full_name: string
@@ -119,6 +120,7 @@ export type Database = {
           claimed_by_doctor?: boolean | null
           clinic_name: string
           community_report_count?: number | null
+          cpso_number?: string | null
           created_at?: string | null
           email?: string | null
           full_name: string
@@ -146,6 +148,7 @@ export type Database = {
           claimed_by_doctor?: boolean | null
           clinic_name?: string
           community_report_count?: number | null
+          cpso_number?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string
