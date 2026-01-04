@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
+// reCAPTCHA site key (v2 checkbox)
+const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key - replace with real key
+
+declare global {
+  interface Window {
+    grecaptcha: any;
+    onRecaptchaLoad: () => void;
+  }
+}
 
 export default function AssistedAccess() {
   const { toast } = useToast();
@@ -19,6 +29,48 @@ export default function AssistedAccess() {
   const [reason, setReason] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+  // Load reCAPTCHA script
+  useEffect(() => {
+    if (window.grecaptcha) {
+      setRecaptchaLoaded(true);
+      return;
+    }
+
+    window.onRecaptchaLoad = () => {
+      setRecaptchaLoaded(true);
+    };
+
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+
+    return () => {
+      window.onRecaptchaLoad = () => {};
+    };
+  }, []);
+
+  // Render reCAPTCHA widget
+  useEffect(() => {
+    if (recaptchaLoaded && window.grecaptcha?.render) {
+      try {
+        const container = document.getElementById("recaptcha-container");
+        if (container && !container.hasChildNodes()) {
+          window.grecaptcha.render("recaptcha-container", {
+            sitekey: RECAPTCHA_SITE_KEY,
+            callback: (token: string) => setRecaptchaToken(token),
+            "expired-callback": () => setRecaptchaToken(null),
+          });
+        }
+      } catch (e) {
+        console.log("reCAPTCHA already rendered");
+      }
+    }
+  }, [recaptchaLoaded]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +84,35 @@ export default function AssistedAccess() {
       return;
     }
 
+    if (!recaptchaToken) {
+      toast({
+        title: "Please complete the reCAPTCHA",
+        description: "This helps us prevent spam submissions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Verify reCAPTCHA
+      const { data: recaptchaResult, error: recaptchaError } = await supabase.functions.invoke("verify-recaptcha", {
+        body: { token: recaptchaToken },
+      });
+
+      if (recaptchaError || !recaptchaResult?.success) {
+        toast({
+          title: "reCAPTCHA verification failed",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        window.grecaptcha?.reset();
+        setRecaptchaToken(null);
+        return;
+      }
+
       // Check if user exists
       const { data: existingProfile } = await supabase
         .from("profiles")
@@ -210,7 +288,16 @@ export default function AssistedAccess() {
                   </Label>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading || !confirmed}>
+                {/* reCAPTCHA */}
+                <div className="space-y-2">
+                  <div id="recaptcha-container" className="flex justify-center"></div>
+                  <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                    <Shield className="h-3 w-3" />
+                    Protected by reCAPTCHA
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={loading || !confirmed || !recaptchaToken}>
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
