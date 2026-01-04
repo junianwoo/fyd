@@ -10,13 +10,17 @@ import {
   Clock,
   HelpCircle,
   Edit,
-  ExternalLink
+  ExternalLink,
+  Save,
+  X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -32,8 +36,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
 type Doctor = Database["public"]["Tables"]["doctors"]["Row"];
 type AcceptingStatus = Database["public"]["Enums"]["accepting_status"];
@@ -43,6 +56,9 @@ export default function AdminDoctors() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AcceptingStatus | "all">("all");
+  const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Doctor>>({});
+  const [saving, setSaving] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     accepting: 0,
@@ -78,6 +94,49 @@ export default function AdminDoctors() {
     }
     
     setLoading(false);
+  };
+
+  const openEditDialog = (doctor: Doctor) => {
+    setEditingDoctor(doctor);
+    setEditForm({
+      full_name: doctor.full_name,
+      clinic_name: doctor.clinic_name,
+      address: doctor.address,
+      city: doctor.city,
+      province: doctor.province,
+      postal_code: doctor.postal_code,
+      phone: doctor.phone,
+      email: doctor.email,
+      website: doctor.website,
+      accepting_status: doctor.accepting_status,
+      virtual_appointments: doctor.virtual_appointments,
+    });
+  };
+
+  const handleSaveDoctor = async () => {
+    if (!editingDoctor) return;
+    
+    setSaving(true);
+    
+    const { error } = await supabase
+      .from("doctors")
+      .update({
+        ...editForm,
+        status_last_updated_at: new Date().toISOString(),
+        status_verified_by: "doctor" as const,
+      })
+      .eq("id", editingDoctor.id);
+
+    if (error) {
+      toast.error("Failed to update doctor");
+      console.error(error);
+    } else {
+      toast.success("Doctor updated successfully");
+      setEditingDoctor(null);
+      loadDoctors();
+    }
+    
+    setSaving(false);
   };
 
   const filteredDoctors = doctors.filter((doctor) => {
@@ -279,6 +338,13 @@ export default function AdminDoctors() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => openEditDialog(doctor)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" asChild>
                           <Link to={`/doctors/${doctor.id}`} target="_blank">
                             <ExternalLink className="h-4 w-4" />
@@ -298,6 +364,154 @@ export default function AdminDoctors() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Doctor Dialog */}
+      <Dialog open={!!editingDoctor} onOpenChange={() => setEditingDoctor(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Doctor / Clinic</DialogTitle>
+            <DialogDescription>
+              Update doctor information and accepting status.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Doctor Name</Label>
+                <Input
+                  id="full_name"
+                  value={editForm.full_name || ""}
+                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="clinic_name">Clinic Name</Label>
+                <Input
+                  id="clinic_name"
+                  value={editForm.clinic_name || ""}
+                  onChange={(e) => setEditForm({ ...editForm, clinic_name: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                value={editForm.address || ""}
+                onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={editForm.city || ""}
+                  onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="province">Province</Label>
+                <Input
+                  id="province"
+                  value={editForm.province || ""}
+                  onChange={(e) => setEditForm({ ...editForm, province: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="postal_code">Postal Code</Label>
+                <Input
+                  id="postal_code"
+                  value={editForm.postal_code || ""}
+                  onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                  id="phone"
+                  value={editForm.phone || ""}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={editForm.email || ""}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={editForm.website || ""}
+                onChange={(e) => setEditForm({ ...editForm, website: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="accepting_status">Accepting Status</Label>
+                <Select
+                  value={editForm.accepting_status}
+                  onValueChange={(value) => setEditForm({ ...editForm, accepting_status: value as AcceptingStatus })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="accepting">Accepting</SelectItem>
+                    <SelectItem value="not_accepting">Not Accepting</SelectItem>
+                    <SelectItem value="waitlist">Waitlist</SelectItem>
+                    <SelectItem value="unknown">Unknown</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="virtual">Virtual Appointments</Label>
+                <Select
+                  value={editForm.virtual_appointments ? "yes" : "no"}
+                  onValueChange={(value) => setEditForm({ ...editForm, virtual_appointments: value === "yes" })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Yes</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingDoctor(null)}>
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleSaveDoctor} disabled={saving}>
+              {saving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
