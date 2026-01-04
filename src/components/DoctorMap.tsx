@@ -31,8 +31,7 @@ const statusColors: Record<string, string> = {
 export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className = "" }: DoctorMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -71,7 +70,7 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
 
     const script = document.createElement("script");
     script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initGoogleMaps&libraries=marker`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initGoogleMaps`;
     script.async = true;
     script.defer = true;
     script.onerror = () => {
@@ -141,10 +140,10 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
 
   // Update markers when doctors change
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.google?.maps?.marker) return;
+    if (!mapInstanceRef.current || !window.google?.maps) return;
 
     // Clear existing markers
-    markersRef.current.forEach(marker => marker.map = null);
+    markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
     if (doctors.length === 0) return;
@@ -155,47 +154,27 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
       const position = { lat: doctor.latitude, lng: doctor.longitude };
       bounds.extend(position);
 
-      // Create custom marker element with brand styling
-      const markerElement = document.createElement("div");
-      markerElement.className = "doctor-marker";
       const isSelected = selectedDoctorId === doctor.id;
       const markerColor = statusColors[doctor.acceptingStatus] || statusColors.unknown;
-      
-      markerElement.style.cssText = `
-        width: ${isSelected ? "40px" : "32px"};
-        height: ${isSelected ? "40px" : "32px"};
-        background-color: ${markerColor};
-        border: 3px solid ${isSelected ? "#0F4C5C" : "white"};
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 3px 8px rgba(15, 76, 92, 0.35);
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        ${isSelected ? "z-index: 100;" : ""}
-      `;
 
-      markerElement.addEventListener("mouseenter", () => {
-        if (!isSelected) {
-          markerElement.style.width = "36px";
-          markerElement.style.height = "36px";
-          markerElement.style.boxShadow = "0 4px 12px rgba(15, 76, 92, 0.45)";
-        }
-      });
-      markerElement.addEventListener("mouseleave", () => {
-        if (!isSelected) {
-          markerElement.style.width = "32px";
-          markerElement.style.height = "32px";
-          markerElement.style.boxShadow = "0 3px 8px rgba(15, 76, 92, 0.35)";
-        }
-      });
+      // Create SVG icon for the marker
+      const size = isSelected ? 40 : 32;
+      const svgIcon = {
+        url: `data:image/svg+xml,${encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 2}" fill="${markerColor}" stroke="${isSelected ? '#0F4C5C' : 'white'}" stroke-width="3"/>
+          </svg>
+        `)}`,
+        scaledSize: new window.google.maps.Size(size, size),
+        anchor: new window.google.maps.Point(size/2, size/2),
+      };
 
-      const marker = new window.google.maps.marker.AdvancedMarkerElement({
+      const marker = new window.google.maps.Marker({
         map: mapInstanceRef.current,
         position,
-        content: markerElement,
+        icon: svgIcon,
         title: doctor.fullName,
+        zIndex: isSelected ? 100 : 1,
       });
 
       marker.addListener("click", () => {
