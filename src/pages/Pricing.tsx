@@ -85,7 +85,7 @@ export default function Pricing() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Pricing
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -185,7 +185,7 @@ export default function Pricing() {
       {/* FAQ Section */}
       <section className="bg-background-alt py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary text-center mb-12">
+          <h2 className="text-3xl text-primary text-center mb-12">
             Frequently Asked Questions
           </h2>
           
@@ -197,7 +197,7 @@ export default function Pricing() {
                   value={`item-${index}`}
                   className="bg-card border border-border rounded-lg px-6"
                 >
-                  <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <AccordionTrigger className="text-left hover:no-underline">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">

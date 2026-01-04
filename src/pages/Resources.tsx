@@ -61,7 +61,7 @@ export default function Resources() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Resources
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -86,7 +86,7 @@ export default function Resources() {
                           {article.readTime}
                         </span>
                       </div>
-                      <h2 className="text-xl font-semibold text-foreground mb-2 hover:text-primary transition-colors">
+                      <h2 className="text-xl text-foreground mb-2 hover:text-primary transition-colors">
                         <Link to={`/resources/${article.id}`}>
                           {article.title}
                         </Link>
@@ -117,7 +117,7 @@ export default function Resources() {
       {/* CTA */}
       <section className="bg-background-alt py-16 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-primary mb-4">
+          <h2 className="text-2xl text-primary mb-4">
             Ready to Find Your Doctor?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">

@@ -38,7 +38,7 @@ export default function Contact() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Contact Us
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -57,7 +57,7 @@ export default function Contact() {
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 mb-4">
                   <Mail className="h-6 w-6 text-secondary" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Email Us Directly</h3>
+                <h3 className="text-lg text-foreground mb-2">Email Us Directly</h3>
                 <a 
                   href="mailto:support@findyourdoctor.ca"
                   className="text-secondary hover:text-primary transition-colors"
@@ -68,7 +68,7 @@ export default function Contact() {
 
               {/* FAQ Link */}
               <div className="p-6 bg-background-alt rounded-xl">
-                <h3 className="text-lg font-semibold text-foreground mb-2">Check Our FAQ</h3>
+                <h3 className="text-lg text-foreground mb-2">Check Our FAQ</h3>
                 <p className="text-muted-foreground mb-4">
                   Many common questions are already answered.
                 </p>

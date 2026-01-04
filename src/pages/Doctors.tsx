@@ -165,7 +165,7 @@ export default function Doctors() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-foreground">
+                            <h3 className="text-lg text-foreground">
                               {doctor.fullName}
                             </h3>
                             {/* Status Badge - Desktop */}
@@ -244,7 +244,7 @@ export default function Doctors() {
 
         {/* Bottom CTA */}
         <div className="mt-12 p-8 bg-background-alt rounded-xl text-center">
-          <h3 className="text-xl font-semibold text-foreground mb-2">
+          <h3 className="text-xl text-foreground mb-2">
             Not finding what you need?
           </h3>
           <p className="text-muted-foreground mb-6">

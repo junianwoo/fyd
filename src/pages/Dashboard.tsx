@@ -243,7 +243,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+            <h1 className="text-3xl text-foreground">Dashboard</h1>
             <p className="text-muted-foreground">
               Welcome back, {user?.email}
             </p>
@@ -262,7 +262,7 @@ export default function Dashboard() {
                 <div className="flex items-start gap-4">
                   <AlertCircle className="h-6 w-6 text-accent flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-foreground">Alerts Paused</h3>
+                    <h3 className="text-foreground">Alerts Paused</h3>
                     <p className="text-sm text-muted-foreground">
                       Subscribe to the Alert Service to receive email notifications when doctors start accepting patients.
                     </p>

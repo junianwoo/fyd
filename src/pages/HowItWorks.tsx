@@ -29,7 +29,7 @@ export default function HowItWorks() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             How It Works
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -63,10 +63,10 @@ export default function HowItWorks() {
 
                 {/* Content */}
                 <div className="flex-1 text-center md:text-left">
-                  <span className="text-5xl font-bold text-muted-foreground/20">
+                  <span className="text-5xl text-muted-foreground/20">
                     {step.number}
                   </span>
-                  <h2 className="text-2xl md:text-3xl font-bold text-primary mt-2 mb-4">
+                  <h2 className="text-2xl md:text-3xl text-primary mt-2 mb-4">
                     {step.title}
                   </h2>
                   <p className="text-lg text-muted-foreground">
@@ -82,7 +82,7 @@ export default function HowItWorks() {
       {/* CTA */}
       <section className="bg-background-alt py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-3xl md:text-4xl text-primary mb-4">
             Ready to Find Your Doctor?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">

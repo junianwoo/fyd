@@ -79,7 +79,7 @@ export default function DoctorDetails() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Doctor Not Found</h1>
+          <h1 className="text-2xl text-foreground mb-4">Doctor Not Found</h1>
           <p className="text-muted-foreground mb-6">The doctor you're looking for doesn't exist.</p>
           <Button asChild>
             <Link to="/doctors">Back to Search</Link>
@@ -182,7 +182,7 @@ export default function DoctorDetails() {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
             <div>
               <StatusBadge status={doctor.acceptingStatus} size="lg" className="mb-4" />
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              <h1 className="text-3xl md:text-4xl text-foreground mb-2">
                 {doctor.fullName}
               </h1>
               <p className="text-lg text-muted-foreground">{doctor.clinicName}</p>
@@ -419,7 +419,7 @@ export default function DoctorDetails() {
             {/* CTA Card */}
             <Card className="bg-background-alt border-secondary/20">
               <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-2">
+                <h3 className="text-foreground mb-2">
                   Get Alerts for This Area
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -435,7 +435,7 @@ export default function DoctorDetails() {
             {!doctor.claimedByDoctor && (
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                  <h3 className="text-foreground mb-2 flex items-center gap-2">
                     <Building2 className="h-4 w-4" />
                     Is this your clinic?
                   </h3>

@@ -180,7 +180,7 @@ export default function ClaimVerify() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <XCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-2">Verification Failed</h1>
+          <h1 className="text-2xl text-foreground mb-2">Verification Failed</h1>
           <p className="text-muted-foreground mb-6">{error}</p>
           <Button onClick={() => navigate("/doctors")}>
             Back to Directory
@@ -195,7 +195,7 @@ export default function ClaimVerify() {
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="text-center mb-8">
           <CheckCircle className="h-12 w-12 text-status-accepting mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-3xl text-foreground mb-2">
             Verify & Update Your Listing
           </h1>
           <p className="text-muted-foreground">
