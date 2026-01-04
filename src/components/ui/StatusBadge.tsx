@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
+import type { Database } from "@/integrations/supabase/types";
 
-export type DoctorStatus = "accepting" | "not_accepting" | "waitlist" | "unknown";
+export type DoctorStatus = Database["public"]["Enums"]["accepting_status"];
 
 interface StatusBadgeProps {
   status: DoctorStatus;

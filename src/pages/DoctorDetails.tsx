@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, 
@@ -13,7 +13,8 @@ import {
   Video, 
   CheckCircle,
   ArrowLeft,
-  Flag
+  Flag,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,18 +35,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusBadge, DoctorStatus } from "@/components/ui/StatusBadge";
-import { getDoctorById } from "@/data/mockDoctors";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { fetchDoctorById, submitCommunityReport, Doctor, DoctorStatus } from "@/lib/doctors";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DoctorDetails() {
   const { id } = useParams<{ id: string }>();
-  const doctor = getDoctorById(id || "");
   const { toast } = useToast();
   
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [loading, setLoading] = useState(true);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportStatus, setReportStatus] = useState<DoctorStatus | "">("");
   const [reportDetails, setReportDetails] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const loadDoctor = async () => {
+      if (!id) return;
+      setLoading(true);
+      const data = await fetchDoctorById(id);
+      setDoctor(data);
+      setLoading(false);
+    };
+    loadDoctor();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+      </div>
+    );
+  }
 
   if (!doctor) {
     return (
@@ -70,7 +92,7 @@ export default function DoctorDetails() {
     });
   };
 
-  const handleSubmitReport = () => {
+  const handleSubmitReport = async () => {
     if (!reportStatus) {
       toast({
         title: "Please select a status",
@@ -79,13 +101,29 @@ export default function DoctorDetails() {
       return;
     }
 
-    toast({
-      title: "Thank you for your update!",
-      description: "Your report has been submitted and will help keep this listing accurate.",
-    });
-    setReportDialogOpen(false);
-    setReportStatus("");
-    setReportDetails("");
+    setSubmitting(true);
+    const success = await submitCommunityReport(doctor.id, reportStatus as DoctorStatus, reportDetails);
+    setSubmitting(false);
+
+    if (success) {
+      toast({
+        title: "Thank you for your update!",
+        description: "Your report has been submitted and will help keep this listing accurate.",
+      });
+      setReportDialogOpen(false);
+      setReportStatus("");
+      setReportDetails("");
+      
+      // Reload doctor data
+      const updatedDoctor = await fetchDoctorById(doctor.id);
+      if (updatedDoctor) setDoctor(updatedDoctor);
+    } else {
+      toast({
+        title: "Error submitting report",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -160,8 +198,15 @@ export default function DoctorDetails() {
                   <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleSubmitReport}>
-                    Submit Update
+                  <Button onClick={handleSubmitReport} disabled={submitting}>
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit Update"
+                    )}
                   </Button>
                 </div>
               </DialogContent>
@@ -323,7 +368,7 @@ export default function DoctorDetails() {
                       Updated {formatDate(doctor.statusLastUpdatedAt)}
                     </p>
                     <p className="text-foreground mt-1">
-                      Status changed to "{doctor.acceptingStatus.replace("_", " ")}"
+                      Status: "{doctor.acceptingStatus.replace("_", " ")}"
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground">

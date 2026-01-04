@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { MapPin, Phone, Calendar, ExternalLink, Filter } from "lucide-react";
+import { MapPin, Phone, Calendar, ExternalLink, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { StatusBadge, DoctorStatus } from "@/components/ui/StatusBadge";
-import { mockDoctors, searchDoctors, filterDoctors } from "@/data/mockDoctors";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { fetchDoctors, searchDoctors, Doctor, DoctorStatus } from "@/lib/doctors";
 
 export default function Doctors() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,12 +20,25 @@ export default function Doctors() {
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<DoctorStatus | "all">("all");
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+      setLoading(true);
+      const data = searchQuery 
+        ? await searchDoctors(searchQuery)
+        : await fetchDoctors();
+      setDoctors(data);
+      setLoading(false);
+    };
+    loadDoctors();
+  }, [searchQuery]);
 
   const filteredDoctors = useMemo(() => {
-    let doctors = searchQuery ? searchDoctors(searchQuery) : mockDoctors;
-    doctors = filterDoctors(doctors, statusFilter);
-    return doctors;
-  }, [searchQuery, statusFilter]);
+    if (!statusFilter || statusFilter === "all") return doctors;
+    return doctors.filter((doctor) => doctor.acceptingStatus === statusFilter);
+  }, [doctors, statusFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,102 +114,117 @@ export default function Doctors() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <p className="text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredDoctors.length}</span> doctors
-            {searchQuery && (
-              <span> for "{searchQuery}"</span>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading doctors...
+              </span>
+            ) : (
+              <>
+                Showing <span className="font-semibold text-foreground">{filteredDoctors.length}</span> doctors
+                {searchQuery && (
+                  <span> for "{searchQuery}"</span>
+                )}
+              </>
             )}
           </p>
         </div>
 
-        <div className="grid gap-4">
-          {filteredDoctors.map((doctor) => (
-            <Card key={doctor.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row">
-                  {/* Status Badge - Mobile */}
-                  <div className="p-4 md:hidden">
-                    <StatusBadge status={doctor.acceptingStatus} />
-                  </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {filteredDoctors.map((doctor) => (
+              <Card key={doctor.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardContent className="p-0">
+                  <div className="flex flex-col md:flex-row">
+                    {/* Status Badge - Mobile */}
+                    <div className="p-4 md:hidden">
+                      <StatusBadge status={doctor.acceptingStatus} />
+                    </div>
 
-                  {/* Main Content */}
-                  <div className="flex-1 p-4 md:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {doctor.fullName}
-                          </h3>
-                          {/* Status Badge - Desktop */}
-                          <div className="hidden md:block">
-                            <StatusBadge status={doctor.acceptingStatus} size="sm" />
+                    {/* Main Content */}
+                    <div className="flex-1 p-4 md:p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold text-foreground">
+                              {doctor.fullName}
+                            </h3>
+                            {/* Status Badge - Desktop */}
+                            <div className="hidden md:block">
+                              <StatusBadge status={doctor.acceptingStatus} size="sm" />
+                            </div>
+                          </div>
+                          <p className="text-muted-foreground mb-3">{doctor.clinicName}</p>
+                          
+                          <div className="flex flex-col gap-2 text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <MapPin className="h-4 w-4 flex-shrink-0" />
+                              <span>{doctor.address}, {doctor.city}, {doctor.province} {doctor.postalCode}</span>
+                            </div>
+                            <a 
+                              href={`tel:${doctor.phone.replace(/[^0-9]/g, "")}`}
+                              className="flex items-center gap-2 text-secondary hover:text-primary transition-colors"
+                            >
+                              <Phone className="h-4 w-4 flex-shrink-0" />
+                              <span>{doctor.phone}</span>
+                            </a>
+                          </div>
+
+                          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>Updated {formatDate(doctor.statusLastUpdatedAt)}</span>
+                            </div>
+                            <span>
+                              Verified by {doctor.statusVerifiedBy === "doctor" ? "Doctor ✓" : "Community"}
+                            </span>
                           </div>
                         </div>
-                        <p className="text-muted-foreground mb-3">{doctor.clinicName}</p>
-                        
-                        <div className="flex flex-col gap-2 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="h-4 w-4 flex-shrink-0" />
-                            <span>{doctor.address}, {doctor.city}, {doctor.province} {doctor.postalCode}</span>
-                          </div>
-                          <a 
-                            href={`tel:${doctor.phone.replace(/[^0-9]/g, "")}`}
-                            className="flex items-center gap-2 text-secondary hover:text-primary transition-colors"
-                          >
-                            <Phone className="h-4 w-4 flex-shrink-0" />
-                            <span>{doctor.phone}</span>
-                          </a>
-                        </div>
 
-                        <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Updated {formatDate(doctor.statusLastUpdatedAt)}</span>
-                          </div>
-                          <span>
-                            Verified by {doctor.statusVerifiedBy === "doctor" ? "Doctor ✓" : "Community"}
-                          </span>
+                        <div className="hidden md:block">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/doctors/${doctor.id}`}>
+                              View Details
+                              <ExternalLink className="h-3 w-3 ml-2" />
+                            </Link>
+                          </Button>
                         </div>
-                      </div>
-
-                      <div className="hidden md:block">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/doctors/${doctor.id}`}>
-                            View Details
-                            <ExternalLink className="h-3 w-3 ml-2" />
-                          </Link>
-                        </Button>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Mobile View Details Button */}
-                  <div className="p-4 pt-0 md:hidden">
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link to={`/doctors/${doctor.id}`}>
-                        View Details
-                      </Link>
-                    </Button>
+                    {/* Mobile View Details Button */}
+                    <div className="p-4 pt-0 md:hidden">
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link to={`/doctors/${doctor.id}`}>
+                          View Details
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
 
-          {filteredDoctors.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-lg text-muted-foreground mb-4">
-                No doctors found matching your search.
-              </p>
-              <Button variant="outline" onClick={() => {
-                setSearchQuery("");
-                setStatusFilter("all");
-                setSearchParams({});
-              }}>
-                Clear Filters
-              </Button>
-            </div>
-          )}
-        </div>
+            {filteredDoctors.length === 0 && !loading && (
+              <div className="text-center py-16">
+                <p className="text-lg text-muted-foreground mb-4">
+                  No doctors found matching your search.
+                </p>
+                <Button variant="outline" onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                  setSearchParams({});
+                }}>
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Bottom CTA */}
         <div className="mt-12 p-8 bg-background-alt rounded-xl text-center">
