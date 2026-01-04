@@ -147,10 +147,6 @@ export default function ResourceDetail() {
             <h1 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
               {resource.title}
             </h1>
-            
-            <h1 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
-              {resource.title}
-            </h1>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
