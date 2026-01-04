@@ -12,6 +12,7 @@ const categories = [
   "Success Stories",
   "Healthcare News",
   "Product Updates",
+  "General Topics",
 ];
 
 export default function Resources() {
