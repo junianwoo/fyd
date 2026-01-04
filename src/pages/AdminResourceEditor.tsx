@@ -236,16 +236,33 @@ export default function AdminResourceEditor() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="content">Content</Label>
-                  <Textarea
-                    id="content"
-                    value={formData.content || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                    placeholder="Full article content (supports basic markdown)"
-                    rows={15}
-                  />
-                </div>
+                {formData.category === "Healthcare News" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="content">External Article URL *</Label>
+                    <Input
+                      id="content"
+                      type="url"
+                      value={formData.content || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                      placeholder="https://example.com/article"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Link to the original article. Users will be directed to this URL.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="content">Content</Label>
+                    <Textarea
+                      id="content"
+                      value={formData.content || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                      placeholder="Full article content (supports markdown links)"
+                      rows={15}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
 
