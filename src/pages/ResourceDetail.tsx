@@ -5,6 +5,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fetchResourceBySlug, Resource } from "@/lib/resources";
 
+// Category color mapping using brand colors
+const getCategoryStyles = (category: string): string => {
+  switch (category) {
+    case "Healthcare News":
+      return "bg-secondary text-secondary-foreground"; // Bright Teal
+    case "How-To Guides":
+      return "bg-primary text-primary-foreground"; // Deep Teal
+    case "Success Stories":
+      return "bg-accent text-accent-foreground"; // Warm Orange
+    case "Product Updates":
+      return "bg-muted text-muted-foreground"; // Neutral gray
+    case "General Topics":
+      return "bg-primary/80 text-primary-foreground"; // Deep Teal variant
+    default:
+      return "bg-secondary text-secondary-foreground";
+  }
+};
+
 export default function ResourceDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [resource, setResource] = useState<Resource | null>(null);
@@ -116,13 +134,19 @@ export default function ResourceDetail() {
           <div className="max-w-3xl mx-auto">
             <Link 
               to="/resources" 
-              className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors"
+              className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Resources
             </Link>
 
-            <Badge variant="secondary" className="mb-4">{resource.category}</Badge>
+            <div className="mb-4">
+              <Badge className={getCategoryStyles(resource.category)}>{resource.category}</Badge>
+            </div>
+            
+            <h1 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
+              {resource.title}
+            </h1>
             
             <h1 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
               {resource.title}
