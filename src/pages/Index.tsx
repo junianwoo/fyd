@@ -2,12 +2,23 @@ import { Link } from "react-router-dom";
 import { Search, Users, Bell, ArrowRight, Heart, Clock, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/ui/SearchBar";
+import heroImage from "@/assets/hero-doctor.webp";
 
 export default function Index() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative bg-background py-20 md:py-32">
+      <section className="relative bg-background py-20 md:py-32 overflow-hidden">
+        {/* Hero background image */}
+        <div className="absolute inset-0 -z-10">
+          <img 
+            src={heroImage} 
+            alt="" 
+            className="w-full h-full object-cover opacity-15"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+        </div>
+        
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
@@ -21,10 +32,6 @@ export default function Index() {
               Search is always free. No signup required.
             </p>
           </div>
-        </div>
-        {/* Decorative gradient */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-secondary/5 blur-3xl" />
         </div>
       </section>
 
