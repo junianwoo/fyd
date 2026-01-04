@@ -98,18 +98,28 @@ export default function AdminResourceEditor() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.slug || !formData.excerpt) {
+    const isHealthcareNews = formData.category === "Healthcare News";
+    
+    if (!formData.title || !formData.slug || (!isHealthcareNews && !formData.excerpt)) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
+    
+    if (isHealthcareNews && !formData.content) {
+      toast({ title: "Please enter the external article URL", variant: "destructive" });
       return;
     }
 
     setSaving(true);
+    
+    // Use placeholder excerpt for Healthcare News
+    const excerptToSave = isHealthcareNews ? "External article" : formData.excerpt!;
 
     if (isNew) {
       const result = await createResource({
         title: formData.title!,
         slug: formData.slug!,
-        excerpt: formData.excerpt!,
+        excerpt: excerptToSave,
         content: formData.content || null,
         category: formData.category!,
         read_time: formData.read_time!,
@@ -224,17 +234,19 @@ export default function AdminResourceEditor() {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="excerpt">Excerpt *</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                    placeholder="Brief description shown in listings"
-                    rows={3}
-                    required
-                  />
-                </div>
+                {formData.category !== "Healthcare News" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="excerpt">Excerpt *</Label>
+                    <Textarea
+                      id="excerpt"
+                      value={formData.excerpt}
+                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                      placeholder="Brief description shown in listings"
+                      rows={3}
+                      required
+                    />
+                  </div>
+                )}
 
                 {formData.category === "Healthcare News" ? (
                   <div className="space-y-2">

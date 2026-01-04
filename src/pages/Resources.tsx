@@ -213,7 +213,7 @@ export default function Resources() {
                             )}
                           </h2>
                           <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                            {resource.excerpt}
+                            {isExternalNews ? "Click the link for more details." : resource.excerpt}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
