@@ -33,6 +33,59 @@ export default function ResourceDetail() {
     });
   };
 
+  // Parse text to convert markdown links [text](url) and plain URLs into clickable links
+  const parseLinks = (text: string) => {
+    const parts: (string | JSX.Element)[] = [];
+    // Match markdown links [text](url) or plain URLs
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)|(https?:\/\/[^\s]+)/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      if (match[1] && match[2]) {
+        // Markdown link: [text](url)
+        parts.push(
+          <a
+            key={match.index}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-secondary hover:text-secondary/80 underline"
+          >
+            {match[1]}
+          </a>
+        );
+      } else if (match[3]) {
+        // Plain URL
+        parts.push(
+          <a
+            key={match.index}
+            href={match[3]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-secondary hover:text-secondary/80 underline break-all"
+          >
+            {match[3]}
+          </a>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -104,7 +157,7 @@ export default function ResourceDetail() {
                 {resource.content.split('\n').map((paragraph, index) => (
                   paragraph.trim() && (
                     <p key={index} className="text-foreground mb-4 leading-relaxed">
-                      {paragraph}
+                      {parseLinks(paragraph)}
                     </p>
                   )
                 ))}
