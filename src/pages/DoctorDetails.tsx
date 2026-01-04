@@ -14,12 +14,15 @@ import {
   CheckCircle,
   ArrowLeft,
   Flag,
-  Loader2
+  Loader2,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { fetchDoctorById, submitCommunityReport, Doctor, DoctorStatus } from "@/lib/doctors";
+import { fetchDoctorById, submitCommunityReport, claimListing, Doctor, DoctorStatus } from "@/lib/doctors";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DoctorDetails() {
@@ -46,9 +49,12 @@ export default function DoctorDetails() {
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [loading, setLoading] = useState(true);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [claimDialogOpen, setClaimDialogOpen] = useState(false);
   const [reportStatus, setReportStatus] = useState<DoctorStatus | "">("");
   const [reportDetails, setReportDetails] = useState("");
+  const [claimEmail, setClaimEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [claiming, setClaiming] = useState(false);
 
   useEffect(() => {
     const loadDoctor = async () => {
@@ -102,13 +108,13 @@ export default function DoctorDetails() {
     }
 
     setSubmitting(true);
-    const success = await submitCommunityReport(doctor.id, reportStatus as DoctorStatus, reportDetails);
+    const result = await submitCommunityReport(doctor.id, reportStatus as DoctorStatus, reportDetails);
     setSubmitting(false);
 
-    if (success) {
+    if (result.success) {
       toast({
         title: "Thank you for your update!",
-        description: "Your report has been submitted and will help keep this listing accurate.",
+        description: result.message,
       });
       setReportDialogOpen(false);
       setReportStatus("");
@@ -120,7 +126,36 @@ export default function DoctorDetails() {
     } else {
       toast({
         title: "Error submitting report",
-        description: "Please try again later.",
+        description: result.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleClaimListing = async () => {
+    if (!claimEmail || !claimEmail.includes("@")) {
+      toast({
+        title: "Please enter a valid email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setClaiming(true);
+    const result = await claimListing(doctor.id, claimEmail);
+    setClaiming(false);
+
+    if (result.success) {
+      toast({
+        title: "Verification email sent!",
+        description: "Check your inbox for a link to claim this listing.",
+      });
+      setClaimDialogOpen(false);
+      setClaimEmail("");
+    } else {
+      toast({
+        title: "Error sending verification",
+        description: result.message,
         variant: "destructive",
       });
     }
@@ -400,15 +435,59 @@ export default function DoctorDetails() {
             {!doctor.claimedByDoctor && (
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2">
+                  <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
                     Is this your clinic?
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Claim this listing to keep it accurate and verified.
                   </p>
-                  <Button variant="outline" className="w-full">
-                    Claim This Listing
-                  </Button>
+                  <Dialog open={claimDialogOpen} onOpenChange={setClaimDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Claim This Listing
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Claim Your Listing</DialogTitle>
+                        <DialogDescription>
+                          Enter your clinic email to receive a verification link. 
+                          This helps us ensure only authorized staff can update listings.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="claim-email">Work Email</Label>
+                          <Input
+                            id="claim-email"
+                            type="email"
+                            placeholder="clinic@example.com"
+                            value={claimEmail}
+                            onChange={(e) => setClaimEmail(e.target.value)}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            We'll send a verification link that expires in 24 hours.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-3">
+                        <Button variant="outline" onClick={() => setClaimDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handleClaimListing} disabled={claiming}>
+                          {claiming ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            "Send Verification Email"
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             )}

@@ -19,6 +19,7 @@ import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AssistedAccess from "./pages/AssistedAccess";
+import ClaimVerify from "./pages/ClaimVerify";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/signup" element={<Auth />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assisted-access" element={<AssistedAccess />} />
+                <Route path="/claim-verify" element={<ClaimVerify />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
