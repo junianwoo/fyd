@@ -97,11 +97,11 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
     // Parks - Slightly lighter teal variant
     { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#1A5F6F" }] },
     
-    // Roads - White with subtle styling
-    { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
+    // Roads - Very light teal for softer contrast
+    { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#E8F6F5" }] },
     { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#00A6A6" }, { weight: 1 }] },
-    { featureType: "road.arterial", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
-    { featureType: "road.local", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
+    { featureType: "road.arterial", elementType: "geometry.fill", stylers: [{ color: "#E8F6F5" }] },
+    { featureType: "road.local", elementType: "geometry.fill", stylers: [{ color: "#D6F0EE" }] },
     
     // Labels - Light text for dark background
     { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#F3FBFA" }] },
