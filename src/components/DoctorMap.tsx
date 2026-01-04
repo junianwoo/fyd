@@ -86,16 +86,16 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
 
   // Custom map styles based on FindYourDoctor brand colors
   const brandMapStyles: google.maps.MapTypeStyle[] = [
-    // Water - Primary teal
-    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#0F4C5C" }] },
-    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#F3FBFA" }] },
+    // Water - Lighter Bright Teal
+    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#00A6A6" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#FFFFFF" }] },
     
-    // Land/landscape - Light teal background  
-    { featureType: "landscape", elementType: "geometry.fill", stylers: [{ color: "#F3FBFA" }] },
-    { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#E8F6F5" }] },
+    // Land/landscape - Deeper teal (primary)
+    { featureType: "landscape", elementType: "geometry.fill", stylers: [{ color: "#0F4C5C" }] },
+    { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#0D4350" }] },
     
-    // Parks - Soft teal green
-    { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#C5E8E5" }] },
+    // Parks - Slightly lighter teal variant
+    { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#1A5F6F" }] },
     
     // Roads - White with subtle styling
     { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
@@ -103,20 +103,20 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
     { featureType: "road.arterial", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
     { featureType: "road.local", elementType: "geometry.fill", stylers: [{ color: "#FFFFFF" }] },
     
-    // Labels - Text color matching brand
-    { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#102A43" }] },
-    { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#FFFFFF" }, { weight: 2 }] },
+    // Labels - Light text for dark background
+    { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#F3FBFA" }] },
+    { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#0F4C5C" }, { weight: 2 }] },
     
-    // POI - Subtle styling
-    { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#D6F0EE" }] },
+    // POI - Subtle styling on dark background
+    { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#14545F" }] },
     { featureType: "poi.business", stylers: [{ visibility: "off" }] },
     { featureType: "poi.medical", elementType: "geometry.fill", stylers: [{ color: "#00A6A6" }] },
     
-    // Transit - Secondary teal
-    { featureType: "transit", elementType: "geometry.fill", stylers: [{ color: "#B8E0DD" }] },
+    // Transit - Mid-tone teal
+    { featureType: "transit", elementType: "geometry.fill", stylers: [{ color: "#1A5F6F" }] },
     
     // Administrative boundaries
-    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#0F4C5C" }, { weight: 0.5 }] },
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#00A6A6" }, { weight: 0.5 }] },
   ];
 
   // Initialize map
