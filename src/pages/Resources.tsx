@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Clock, Search } from "lucide-react";
+import { ArrowRight, Clock, Search, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { fetchResources, Resource } from "@/lib/resources";
 
 const categories = [
   "All Resources",
@@ -13,75 +14,22 @@ const categories = [
   "Product Updates",
 ];
 
-const articles = [
-  {
-    id: "1",
-    title: "What to Know When Searching for a Family Doctor in Ontario",
-    excerpt: "A comprehensive guide to finding a family doctor, including where to look, what to ask, and how to improve your chances.",
-    category: "How-To Guides",
-    readTime: "5 min read",
-    date: "2026-01-03",
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "Understanding the Ontario Doctor Shortage: Facts and Figures",
-    excerpt: "Why 2.5 million Ontarians are without a family doctor, and what factors are contributing to the ongoing crisis.",
-    category: "Healthcare News",
-    readTime: "7 min read",
-    date: "2026-01-02",
-    featured: true,
-  },
-  {
-    id: "3",
-    title: "Walk-In Clinics vs Family Doctors: What's the Difference?",
-    excerpt: "Understanding when to use walk-in clinics and why having a family doctor matters for your long-term health.",
-    category: "How-To Guides",
-    readTime: "4 min read",
-    date: "2025-12-28",
-    featured: false,
-  },
-  {
-    id: "4",
-    title: "Virtual Care in Ontario: Your Options Explained",
-    excerpt: "A guide to virtual healthcare options available to Ontarians, including telehealth services and online doctor consultations.",
-    category: "How-To Guides",
-    readTime: "6 min read",
-    date: "2025-12-20",
-    featured: false,
-  },
-  {
-    id: "5",
-    title: "Health Care Connect: How It Works (And Why It Often Doesn't)",
-    excerpt: "An honest look at Ontario's official patient referral program, including wait times and what to realistically expect.",
-    category: "Healthcare News",
-    readTime: "5 min read",
-    date: "2025-12-15",
-    featured: false,
-  },
-  {
-    id: "6",
-    title: "How Sarah Found a Doctor After 3 Years Searching",
-    excerpt: "A Toronto mother's journey to finally finding a family doctor for her young family through community resources.",
-    category: "Success Stories",
-    readTime: "4 min read",
-    date: "2025-12-10",
-    featured: false,
-  },
-  {
-    id: "7",
-    title: "Introducing Assisted Access: Free Alerts for Those Who Need It",
-    excerpt: "We're launching a new program to ensure financial barriers don't prevent anyone from accessing our Alert Service.",
-    category: "Product Updates",
-    readTime: "3 min read",
-    date: "2025-12-05",
-    featured: false,
-  },
-];
-
 export default function Resources() {
   const [selectedCategory, setSelectedCategory] = useState("All Resources");
   const [searchQuery, setSearchQuery] = useState("");
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadResources();
+  }, []);
+
+  const loadResources = async () => {
+    setLoading(true);
+    const data = await fetchResources(false); // Only fetch published resources
+    setResources(data);
+    setLoading(false);
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -92,15 +40,15 @@ export default function Resources() {
     });
   };
 
-  const filteredArticles = articles.filter((article) => {
-    const matchesCategory = selectedCategory === "All Resources" || article.category === selectedCategory;
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredResources = resources.filter((resource) => {
+    const matchesCategory = selectedCategory === "All Resources" || resource.category === selectedCategory;
+    const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const recentArticles = [...articles].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+  const recentResources = [...resources].sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   ).slice(0, 5);
 
   return (
@@ -158,20 +106,22 @@ export default function Resources() {
                 </div>
 
                 {/* Recent Resources - Desktop Only */}
-                <div className="hidden lg:block">
-                  <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Recent</h3>
-                  <div className="space-y-3">
-                    {recentArticles.map((article) => (
-                      <Link
-                        key={article.id}
-                        to={`/resources/${article.id}`}
-                        className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
-                      >
-                        {article.title}
-                      </Link>
-                    ))}
+                {recentResources.length > 0 && (
+                  <div className="hidden lg:block">
+                    <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Recent</h3>
+                    <div className="space-y-3">
+                      {recentResources.map((resource) => (
+                        <Link
+                          key={resource.id}
+                          to={`/resources/${resource.slug}`}
+                          className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
+                        >
+                          {resource.title}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </aside>
 
@@ -179,60 +129,77 @@ export default function Resources() {
             <div className="flex-1">
               {/* Results Count */}
               <p className="text-muted-foreground mb-6">
-                Showing <span className="font-semibold text-foreground">{filteredArticles.length}</span> resources
-                {selectedCategory !== "All Resources" && ` in ${selectedCategory}`}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading resources...
+                  </span>
+                ) : (
+                  <>
+                    Showing <span className="font-semibold text-foreground">{filteredResources.length}</span> resources
+                    {selectedCategory !== "All Resources" && ` in ${selectedCategory}`}
+                  </>
+                )}
               </p>
 
-              {/* Articles Grid */}
-              <div className="grid gap-6 md:grid-cols-2">
-                {filteredArticles.map((article) => (
-                  <Card key={article.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-3">
-                        <Badge variant="secondary">{article.category}</Badge>
-                        <span className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {article.readTime}
-                        </span>
-                      </div>
-                      <h2 className="text-lg text-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
-                        <Link to={`/resources/${article.id}`}>
-                          {article.title}
-                        </Link>
-                      </h2>
-                      <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                        {article.excerpt}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(article.date)}
-                        </span>
-                        <Link 
-                          to={`/resources/${article.id}`}
-                          className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
-                        >
-                          Read More <ArrowRight className="h-3 w-3 ml-1" />
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {filteredArticles.length === 0 && (
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+                </div>
+              ) : filteredResources.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground mb-4">
-                    No resources found matching your criteria.
+                    {resources.length === 0 
+                      ? "No resources available yet. Check back soon!"
+                      : "No resources found matching your criteria."
+                    }
                   </p>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory("All Resources");
-                      setSearchQuery("");
-                    }}
-                    className="text-secondary hover:text-primary transition-colors"
-                  >
-                    Clear filters
-                  </button>
+                  {resources.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory("All Resources");
+                        setSearchQuery("");
+                      }}
+                      className="text-secondary hover:text-primary transition-colors"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid gap-6 md:grid-cols-2">
+                  {filteredResources.map((resource) => (
+                    <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-3 mb-3">
+                          <Badge variant="secondary">{resource.category}</Badge>
+                          <span className="flex items-center text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {resource.read_time}
+                          </span>
+                        </div>
+                        <h2 className="text-lg text-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
+                          <Link to={`/resources/${resource.slug}`}>
+                            {resource.title}
+                          </Link>
+                        </h2>
+                        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                          {resource.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(resource.published_at || resource.created_at)}
+                          </span>
+                          <Link 
+                            to={`/resources/${resource.slug}`}
+                            className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
+                          >
+                            Read More <ArrowRight className="h-3 w-3 ml-1" />
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </div>

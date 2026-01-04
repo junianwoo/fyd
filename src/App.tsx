@@ -15,12 +15,15 @@ import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
+import ResourceDetail from "./pages/ResourceDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AssistedAccess from "./pages/AssistedAccess";
 import ClaimVerify from "./pages/ClaimVerify";
+import Admin from "./pages/Admin";
+import AdminResourceEditor from "./pages/AdminResourceEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +48,7 @@ const App = () => (
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/resources" element={<Resources />} />
+                <Route path="/resources/:slug" element={<ResourceDetail />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/auth" element={<Auth />} />
@@ -53,6 +57,8 @@ const App = () => (
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assisted-access" element={<AssistedAccess />} />
                 <Route path="/claim-verify" element={<ClaimVerify />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/resources/:id" element={<AdminResourceEditor />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
