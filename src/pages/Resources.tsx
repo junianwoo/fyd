@@ -41,6 +41,15 @@ export default function Resources() {
     });
   };
 
+  const extractDomain = (url: string): string => {
+    try {
+      const hostname = new URL(url).hostname;
+      return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+    } catch {
+      return url;
+    }
+  };
+
   const filteredResources = resources.filter((resource) => {
     const matchesCategory = selectedCategory === "All Resources" || resource.category === selectedCategory;
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -213,7 +222,9 @@ export default function Resources() {
                             )}
                           </h2>
                           <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                            {isExternalNews ? "Click the link for more details." : resource.excerpt}
+                            {isExternalNews ? (
+                              <span className="text-xs text-secondary">{extractDomain(resource.content!)}</span>
+                            ) : resource.excerpt}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
