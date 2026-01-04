@@ -14,7 +14,194 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alert_settings: {
+        Row: {
+          accessibility_required: boolean | null
+          city_postal: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          languages: string[] | null
+          radius_km: number | null
+          user_id: string
+        }
+        Insert: {
+          accessibility_required?: boolean | null
+          city_postal: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          radius_km?: number | null
+          user_id: string
+        }
+        Update: {
+          accessibility_required?: boolean | null
+          city_postal?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          radius_km?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_reports: {
+        Row: {
+          details: string | null
+          doctor_id: string
+          id: string
+          reported_at: string | null
+          reported_status: Database["public"]["Enums"]["accepting_status"]
+          reporter_ip: string | null
+        }
+        Insert: {
+          details?: string | null
+          doctor_id: string
+          id?: string
+          reported_at?: string | null
+          reported_status: Database["public"]["Enums"]["accepting_status"]
+          reporter_ip?: string | null
+        }
+        Update: {
+          details?: string | null
+          doctor_id?: string
+          id?: string
+          reported_at?: string | null
+          reported_status?: Database["public"]["Enums"]["accepting_status"]
+          reporter_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_reports_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          accepting_status: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features: string[] | null
+          address: string
+          age_groups_served: string[] | null
+          city: string
+          claimed_by_doctor: boolean | null
+          clinic_name: string
+          community_report_count: number | null
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          languages: string[] | null
+          latitude: number
+          longitude: number
+          phone: string
+          postal_code: string
+          profile_last_updated_at: string | null
+          province: string
+          status_last_updated_at: string | null
+          status_verified_by:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments: boolean | null
+          website: string | null
+        }
+        Insert: {
+          accepting_status?: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features?: string[] | null
+          address: string
+          age_groups_served?: string[] | null
+          city: string
+          claimed_by_doctor?: boolean | null
+          clinic_name: string
+          community_report_count?: number | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          languages?: string[] | null
+          latitude: number
+          longitude: number
+          phone: string
+          postal_code: string
+          profile_last_updated_at?: string | null
+          province?: string
+          status_last_updated_at?: string | null
+          status_verified_by?:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          accepting_status?: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features?: string[] | null
+          address?: string
+          age_groups_served?: string[] | null
+          city?: string
+          claimed_by_doctor?: boolean | null
+          clinic_name?: string
+          community_report_count?: number | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          languages?: string[] | null
+          latitude?: number
+          longitude?: number
+          phone?: string
+          postal_code?: string
+          profile_last_updated_at?: string | null
+          province?: string
+          status_last_updated_at?: string | null
+          status_verified_by?:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments?: boolean | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          status: Database["public"]["Enums"]["user_status"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          status?: Database["public"]["Enums"]["user_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          status?: Database["public"]["Enums"]["user_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +210,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      accepting_status: "accepting" | "not_accepting" | "waitlist" | "unknown"
+      user_status: "free" | "alert_service" | "assisted_access"
+      verification_source: "doctor" | "community"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +339,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      accepting_status: ["accepting", "not_accepting", "waitlist", "unknown"],
+      user_status: ["free", "alert_service", "assisted_access"],
+      verification_source: ["doctor", "community"],
+    },
   },
 } as const
