@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { MapPin, Phone, Calendar, ExternalLink, Loader2, Menu, X } from "lucide-react";
+import { MapPin, Phone, Calendar, ExternalLink, Loader2, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,13 +8,18 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { DoctorMap } from "@/components/DoctorMap";
 import { MapLegend } from "@/components/MapLegend";
 import { DoctorFilters } from "@/components/DoctorFilters";
+import { LocationPrompt } from "@/components/LocationPrompt";
+import { DoctorPagination } from "@/components/DoctorPagination";
 import { fetchDoctors, searchDoctors, Doctor, DoctorStatus } from "@/lib/doctors";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+const DOCTORS_PER_PAGE = 30;
 
 export default function Doctors() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("search") || "";
   
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<DoctorStatus | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState("any");
@@ -25,8 +30,24 @@ export default function Doctors() {
   const [loading, setLoading] = useState(true);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | undefined>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
 
   useEffect(() => {
+    if (!userLocation) return;
+    
     const loadDoctors = async () => {
       setLoading(true);
       const data = searchQuery 
@@ -36,10 +57,20 @@ export default function Doctors() {
       setLoading(false);
     };
     loadDoctors();
-  }, [searchQuery]);
+  }, [searchQuery, userLocation]);
 
+  // Sort doctors by distance and apply filters
   const filteredDoctors = useMemo(() => {
     let result = doctors;
+
+    // Sort by distance from user
+    if (userLocation) {
+      result = [...result].sort((a, b) => {
+        const distA = calculateDistance(userLocation.lat, userLocation.lng, a.latitude, a.longitude);
+        const distB = calculateDistance(userLocation.lat, userLocation.lng, b.latitude, b.longitude);
+        return distA - distB;
+      });
+    }
 
     // Status filter
     if (statusFilter && statusFilter !== "all") {
@@ -64,7 +95,18 @@ export default function Doctors() {
     }
 
     return result;
-  }, [doctors, statusFilter, languageFilter, accessibilityFilter, virtualFilter]);
+  }, [doctors, userLocation, statusFilter, languageFilter, accessibilityFilter, virtualFilter]);
+
+  // Paginated doctors for display
+  const paginatedDoctors = useMemo(() => {
+    const startIndex = (currentPage - 1) * DOCTORS_PER_PAGE;
+    return filteredDoctors.slice(startIndex, startIndex + DOCTORS_PER_PAGE);
+  }, [filteredDoctors, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, languageFilter, accessibilityFilter, virtualFilter, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +142,15 @@ export default function Doctors() {
     setVirtualFilter(false);
   };
 
+  // Show location prompt if user hasn't shared location yet
+  if (!userLocation) {
+    return (
+      <div className="min-h-screen bg-background">
+        <LocationPrompt onLocationGranted={setUserLocation} />
+      </div>
+    );
+  }
+
   const FiltersContent = (
     <DoctorFilters
       statusFilter={statusFilter}
@@ -121,9 +172,10 @@ export default function Doctors() {
       {/* Map Section */}
       <div className="bg-background-alt border-b border-border">
         <DoctorMap 
-          doctors={filteredDoctors} 
+          doctors={paginatedDoctors} 
           selectedDoctorId={selectedDoctorId}
           onDoctorSelect={handleDoctorSelect}
+          userLocation={userLocation}
           className="h-96 md:h-[30rem]"
         />
       </div>
@@ -178,22 +230,21 @@ export default function Doctors() {
 
           {/* Right Column - Results */}
           <div className="flex-1 min-w-0">
+            {/* Header with pagination */}
             <div className="flex items-center justify-between mb-6">
-              <p className="text-muted-foreground">
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading doctors...
-                  </span>
-                ) : (
-                  <>
-                    Showing <span className="font-semibold text-foreground">{filteredDoctors.length}</span> doctors
-                    {searchQuery && (
-                      <span> for "{searchQuery}"</span>
-                    )}
-                  </>
-                )}
-              </p>
+              {loading ? (
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading doctors...
+                </span>
+              ) : (
+                <DoctorPagination
+                  currentPage={currentPage}
+                  totalItems={filteredDoctors.length}
+                  itemsPerPage={DOCTORS_PER_PAGE}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </div>
 
             {loading ? (
@@ -202,7 +253,7 @@ export default function Doctors() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {filteredDoctors.map((doctor) => (
+                {paginatedDoctors.map((doctor) => (
                   <Card 
                     key={doctor.id} 
                     id={`doctor-${doctor.id}`}
@@ -295,6 +346,18 @@ export default function Doctors() {
                     }}>
                       Clear Filters
                     </Button>
+                  </div>
+                )}
+
+                {/* Bottom pagination */}
+                {filteredDoctors.length > DOCTORS_PER_PAGE && (
+                  <div className="flex justify-end pt-4">
+                    <DoctorPagination
+                      currentPage={currentPage}
+                      totalItems={filteredDoctors.length}
+                      itemsPerPage={DOCTORS_PER_PAGE}
+                      onPageChange={setCurrentPage}
+                    />
                   </div>
                 )}
               </div>

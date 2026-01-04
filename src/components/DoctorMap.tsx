@@ -7,6 +7,7 @@ interface DoctorMapProps {
   doctors: Doctor[];
   selectedDoctorId?: string;
   onDoctorSelect?: (doctorId: string) => void;
+  userLocation?: { lat: number; lng: number } | null;
   className?: string;
 }
 
@@ -24,7 +25,7 @@ const statusColors: Record<string, string> = {
   unknown: "#6b7280",        // Gray - unknown/neutral
 };
 
-export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className = "" }: DoctorMapProps) {
+export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocation, className = "" }: DoctorMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -119,12 +120,14 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
   useEffect(() => {
     if (loading || error || !mapRef.current || !window.google?.maps) return;
 
-    // Default center: Ontario, Canada
-    const defaultCenter = { lat: 43.65107, lng: -79.347015 };
+    // Use user location if available, otherwise default to Toronto
+    const defaultCenter = userLocation 
+      ? { lat: userLocation.lat, lng: userLocation.lng }
+      : { lat: 43.65107, lng: -79.347015 };
     
     mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
       center: defaultCenter,
-      zoom: 10,
+      zoom: userLocation ? 12 : 10,
       styles: brandMapStyles,
       disableDefaultUI: false,
       zoomControl: true,
@@ -132,7 +135,7 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
       streetViewControl: false,
       fullscreenControl: true,
     });
-  }, [loading, error]);
+  }, [loading, error, userLocation]);
 
   // Update markers when doctors change
   useEffect(() => {
