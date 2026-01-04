@@ -112,32 +112,50 @@ export async function submitCommunityReport(
   doctorId: string,
   reportedStatus: DoctorStatus,
   details?: string
-): Promise<boolean> {
-  const { error } = await supabase.from("community_reports").insert({
-    doctor_id: doctorId,
-    reported_status: reportedStatus,
-    details: details || null,
-  });
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { data, error } = await supabase.functions.invoke("process-community-update", {
+      body: {
+        doctorId,
+        reportedStatus,
+        details: details || null,
+        reporterIp: null, // IP will be captured server-side if needed
+      },
+    });
 
-  if (error) {
-    console.error("Error submitting community report:", error);
-    return false;
+    if (error) {
+      console.error("Error submitting community report:", error);
+      return { success: false, message: error.message };
+    }
+
+    return { 
+      success: data?.success || false, 
+      message: data?.message || "Thank you for your update!" 
+    };
+  } catch (err: any) {
+    console.error("Error submitting community report:", err);
+    return { success: false, message: err.message || "Failed to submit report" };
   }
+}
 
-  // Increment the community report count and update status
-  const { error: updateError } = await supabase
-    .from("doctors")
-    .update({
-      accepting_status: reportedStatus,
-      status_last_updated_at: new Date().toISOString(),
-      status_verified_by: "community",
-      community_report_count: supabase.rpc ? undefined : undefined, // Will handle this with RPC later
-    })
-    .eq("id", doctorId);
+export async function claimListing(
+  doctorId: string,
+  email: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { data, error } = await supabase.functions.invoke("claim-listing", {
+      body: { doctorId, email },
+    });
 
-  if (updateError) {
-    console.error("Error updating doctor status:", updateError);
+    if (error) {
+      return { success: false, message: error.message };
+    }
+
+    return { 
+      success: data?.success || false, 
+      message: data?.message || "Verification email sent!" 
+    };
+  } catch (err: any) {
+    return { success: false, message: err.message || "Failed to send verification email" };
   }
-
-  return !error;
 }

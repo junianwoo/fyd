@@ -43,10 +43,38 @@ export default function AssistedAccess() {
         .maybeSingle();
 
       if (existingProfile) {
+        if (existingProfile.status === "alert_service") {
+          toast({
+            title: "Active subscription detected",
+            description: "Please cancel your subscription first before applying for Assisted Access.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        
+        if (existingProfile.status === "assisted_access") {
+          toast({
+            title: "You already have Assisted Access",
+            description: "Sign in to access your dashboard.",
+          });
+          navigate("/auth");
+          return;
+        }
+
+        // Calculate expiry date (6 months from now)
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + 6);
+
         // Update existing user to assisted_access
         await supabase
           .from("profiles")
-          .update({ status: "assisted_access" })
+          .update({ 
+            status: "assisted_access",
+            assisted_reason: reason,
+            assisted_expires_at: expiresAt.toISOString(),
+            assisted_renewed_count: 0,
+          })
           .eq("user_id", existingProfile.user_id);
           
         toast({
@@ -56,7 +84,7 @@ export default function AssistedAccess() {
         navigate("/auth");
       } else {
         // Create new account with assisted access
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password: Math.random().toString(36).slice(-12) + "Aa1!", // Temporary password
           options: {
@@ -66,8 +94,24 @@ export default function AssistedAccess() {
 
         if (signUpError) throw signUpError;
 
-        // Note: The profile will be created automatically via trigger
-        // We'll update it to assisted_access
+        // Wait a moment for the trigger to create the profile, then update it
+        if (signUpData.user) {
+          const expiresAt = new Date();
+          expiresAt.setMonth(expiresAt.getMonth() + 6);
+
+          // Wait for profile to be created by trigger
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          await supabase
+            .from("profiles")
+            .update({ 
+              status: "assisted_access",
+              assisted_reason: reason,
+              assisted_expires_at: expiresAt.toISOString(),
+              assisted_renewed_count: 0,
+            })
+            .eq("user_id", signUpData.user.id);
+        }
         
         toast({
           title: "Assisted Access Granted!",

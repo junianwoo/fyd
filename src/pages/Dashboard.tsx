@@ -41,7 +41,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
+  assisted_reason?: string | null;
+  assisted_expires_at?: string | null;
+  assisted_renewed_count?: number | null;
+};
 type AlertSetting = Database["public"]["Tables"]["alert_settings"]["Row"];
 
 export default function Dashboard() {
@@ -452,6 +456,15 @@ export default function Dashboard() {
                     <p className="text-muted-foreground">
                       You have Assisted Access (free for 6 months).
                     </p>
+                    {profile.assisted_expires_at && (
+                      <p className="text-sm text-muted-foreground">
+                        Expires: {new Date(profile.assisted_expires_at).toLocaleDateString("en-CA", {
+                          year: "numeric",
+                          month: "long", 
+                          day: "numeric"
+                        })}
+                      </p>
+                    )}
                     <Button variant="outline" onClick={handleCheckout}>
                       Upgrade to Paid Subscription
                     </Button>
