@@ -7,7 +7,10 @@ import {
   XCircle,
   HelpCircle,
   Eye,
-  Users
+  Users,
+  Trash2,
+  Check,
+  RotateCcw
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -21,8 +24,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
 type PendingUpdate = Database["public"]["Tables"]["pending_updates"]["Row"];
 type CommunityReport = Database["public"]["Tables"]["community_reports"]["Row"];
@@ -49,6 +63,8 @@ export default function AdminModeration() {
   const [pendingUpdates, setPendingUpdates] = useState<PendingUpdateWithDoctor[]>([]);
   const [recentReports, setRecentReports] = useState<CommunityReportWithDoctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [deleteReportId, setDeleteReportId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -95,6 +111,73 @@ export default function AdminModeration() {
     }
     
     setLoading(false);
+  };
+
+  const handleApproveUpdate = async (update: PendingUpdateWithDoctor) => {
+    setActionLoading(update.id);
+    
+    // Update the doctor's status
+    const { error: updateError } = await supabase
+      .from("doctors")
+      .update({
+        accepting_status: update.status,
+        status_last_updated_at: new Date().toISOString(),
+        status_verified_by: "community" as const,
+        community_report_count: update.count,
+      })
+      .eq("id", update.doctor_id);
+
+    if (updateError) {
+      toast.error("Failed to approve update");
+      setActionLoading(null);
+      return;
+    }
+
+    // Delete the pending update
+    await supabase.from("pending_updates").delete().eq("id", update.id);
+    
+    toast.success("Update approved and applied");
+    setActionLoading(null);
+    loadData();
+  };
+
+  const handleDismissUpdate = async (updateId: string) => {
+    setActionLoading(updateId);
+    
+    const { error } = await supabase
+      .from("pending_updates")
+      .delete()
+      .eq("id", updateId);
+
+    if (error) {
+      toast.error("Failed to dismiss update");
+    } else {
+      toast.success("Pending update dismissed");
+      loadData();
+    }
+    
+    setActionLoading(null);
+  };
+
+  const handleDeleteReport = async () => {
+    if (!deleteReportId) return;
+    
+    setActionLoading(deleteReportId);
+    
+    const { error } = await supabase
+      .from("community_reports")
+      .delete()
+      .eq("id", deleteReportId);
+
+    if (error) {
+      toast.error("Failed to delete report");
+    } else {
+      toast.success("Report deleted");
+      loadData();
+    }
+    
+    setActionLoading(null);
+    setDeleteReportId(null);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -180,8 +263,8 @@ export default function AdminModeration() {
             Pending Status Updates
           </CardTitle>
           <CardDescription>
-            Community reports awaiting the 2-report threshold for auto-approval. 
-            No action needed unless suspicious patterns are detected.
+            Community reports awaiting the 2-report threshold for auto-approval.
+            Approve to apply immediately or dismiss to discard.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -234,7 +317,29 @@ export default function AdminModeration() {
                       {formatDate(update.updated_at)}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleApproveUpdate(update)}
+                          disabled={actionLoading === update.id}
+                          title="Approve and apply"
+                        >
+                          {actionLoading === update.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4 text-green-600" />
+                          )}
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleDismissUpdate(update.id)}
+                          disabled={actionLoading === update.id}
+                          title="Dismiss"
+                        >
+                          <XCircle className="h-4 w-4 text-red-600" />
+                        </Button>
                         <Button variant="ghost" size="icon" asChild>
                           <Link to={`/doctors/${update.doctor_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
@@ -258,7 +363,7 @@ export default function AdminModeration() {
             Recent Community Reports
           </CardTitle>
           <CardDescription>
-            All recent status reports submitted by the community.
+            All recent status reports submitted by the community. Delete suspicious or spam reports.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -306,7 +411,15 @@ export default function AdminModeration() {
                       {formatDate(report.reported_at)}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => setDeleteReportId(report.id)}
+                          title="Delete report"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
                         <Button variant="ghost" size="icon" asChild>
                           <Link to={`/doctors/${report.doctor_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
@@ -321,6 +434,27 @@ export default function AdminModeration() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteReportId} onOpenChange={() => setDeleteReportId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Community Report?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this community report. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteReport}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
