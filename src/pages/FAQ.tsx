@@ -84,7 +84,7 @@ export default function FAQ() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -99,7 +99,7 @@ export default function FAQ() {
           <div className="max-w-3xl mx-auto space-y-12">
             {faqCategories.map((category) => (
               <div key={category.title}>
-                <h2 className="text-2xl font-bold text-primary mb-6">
+                <h2 className="text-2xl text-primary mb-6">
                   {category.title}
                 </h2>
                 <Accordion type="single" collapsible className="space-y-4">
@@ -109,7 +109,7 @@ export default function FAQ() {
                       value={`${category.title}-${index}`}
                       className="bg-card border border-border rounded-lg px-6"
                     >
-                      <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                      <AccordionTrigger className="text-left hover:no-underline">
                         {faq.question}
                       </AccordionTrigger>
                       <AccordionContent className="text-muted-foreground">
@@ -127,7 +127,7 @@ export default function FAQ() {
       {/* Contact CTA */}
       <section className="bg-background-alt py-16 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-primary mb-4">
+          <h2 className="text-2xl text-primary mb-4">
             Still have questions?
           </h2>
           <p className="text-muted-foreground mb-6">

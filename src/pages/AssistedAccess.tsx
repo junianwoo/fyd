@@ -216,7 +216,7 @@ export default function AssistedAccess() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 mb-6">
             <Heart className="h-8 w-8 text-accent" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Can't Afford Alert Service?
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

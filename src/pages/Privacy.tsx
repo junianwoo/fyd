@@ -4,7 +4,7 @@ export default function Privacy() {
       {/* Hero */}
       <section className="bg-background py-16 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             Privacy Policy
           </h1>
           <p className="text-muted-foreground">
@@ -19,7 +19,7 @@ export default function Privacy() {
           <div className="max-w-3xl mx-auto prose prose-slate">
             <div className="space-y-8 text-foreground">
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Introduction</h2>
+                <h2 className="text-2xl text-primary mb-4">Introduction</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   FindYourDoctor.ca ("we," "our," or "us") respects your privacy and is committed to 
                   protecting your personal information. This Privacy Policy explains how we collect, 
@@ -28,7 +28,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Information We Collect</h2>
+                <h2 className="text-2xl text-primary mb-4">Information We Collect</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   We collect information in the following ways:
                 </p>
@@ -42,7 +42,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">How We Use Your Information</h2>
+                <h2 className="text-2xl text-primary mb-4">How We Use Your Information</h2>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>To provide and maintain our service</li>
                   <li>To send email alerts when doctors update their accepting status</li>
@@ -53,7 +53,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Information Sharing</h2>
+                <h2 className="text-2xl text-primary mb-4">Information Sharing</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   We do not sell your personal information. We may share data with:
                 </p>
@@ -64,7 +64,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Data Security</h2>
+                <h2 className="text-2xl text-primary mb-4">Data Security</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   We implement industry-standard security measures to protect your data, including 
                   encryption in transit and at rest, secure authentication, and regular security audits.
@@ -72,7 +72,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Your Rights</h2>
+                <h2 className="text-2xl text-primary mb-4">Your Rights</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   You have the right to access, correct, or delete your personal information. 
                   You can manage your account settings or contact us to exercise these rights.
@@ -80,7 +80,7 @@ export default function Privacy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-primary mb-4">Contact Us</h2>
+                <h2 className="text-2xl text-primary mb-4">Contact Us</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   If you have questions about this Privacy Policy, please contact us at{" "}
                   <a href="mailto:support@findyourdoctor.ca" className="text-secondary hover:text-primary">
