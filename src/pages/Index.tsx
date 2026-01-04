@@ -2,32 +2,32 @@ import { Link } from "react-router-dom";
 import { Search, Users, Bell, ArrowRight, Heart, Clock, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/ui/SearchBar";
-import heroImage from "@/assets/hero-doctor.webp";
+import heroImage from "@/assets/hero-doctor.png";
 
 export default function Index() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative bg-background py-20 md:py-32 overflow-hidden">
+      <section className="relative bg-background py-20 md:py-32 overflow-hidden min-h-[500px] md:min-h-[600px]">
         {/* Hero background image */}
         <div className="absolute inset-0 z-0">
           <img 
             src={heroImage} 
             alt="" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-right"
           />
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl text-white mb-6">
-              Find Your Family Doctor
+        <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+          <div className="max-w-xl text-left animate-fade-in">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-primary mb-6 leading-tight">
+              Find Your<br />Family Doctor
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10">
+            <p className="text-lg md:text-xl text-foreground/80 mb-8">
               2.5 million Ontarians are searching. We help you find one faster.
             </p>
-            <SearchBar size="large" className="max-w-2xl mx-auto" />
-            <p className="mt-4 text-sm text-muted-foreground">
+            <SearchBar size="large" className="max-w-md" />
+            <p className="mt-4 text-sm text-foreground/60">
               Search is always free. No signup required.
             </p>
           </div>
