@@ -15,6 +15,24 @@ const categories = [
   "General Topics",
 ];
 
+// Category color mapping using brand colors
+const getCategoryStyles = (category: string): string => {
+  switch (category) {
+    case "Healthcare News":
+      return "bg-secondary text-secondary-foreground"; // Bright Teal
+    case "How-To Guides":
+      return "bg-primary text-primary-foreground"; // Deep Teal
+    case "Success Stories":
+      return "bg-accent text-accent-foreground"; // Warm Orange
+    case "Product Updates":
+      return "bg-muted text-muted-foreground"; // Neutral gray
+    case "General Topics":
+      return "bg-primary/80 text-primary-foreground"; // Deep Teal variant
+    default:
+      return "bg-secondary text-secondary-foreground";
+  }
+};
+
 export default function Resources() {
   const [selectedCategory, setSelectedCategory] = useState("All Resources");
   const [searchQuery, setSearchQuery] = useState("");
@@ -197,7 +215,7 @@ export default function Resources() {
                       <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                           <div className="flex items-center gap-3 mb-3">
-                            <Badge variant="secondary">{resource.category}</Badge>
+                            <Badge className={getCategoryStyles(resource.category)}>{resource.category}</Badge>
                             {isExternalNews ? (
                               <span className="flex items-center text-xs text-muted-foreground">
                                 <ExternalLink className="h-3 w-3 mr-1" />
