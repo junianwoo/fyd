@@ -242,7 +242,9 @@ export default function Resources() {
                           <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
                             {isExternalNews ? (
                               <span className="text-xs text-secondary">{extractDomain(resource.content!)}</span>
-                            ) : resource.excerpt}
+                            ) : (
+                              resource.content?.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/https?:\/\/[^\s]+/g, '').slice(0, 150) + (resource.content && resource.content.length > 150 ? '...' : '')
+                            )}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">

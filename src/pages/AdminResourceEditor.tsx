@@ -46,7 +46,7 @@ export default function AdminResourceEditor() {
   const [formData, setFormData] = useState<Partial<ResourceInsert>>({
     title: "",
     slug: "",
-    excerpt: "",
+    excerpt: "", // Auto-generated from content
     content: "",
     category: "How-To Guides",
     read_time: "5 min read",
@@ -100,7 +100,7 @@ export default function AdminResourceEditor() {
     
     const isHealthcareNews = formData.category === "Healthcare News";
     
-    if (!formData.title || !formData.slug || (!isHealthcareNews && !formData.excerpt)) {
+    if (!formData.title || !formData.slug) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
@@ -109,11 +109,21 @@ export default function AdminResourceEditor() {
       toast({ title: "Please enter the external article URL", variant: "destructive" });
       return;
     }
+    
+    if (!isHealthcareNews && !formData.content) {
+      toast({ title: "Please enter the article content", variant: "destructive" });
+      return;
+    }
 
     setSaving(true);
     
-    // Use placeholder excerpt for Healthcare News
-    const excerptToSave = isHealthcareNews ? "External article" : formData.excerpt!;
+    // Auto-generate excerpt from content (first 150 chars)
+    const generateExcerpt = (content: string) => {
+      const plainText = content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/https?:\/\/[^\s]+/g, '');
+      return plainText.slice(0, 150).trim() + (plainText.length > 150 ? '...' : '');
+    };
+    
+    const excerptToSave = isHealthcareNews ? "External article" : generateExcerpt(formData.content || '');
 
     if (isNew) {
       const result = await createResource({
@@ -234,19 +244,6 @@ export default function AdminResourceEditor() {
                   </p>
                 </div>
 
-                {formData.category !== "Healthcare News" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="excerpt">Excerpt *</Label>
-                    <Textarea
-                      id="excerpt"
-                      value={formData.excerpt}
-                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                      placeholder="Brief description shown in listings"
-                      rows={3}
-                      required
-                    />
-                  </div>
-                )}
 
                 {formData.category === "Healthcare News" ? (
                   <div className="space-y-2">
