@@ -64,6 +64,35 @@ const faqCategories = [
     ],
   },
   {
+    title: "Assisted Access",
+    faqs: [
+      {
+        question: "What is Assisted Access?",
+        answer: "Assisted Access is our program that provides free access to the Alert Service for individuals who cannot afford the monthly subscription fee. We believe that financial circumstances should never prevent someone from finding the healthcare they need.",
+      },
+      {
+        question: "Who qualifies for Assisted Access?",
+        answer: "Assisted Access is available to anyone experiencing financial hardship that prevents them from affording the Alert Service subscription. We operate on an honour system—no proof of income or documentation is required. We trust that those who apply genuinely need the support.",
+      },
+      {
+        question: "How long does Assisted Access last?",
+        answer: "Assisted Access is granted for 6-month terms. At the end of your term, you'll receive a reminder email and can easily renew for another 6-month period if you still need support.",
+      },
+      {
+        question: "How do I apply for Assisted Access?",
+        answer: "Simply visit our Assisted Access page and fill out the brief application form. The process takes less than 2 minutes and you'll typically receive access within 24 hours.",
+      },
+      {
+        question: "Can I upgrade from Assisted Access to a paid subscription?",
+        answer: "Absolutely! If your circumstances change and you're able to support our service financially, we genuinely appreciate it. You can upgrade to a paid subscription at any time from your dashboard. Your support helps us continue offering Assisted Access to others who need it.",
+      },
+      {
+        question: "Is Assisted Access really free? What's the catch?",
+        answer: "Yes, it's completely free with no hidden catches. We created this program because we believe everyone deserves access to healthcare resources regardless of their financial situation. Our paid subscribers help make this possible.",
+      },
+    ],
+  },
+  {
     title: "Privacy & Security",
     faqs: [
       {

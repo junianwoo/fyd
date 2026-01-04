@@ -16,16 +16,12 @@ declare global {
   }
 }
 
-// Brand-aligned status colors from branding guide
-// Accepting: Secondary teal (friendly, positive)
-// Not Accepting: Muted red (clear but not aggressive)
-// Waitlist: Accent orange (approachable attention)
-// Unknown: Neutral gray
+// Using standard intuitive colors for status markers
 const statusColors: Record<string, string> = {
-  accepting: "#00A6A6",    // Secondary - Bright Teal (friendly, positive)
-  not_accepting: "#dc2626", // Clear red for visibility
-  waitlist: "#F4A261",     // Accent - Warm Orange (approachable)
-  unknown: "#6b7280",      // Neutral gray
+  accepting: "#22c55e",      // Green - universally understood as positive/go
+  not_accepting: "#dc2626",  // Red - universally understood as stop/no
+  waitlist: "#F4A261",       // Orange - caution/waiting
+  unknown: "#6b7280",        // Gray - unknown/neutral
 };
 
 export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className = "" }: DoctorMapProps) {
@@ -222,31 +218,6 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, className
   }
 
   return (
-    <div className={`relative ${className}`}>
-      <div ref={mapRef} className="w-full h-full" />
-      
-      {/* Legend - brand styled */}
-      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg text-xs border border-border">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Status Legend</p>
-        <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: statusColors.accepting }} />
-            <span className="text-foreground">Accepting</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: statusColors.waitlist }} />
-            <span className="text-foreground">Waitlist</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: statusColors.not_accepting }} />
-            <span className="text-foreground">Not Accepting</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: statusColors.unknown }} />
-            <span className="text-foreground">Unknown</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div ref={mapRef} className={`w-full ${className}`} />
   );
 }
