@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { DoctorStatus } from "@/lib/doctors";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Lock } from "lucide-react";
 
 interface DoctorFiltersProps {
   statusFilter: DoctorStatus | "all";
@@ -23,6 +24,7 @@ interface DoctorFiltersProps {
   virtualFilter: boolean;
   onVirtualFilterChange: (virtual: boolean) => void;
   onClearFilters: () => void;
+  isPaidUser?: boolean;
 }
 
 const languages = [
@@ -53,6 +55,7 @@ export function DoctorFilters({
   virtualFilter,
   onVirtualFilterChange,
   onClearFilters,
+  isPaidUser = false,
 }: DoctorFiltersProps) {
   const toggleLanguage = (language: string) => {
     if (languageFilter.includes(language)) {
@@ -126,63 +129,81 @@ export function DoctorFilters({
         </Select>
       </div>
 
-      {/* Languages Filter */}
-      <div className="space-y-3">
-        <Label className="text-sm text-muted-foreground">Languages</Label>
-        <div className="space-y-2 max-h-48 overflow-y-auto">
-          {languages.map((language) => (
-            <div key={language} className="flex items-center gap-2">
+      {/* Advanced Filters - Paid Users Only */}
+      {isPaidUser ? (
+        <>
+          {/* Languages Filter */}
+          <div className="space-y-3">
+            <Label className="text-sm text-muted-foreground">Languages</Label>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {languages.map((language) => (
+                <div key={language} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`lang-${language}`}
+                    checked={languageFilter.includes(language)}
+                    onCheckedChange={() => toggleLanguage(language)}
+                  />
+                  <label
+                    htmlFor={`lang-${language}`}
+                    className="text-sm text-foreground cursor-pointer"
+                  >
+                    {language}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Accessibility Filter */}
+          <div className="space-y-3">
+            <Label className="text-sm text-muted-foreground">Accessibility</Label>
+            <div className="flex items-center gap-2">
               <Checkbox
-                id={`lang-${language}`}
-                checked={languageFilter.includes(language)}
-                onCheckedChange={() => toggleLanguage(language)}
+                id="accessibility"
+                checked={accessibilityFilter}
+                onCheckedChange={(checked) => onAccessibilityFilterChange(checked === true)}
               />
               <label
-                htmlFor={`lang-${language}`}
+                htmlFor="accessibility"
                 className="text-sm text-foreground cursor-pointer"
               >
-                {language}
+                Wheelchair Accessible
               </label>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Accessibility Filter */}
-      <div className="space-y-3">
-        <Label className="text-sm text-muted-foreground">Accessibility</Label>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="accessibility"
-            checked={accessibilityFilter}
-            onCheckedChange={(checked) => onAccessibilityFilterChange(checked === true)}
-          />
-          <label
-            htmlFor="accessibility"
-            className="text-sm text-foreground cursor-pointer"
-          >
-            Wheelchair Accessible
-          </label>
+          {/* Virtual Appointments Filter */}
+          <div className="space-y-3">
+            <Label className="text-sm text-muted-foreground">Services</Label>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="virtual"
+                checked={virtualFilter}
+                onCheckedChange={(checked) => onVirtualFilterChange(checked === true)}
+              />
+              <label
+                htmlFor="virtual"
+                className="text-sm text-foreground cursor-pointer"
+              >
+                Virtual Appointments
+              </label>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <Lock className="h-4 w-4" />
+            <span className="text-sm font-medium">Advanced Filters</span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Filter by language, accessibility, and virtual appointments with Alert Service.
+          </p>
+          <Button variant="outline" size="sm" className="w-full" asChild>
+            <Link to="/pricing">Upgrade to Unlock</Link>
+          </Button>
         </div>
-      </div>
-
-      {/* Virtual Appointments Filter */}
-      <div className="space-y-3">
-        <Label className="text-sm text-muted-foreground">Services</Label>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="virtual"
-            checked={virtualFilter}
-            onCheckedChange={(checked) => onVirtualFilterChange(checked === true)}
-          />
-          <label
-            htmlFor="virtual"
-            className="text-sm text-foreground cursor-pointer"
-          >
-            Virtual Appointments
-          </label>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
