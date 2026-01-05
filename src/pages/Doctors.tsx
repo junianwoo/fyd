@@ -69,16 +69,33 @@ export default function Doctors() {
     loadDoctors();
   }, [searchQuery, userLocation]);
 
+  // Calculate the center of search results (for distance filtering from searched area)
+  const searchCenter = useMemo(() => {
+    if (doctors.length === 0) return null;
+    
+    // Calculate the geographic center of all returned doctors
+    const sumLat = doctors.reduce((sum, d) => sum + d.latitude, 0);
+    const sumLng = doctors.reduce((sum, d) => sum + d.longitude, 0);
+    
+    return {
+      lat: sumLat / doctors.length,
+      lng: sumLng / doctors.length,
+    };
+  }, [doctors]);
+
+  // Use search center when a search is performed, otherwise use user location
+  const filterCenter = searchQuery.trim() && searchCenter ? searchCenter : userLocation;
+
   // Sort doctors by distance and apply filters
   const filteredDoctors = useMemo(() => {
     let result = doctors;
 
     // Calculate distance and filter by distance if set
-    if (userLocation) {
+    if (filterCenter) {
       // Add distance to each doctor for filtering/sorting
       result = result.map((doctor) => ({
         ...doctor,
-        distance: calculateDistance(userLocation.lat, userLocation.lng, doctor.latitude, doctor.longitude),
+        distance: calculateDistance(filterCenter.lat, filterCenter.lng, doctor.latitude, doctor.longitude),
       }));
 
       // Filter by distance
@@ -114,7 +131,7 @@ export default function Doctors() {
     }
 
     return result;
-  }, [doctors, userLocation, statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter]);
+  }, [doctors, filterCenter, statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter]);
 
   // Paginated doctors for display
   const paginatedDoctors = useMemo(() => {
