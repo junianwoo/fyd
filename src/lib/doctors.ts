@@ -100,8 +100,20 @@ export async function fetchDoctorById(id: string): Promise<Doctor | null> {
   return data ? mapDoctorRowToDoctor(data) : null;
 }
 
-export async function searchDoctors(query: string): Promise<Doctor[]> {
-  const lowerQuery = query.toLowerCase();
+// Check if query looks like a postal code (Canadian format starts with letter-digit)
+function isPostalCodeSearch(query: string): boolean {
+  const cleaned = query.replace(/\s/g, "").toUpperCase();
+  return /^[A-Z]\d[A-Z]?\d?[A-Z]?\d?$/.test(cleaned);
+}
+
+export async function searchDoctors(query: string): Promise<{ doctors: Doctor[]; searchLocation: { lat: number; lng: number } | null }> {
+  const cleanedQuery = query.trim();
+  if (!cleanedQuery) {
+    return { doctors: [], searchLocation: null };
+  }
+  
+  const lowerQuery = cleanedQuery.toLowerCase();
+  const isPostalCode = isPostalCodeSearch(cleanedQuery);
   
   // Paginate through search results to bypass 1000 row limit
   const allDoctors: DoctorRow[] = [];
@@ -109,10 +121,20 @@ export async function searchDoctors(query: string): Promise<Doctor[]> {
   const pageSize = 1000;
   
   while (true) {
-    const { data, error } = await supabase
-      .from("doctors")
-      .select("*")
-      .or(`city.ilike.%${lowerQuery}%,postal_code.ilike.%${lowerQuery}%,full_name.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`)
+    let queryBuilder = supabase.from("doctors").select("*");
+    
+    if (isPostalCode) {
+      // For postal codes, search for postal codes starting with the query (prefix match)
+      const postalPrefix = cleanedQuery.replace(/\s/g, "").toUpperCase();
+      queryBuilder = queryBuilder.ilike("postal_code", `${postalPrefix}%`);
+    } else {
+      // For city/name searches, use contains matching
+      queryBuilder = queryBuilder.or(
+        `city.ilike.%${lowerQuery}%,full_name.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`
+      );
+    }
+    
+    const { data, error } = await queryBuilder
       .order("full_name")
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
@@ -129,7 +151,20 @@ export async function searchDoctors(query: string): Promise<Doctor[]> {
     page++;
   }
 
-  return allDoctors.map(mapDoctorRowToDoctor);
+  const doctors = allDoctors.map(mapDoctorRowToDoctor);
+  
+  // Calculate search location as the center of first few results for accurate distance filtering
+  let searchLocation: { lat: number; lng: number } | null = null;
+  if (doctors.length > 0) {
+    // Use the first result's location as the reference point
+    // This is more accurate than averaging all results
+    searchLocation = {
+      lat: doctors[0].latitude,
+      lng: doctors[0].longitude,
+    };
+  }
+
+  return { doctors, searchLocation };
 }
 
 export async function filterDoctorsByStatus(

@@ -22,6 +22,7 @@ export default function Doctors() {
   const initialQuery = searchParams.get("search") || "";
   
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchLocation, setSearchLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<DoctorStatus | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState("any");
@@ -56,35 +57,23 @@ export default function Doctors() {
     // Only search when there's a query - show empty state otherwise
     if (!searchQuery.trim()) {
       setDoctors([]);
+      setSearchLocation(null);
       setLoading(false);
       return;
     }
     
     const loadDoctors = async () => {
       setLoading(true);
-      const data = await searchDoctors(searchQuery);
-      setDoctors(data);
+      const result = await searchDoctors(searchQuery);
+      setDoctors(result.doctors);
+      setSearchLocation(result.searchLocation);
       setLoading(false);
     };
     loadDoctors();
   }, [searchQuery, userLocation]);
 
-  // Calculate the center of search results (for distance filtering from searched area)
-  const searchCenter = useMemo(() => {
-    if (doctors.length === 0) return null;
-    
-    // Calculate the geographic center of all returned doctors
-    const sumLat = doctors.reduce((sum, d) => sum + d.latitude, 0);
-    const sumLng = doctors.reduce((sum, d) => sum + d.longitude, 0);
-    
-    return {
-      lat: sumLat / doctors.length,
-      lng: sumLng / doctors.length,
-    };
-  }, [doctors]);
-
-  // Use search center when a search is performed, otherwise use user location
-  const filterCenter = searchQuery.trim() && searchCenter ? searchCenter : userLocation;
+  // Use search location when a search is performed, otherwise use user location
+  const filterCenter = searchQuery.trim() && searchLocation ? searchLocation : userLocation;
 
   // Sort doctors by distance and apply filters
   const filteredDoctors = useMemo(() => {
