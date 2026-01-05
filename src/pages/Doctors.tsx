@@ -10,7 +10,9 @@ import { MapLegend } from "@/components/MapLegend";
 import { DoctorFilters } from "@/components/DoctorFilters";
 import { LocationPrompt } from "@/components/LocationPrompt";
 import { DoctorPagination } from "@/components/DoctorPagination";
-import { fetchDoctors, searchDoctors, Doctor, DoctorStatus } from "@/lib/doctors";
+import { DoctorEmptyState } from "@/components/DoctorEmptyState";
+import { searchDoctors, Doctor, DoctorStatus } from "@/lib/doctors";
+import { useUserStatus } from "@/hooks/useUserStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const DOCTORS_PER_PAGE = 30;
@@ -45,14 +47,22 @@ export default function Doctors() {
     return R * c;
   };
 
+  // User status for advanced filters
+  const { isPaidUser } = useUserStatus();
+
   useEffect(() => {
     if (!userLocation) return;
     
+    // Only search when there's a query - show empty state otherwise
+    if (!searchQuery.trim()) {
+      setDoctors([]);
+      setLoading(false);
+      return;
+    }
+    
     const loadDoctors = async () => {
       setLoading(true);
-      const data = searchQuery 
-        ? await searchDoctors(searchQuery)
-        : await fetchDoctors();
+      const data = await searchDoctors(searchQuery);
       setDoctors(data);
       setLoading(false);
     };
@@ -151,6 +161,8 @@ export default function Doctors() {
     );
   }
 
+  const hasSearched = searchQuery.trim().length > 0;
+
   const FiltersContent = (
     <DoctorFilters
       statusFilter={statusFilter}
@@ -164,6 +176,7 @@ export default function Doctors() {
       virtualFilter={virtualFilter}
       onVirtualFilterChange={setVirtualFilter}
       onClearFilters={clearFilters}
+      isPaidUser={isPaidUser}
     />
   );
 
@@ -230,28 +243,35 @@ export default function Doctors() {
 
           {/* Right Column - Results */}
           <div className="flex-1 min-w-0">
-            {/* Header with pagination */}
-            <div className="flex items-center justify-between mb-6">
-              {loading ? (
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading doctors...
-                </span>
-              ) : (
-                <DoctorPagination
-                  currentPage={currentPage}
-                  totalItems={filteredDoctors.length}
-                  itemsPerPage={DOCTORS_PER_PAGE}
-                  onPageChange={setCurrentPage}
-                />
-              )}
-            </div>
+            {/* Header with pagination - only show when there are results */}
+            {hasSearched && (
+              <div className="flex items-center justify-between mb-6">
+                {loading ? (
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Searching doctors...
+                  </span>
+                ) : (
+                  <DoctorPagination
+                    currentPage={currentPage}
+                    totalItems={filteredDoctors.length}
+                    itemsPerPage={DOCTORS_PER_PAGE}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Empty state - show when no search has been performed */}
+            {!hasSearched && !loading && (
+              <DoctorEmptyState />
+            )}
 
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-secondary" />
               </div>
-            ) : (
+            ) : hasSearched && (
               <div className="grid gap-4">
                 {paginatedDoctors.map((doctor) => (
                   <Card 

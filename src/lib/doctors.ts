@@ -57,17 +57,32 @@ export function mapDoctorRowToDoctor(row: DoctorRow): Doctor {
 }
 
 export async function fetchDoctors(): Promise<Doctor[]> {
-  const { data, error } = await supabase
-    .from("doctors")
-    .select("*")
-    .order("full_name");
+  // Fetch all doctors by paginating through results (Supabase has 1000 row limit)
+  const allDoctors: DoctorRow[] = [];
+  let page = 0;
+  const pageSize = 1000;
+  
+  while (true) {
+    const { data, error } = await supabase
+      .from("doctors")
+      .select("*")
+      .order("full_name")
+      .range(page * pageSize, (page + 1) * pageSize - 1);
 
-  if (error) {
-    console.error("Error fetching doctors:", error);
-    return [];
+    if (error) {
+      console.error("Error fetching doctors:", error);
+      break;
+    }
+
+    if (!data || data.length === 0) break;
+    
+    allDoctors.push(...data);
+    
+    if (data.length < pageSize) break;
+    page++;
   }
 
-  return (data || []).map(mapDoctorRowToDoctor);
+  return allDoctors.map(mapDoctorRowToDoctor);
 }
 
 export async function fetchDoctorById(id: string): Promise<Doctor | null> {
@@ -88,18 +103,33 @@ export async function fetchDoctorById(id: string): Promise<Doctor | null> {
 export async function searchDoctors(query: string): Promise<Doctor[]> {
   const lowerQuery = query.toLowerCase();
   
-  const { data, error } = await supabase
-    .from("doctors")
-    .select("*")
-    .or(`city.ilike.%${lowerQuery}%,postal_code.ilike.%${lowerQuery}%,full_name.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`)
-    .order("full_name");
+  // Paginate through search results to bypass 1000 row limit
+  const allDoctors: DoctorRow[] = [];
+  let page = 0;
+  const pageSize = 1000;
+  
+  while (true) {
+    const { data, error } = await supabase
+      .from("doctors")
+      .select("*")
+      .or(`city.ilike.%${lowerQuery}%,postal_code.ilike.%${lowerQuery}%,full_name.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`)
+      .order("full_name")
+      .range(page * pageSize, (page + 1) * pageSize - 1);
 
-  if (error) {
-    console.error("Error searching doctors:", error);
-    return [];
+    if (error) {
+      console.error("Error searching doctors:", error);
+      break;
+    }
+
+    if (!data || data.length === 0) break;
+    
+    allDoctors.push(...data);
+    
+    if (data.length < pageSize) break;
+    page++;
   }
 
-  return (data || []).map(mapDoctorRowToDoctor);
+  return allDoctors.map(mapDoctorRowToDoctor);
 }
 
 export async function filterDoctorsByStatus(
