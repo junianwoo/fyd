@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,7 @@ interface LocationPromptProps {
 }
 
 export function LocationPrompt({ onLocationGranted }: LocationPromptProps) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const requestLocation = () => {
@@ -33,7 +33,7 @@ export function LocationPrompt({ onLocationGranted }: LocationPromptProps) {
         setLoading(false);
         switch (err.code) {
           case err.PERMISSION_DENIED:
-            setError("Location access was denied. Please enable location in your browser settings.");
+            setError("Location access was denied. Please enable location in your browser settings to see doctors near you.");
             break;
           case err.POSITION_UNAVAILABLE:
             setError("Location information is unavailable.");
@@ -53,54 +53,54 @@ export function LocationPrompt({ onLocationGranted }: LocationPromptProps) {
     );
   };
 
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-background p-4">
-      <Card className="max-w-md w-full">
-        <CardContent className="pt-8 pb-8 text-center">
-          <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <MapPin className="h-8 w-8 text-secondary" />
-          </div>
-          
-          <h2 className="text-2xl font-semibold text-foreground mb-3">
-            Find Doctors Near You
-          </h2>
-          
-          <p className="text-muted-foreground mb-6">
-            To show you the closest family doctors accepting new patients, 
-            we need to know your location.
-          </p>
+  // Auto-request location on mount (triggers browser's native popup)
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
-          {error && (
-            <div className="flex items-start gap-2 text-destructive text-sm mb-6 text-left bg-destructive/10 p-3 rounded-lg">
-              <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-              <span>{error}</span>
+  // Show simple loading state while browser popup is active
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-background p-4">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-secondary mx-auto mb-4" />
+          <p className="text-muted-foreground">Waiting for location permission...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with retry button only if there was an error
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-background p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-8 pb-8 text-center">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
-          )}
+            
+            <h2 className="text-2xl font-semibold text-foreground mb-3">
+              Location Required
+            </h2>
+            
+            <p className="text-muted-foreground mb-6">
+              {error}
+            </p>
 
-          <Button
-            onClick={requestLocation}
-            disabled={loading}
-            size="lg"
-            className="w-full"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Getting Location...
-              </>
-            ) : (
-              <>
-                <MapPin className="h-4 w-4 mr-2" />
-                Share My Location
-              </>
-            )}
-          </Button>
+            <Button onClick={requestLocation} size="lg" className="w-full">
+              <MapPin className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
 
-          <p className="text-xs text-muted-foreground mt-4">
-            Your location is only used to sort doctors by distance and is never stored.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+            <p className="text-xs text-muted-foreground mt-4">
+              Your location is only used to sort doctors by distance and is never stored.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return null;
 }
