@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { MapPin, Phone, Calendar, ExternalLink, Loader2, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,11 @@ export default function Doctors() {
   
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchLocation, setSearchLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
+
+  // We keep input separate from the "active" query to avoid firing searches on every keystroke
+  const [searchInput, setSearchInput] = useState(initialQuery);
+  const [activeQuery, setActiveQuery] = useState(initialQuery);
+
   const [statusFilter, setStatusFilter] = useState<DoctorStatus | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState("any");
   const [languageFilter, setLanguageFilter] = useState<string[]>([]);
@@ -34,6 +38,8 @@ export default function Doctors() {
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | undefined>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const searchRequestIdRef = useRef(0);
 
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
@@ -51,29 +57,42 @@ export default function Doctors() {
   // User status for advanced filters
   const { isPaidUser } = useUserStatus();
 
+  // Keep state in sync with URL (e.g., back/forward navigation)
+  useEffect(() => {
+    setSearchInput(initialQuery);
+    setActiveQuery(initialQuery);
+  }, [initialQuery]);
+
   useEffect(() => {
     if (!userLocation) return;
-    
+
     // Only search when there's a query - show empty state otherwise
-    if (!searchQuery.trim()) {
+    if (!activeQuery.trim()) {
       setDoctors([]);
       setSearchLocation(null);
       setLoading(false);
       return;
     }
-    
+
+    const requestId = ++searchRequestIdRef.current;
+
     const loadDoctors = async () => {
       setLoading(true);
-      const result = await searchDoctors(searchQuery);
+      const result = await searchDoctors(activeQuery);
+
+      // Ignore out-of-order responses
+      if (requestId !== searchRequestIdRef.current) return;
+
       setDoctors(result.doctors);
       setSearchLocation(result.searchLocation);
       setLoading(false);
     };
+
     loadDoctors();
-  }, [searchQuery, userLocation]);
+  }, [activeQuery, userLocation]);
 
   // Use search location when a search is performed, otherwise use user location
-  const filterCenter = searchQuery.trim() && searchLocation ? searchLocation : userLocation;
+  const filterCenter = activeQuery.trim() && searchLocation ? searchLocation : userLocation;
 
   // Sort doctors by distance and apply filters
   const filteredDoctors = useMemo(() => {
@@ -131,12 +150,15 @@ export default function Doctors() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter, searchQuery]);
+  }, [statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter, activeQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      setSearchParams({ search: searchQuery.trim() });
+    const next = searchInput.trim();
+    setActiveQuery(next);
+
+    if (next) {
+      setSearchParams({ search: next });
     } else {
       setSearchParams({});
     }
@@ -176,7 +198,7 @@ export default function Doctors() {
     );
   }
 
-  const hasSearched = searchQuery.trim().length > 0;
+  const hasSearched = activeQuery.trim().length > 0;
 
   const FiltersContent = (
     <DoctorFilters
@@ -223,8 +245,8 @@ export default function Doctors() {
               <Input
                 type="text"
                 placeholder="City, postal code, or doctor name"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="h-11"
               />
             </div>
@@ -375,7 +397,8 @@ export default function Doctors() {
                       No doctors found matching your search.
                     </p>
                     <Button variant="outline" onClick={() => {
-                      setSearchQuery("");
+                      setSearchInput("");
+                      setActiveQuery("");
                       clearFilters();
                       setSearchParams({});
                     }}>
