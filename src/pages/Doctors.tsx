@@ -73,13 +73,22 @@ export default function Doctors() {
   const filteredDoctors = useMemo(() => {
     let result = doctors;
 
-    // Sort by distance from user
+    // Calculate distance and filter by distance if set
     if (userLocation) {
-      result = [...result].sort((a, b) => {
-        const distA = calculateDistance(userLocation.lat, userLocation.lng, a.latitude, a.longitude);
-        const distB = calculateDistance(userLocation.lat, userLocation.lng, b.latitude, b.longitude);
-        return distA - distB;
-      });
+      // Add distance to each doctor for filtering/sorting
+      result = result.map((doctor) => ({
+        ...doctor,
+        distance: calculateDistance(userLocation.lat, userLocation.lng, doctor.latitude, doctor.longitude),
+      }));
+
+      // Filter by distance
+      if (distanceFilter !== "any") {
+        const maxDistance = parseInt(distanceFilter, 10);
+        result = result.filter((doctor) => (doctor as any).distance <= maxDistance);
+      }
+
+      // Sort by distance
+      result = [...result].sort((a, b) => (a as any).distance - (b as any).distance);
     }
 
     // Status filter
@@ -105,7 +114,7 @@ export default function Doctors() {
     }
 
     return result;
-  }, [doctors, userLocation, statusFilter, languageFilter, accessibilityFilter, virtualFilter]);
+  }, [doctors, userLocation, statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter]);
 
   // Paginated doctors for display
   const paginatedDoctors = useMemo(() => {
@@ -116,7 +125,7 @@ export default function Doctors() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, languageFilter, accessibilityFilter, virtualFilter, searchQuery]);
+  }, [statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
