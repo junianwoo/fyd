@@ -55,7 +55,7 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
     
     // Alert Service price ID
-    const priceId = "price_1SlhFt9kpmAJmkdVch9QBynH";
+    const priceId = "price_1SmQomEfiuQ9vCM5ZTvlL7V3";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
