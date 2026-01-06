@@ -72,15 +72,40 @@ export default function Dashboard() {
     }
   }, [user, authLoading, navigate]);
 
-  // Show success message after Stripe checkout
+  // Show success message after Stripe checkout and check subscription
   useEffect(() => {
-    if (successParam === "true") {
-      toast({
-        title: "Subscription activated!",
-        description: "Welcome to the Alert Service. Set up your locations below.",
-      });
-    }
-  }, [successParam, toast]);
+    const checkSubscriptionAfterCheckout = async () => {
+      if (successParam === "true" && user) {
+        toast({
+          title: "Subscription activated!",
+          description: "Checking your subscription status...",
+        });
+        
+        // Check subscription status
+        const { data, error } = await supabase.functions.invoke("check-subscription");
+        
+        if (!error && data) {
+          // Refetch profile to get updated status
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          
+          setProfile(profileData);
+          
+          if (profileData?.status === "alert_service") {
+            toast({
+              title: "Success!",
+              description: "Your Alert Service subscription is now active.",
+            });
+          }
+        }
+      }
+    };
+    
+    checkSubscriptionAfterCheckout();
+  }, [successParam, user, toast]);
 
   // Fetch user data
   useEffect(() => {
@@ -205,13 +230,11 @@ export default function Dashboard() {
 
   const handleManageBilling = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke("customer-portal", {
-        body: {},
-      });
+      const { data, error } = await supabase.functions.invoke("customer-portal");
 
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, "_blank");
       }
     } catch (error) {
       toast({
@@ -219,6 +242,41 @@ export default function Dashboard() {
         description: "Please try again later.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleRefreshSubscription = async () => {
+    setSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      
+      if (error) throw error;
+      
+      // Refetch profile
+      if (user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        
+        setProfile(profileData);
+        
+        toast({
+          title: "Subscription status updated",
+          description: profileData?.status === "alert_service" 
+            ? "Your subscription is active" 
+            : "No active subscription found",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error checking subscription",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -447,9 +505,18 @@ export default function Dashboard() {
                     <p className="text-muted-foreground">
                       You're subscribed to the Alert Service at $7.99/month.
                     </p>
-                    <Button variant="outline" onClick={handleManageBilling}>
-                      Manage Billing
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button variant="outline" onClick={handleManageBilling}>
+                        Manage Billing
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleRefreshSubscription}
+                        disabled={saving}
+                      >
+                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
+                      </Button>
+                    </div>
                   </div>
                 ) : profile?.status === "assisted_access" ? (
                   <div className="space-y-4">
@@ -465,21 +532,37 @@ export default function Dashboard() {
                         })}
                       </p>
                     )}
-                    <Button variant="outline" onClick={handleCheckout}>
-                      Upgrade to Paid Subscription
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button variant="outline" onClick={handleCheckout}>
+                        Upgrade to Paid Subscription
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleRefreshSubscription}
+                        disabled={saving}
+                      >
+                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <p className="text-muted-foreground">
                       Subscribe to receive email alerts when doctors start accepting patients.
                     </p>
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 flex-wrap">
                       <Button onClick={handleCheckout}>
                         Subscribe - $7.99/mo
                       </Button>
                       <Button variant="outline" asChild>
                         <Link to="/assisted-access">Apply for Free Access</Link>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleRefreshSubscription}
+                        disabled={saving}
+                      >
+                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
                       </Button>
                     </div>
                   </div>
