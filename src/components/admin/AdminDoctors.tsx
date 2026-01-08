@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AdminDoctorImport } from "./AdminDoctorImport";
 import {
   Stethoscope, 
@@ -13,7 +13,8 @@ import {
   Edit,
   ExternalLink,
   Save,
-  X
+  X,
+  Bell
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,6 +61,7 @@ export default function AdminDoctors() {
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [editForm, setEditForm] = useState<Partial<Doctor>>({});
   const [saving, setSaving] = useState(false);
+  const [testingAlertId, setTestingAlertId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     accepting: 0,
@@ -69,28 +71,41 @@ export default function AdminDoctors() {
     claimed: 0,
   });
 
-  useEffect(() => {
-    loadDoctors();
-  }, []);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   const loadDoctors = async () => {
     setLoading(true);
     
-    // Get total count first
+    // Get total count for all doctors (for stats)
     const { count: totalCount } = await supabase
       .from("doctors")
       .select("*", { count: "exact", head: true });
     
-    const { data, error } = await supabase
+    // Build query with server-side filtering
+    let query = supabase
       .from("doctors")
-      .select("*")
-      .order("full_name", { ascending: true })
-      .limit(100);
+      .select("*", { count: "exact" })
+      .order("full_name", { ascending: true });
+    
+    // Apply search filter server-side (now includes postal_code!)
+    if (searchQuery.trim()) {
+      query = query.or(`full_name.ilike.%${searchQuery}%,clinic_name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
+    }
+    
+    // Apply status filter server-side
+    if (statusFilter !== "all") {
+      query = query.eq("accepting_status", statusFilter);
+    }
+    
+    // Limit to reasonable page size
+    query = query.limit(500);
+    
+    const { data, error, count } = await query;
 
     if (!error && data) {
       setDoctors(data);
       setStats({
-        total: totalCount || data.length,
+        total: totalCount || 0,
         accepting: data.filter(d => d.accepting_status === "accepting").length,
         notAccepting: data.filter(d => d.accepting_status === "not_accepting").length,
         waitlist: data.filter(d => d.accepting_status === "waitlist").length,
@@ -101,6 +116,26 @@ export default function AdminDoctors() {
     
     setLoading(false);
   };
+
+  // Load doctors on mount and when search/filter changes (with debounce)
+  useEffect(() => {
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      loadDoctors();
+    }, 300);
+    
+    // Cleanup on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, statusFilter]);
 
   const openEditDialog = (doctor: Doctor) => {
     setEditingDoctor(doctor);
@@ -129,7 +164,7 @@ export default function AdminDoctors() {
       .update({
         ...editForm,
         status_last_updated_at: new Date().toISOString(),
-        status_verified_by: "doctor" as const,
+        status_verified_by: "admin" as const,
       })
       .eq("id", editingDoctor.id);
 
@@ -145,14 +180,28 @@ export default function AdminDoctors() {
     setSaving(false);
   };
 
-  const filteredDoctors = doctors.filter((doctor) => {
-    const matchesSearch = 
-      doctor.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doctor.clinic_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doctor.city.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || doctor.accepting_status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const handleTestAlert = async (doctorId: string) => {
+    setTestingAlertId(doctorId);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('run-alert-engine', {
+        body: { doctorId }
+      });
+      
+      if (error) {
+        toast.error("Alert test failed: " + error.message);
+      } else {
+        toast.success(`Alert test completed! Sent ${data.alertsSent || 0} emails`);
+      }
+    } catch (error: any) {
+      toast.error("Alert test failed: " + (error.message || "Unknown error"));
+    } finally {
+      setTestingAlertId(null);
+    }
+  };
+
+  // Server-side filtering is now handled in loadDoctors, so filteredDoctors = doctors
+  const filteredDoctors = doctors;
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "—";
@@ -347,6 +396,21 @@ export default function AdminDoctors() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-2">
+                        {doctor.accepting_status === "accepting" && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleTestAlert(doctor.id)}
+                            disabled={testingAlertId === doctor.id}
+                            title="Test alert emails"
+                          >
+                            {testingAlertId === doctor.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Bell className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                         <Button 
                           variant="ghost" 
                           size="icon"
@@ -368,7 +432,10 @@ export default function AdminDoctors() {
           )}
           {!loading && filteredDoctors.length > 0 && (
             <p className="text-sm text-muted-foreground mt-4 text-center">
-              Showing {filteredDoctors.length} of {stats.total} doctors (limited to 100)
+              {searchQuery || statusFilter !== "all" 
+                ? `Showing ${filteredDoctors.length} matching doctors (of ${stats.total} total)`
+                : `Showing ${filteredDoctors.length} doctors (of ${stats.total} total) - Use search to find specific doctors`
+              }
             </p>
           )}
         </CardContent>
