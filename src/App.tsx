@@ -19,8 +19,10 @@ import ResourceDetail from "./pages/ResourceDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AssistedAccess from "./pages/AssistedAccess";
+import AssistedAccessConfirmation from "./pages/AssistedAccessConfirmation";
 import ClaimVerify from "./pages/ClaimVerify";
 import Admin from "./pages/Admin";
 import AdminResourceEditor from "./pages/AdminResourceEditor";
@@ -54,8 +56,10 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assisted-access" element={<AssistedAccess />} />
+                <Route path="/assisted-access/confirmation" element={<AssistedAccessConfirmation />} />
                 <Route path="/claim-verify" element={<ClaimVerify />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/resources/:id" element={<AdminResourceEditor />} />

@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 // reCAPTCHA site key (v2 checkbox)
-const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key - replace with real key
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
 
 declare global {
   interface Window {
@@ -113,90 +113,41 @@ export default function AssistedAccess() {
         return;
       }
 
-      // Check if user exists
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("user_id, status")
-        .eq("email", email)
-        .maybeSingle();
-
-      if (existingProfile) {
-        if (existingProfile.status === "alert_service") {
-          toast({
-            title: "Active subscription detected",
-            description: "Please cancel your subscription first before applying for Assisted Access.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-        
-        if (existingProfile.status === "assisted_access") {
-          toast({
-            title: "You already have Assisted Access",
-            description: "Sign in to access your dashboard.",
-          });
-          navigate("/auth");
-          return;
-        }
-
-        // Calculate expiry date (6 months from now)
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + 6);
-
-        // Update existing user to assisted_access
-        await supabase
-          .from("profiles")
-          .update({ 
-            status: "assisted_access",
+      // Create account with a temporary password
+      // User will receive confirmation email with link to set their password
+      const temporaryPassword = crypto.randomUUID() + 'Aa1!_';
+      
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password: temporaryPassword,
+        options: {
+          emailRedirectTo: `${window.location.origin}/reset-password`,
+          data: {
+            applying_for_assisted_access: true,
             assisted_reason: reason,
-            assisted_expires_at: expiresAt.toISOString(),
-            assisted_renewed_count: 0,
-          })
-          .eq("user_id", existingProfile.user_id);
-          
-        toast({
-          title: "Assisted Access Granted!",
-          description: "Your account has been upgraded. Sign in to start using alerts.",
-        });
-        navigate("/auth");
-      } else {
-        // Create new account with assisted access
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password: Math.random().toString(36).slice(-12) + "Aa1!", // Temporary password
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-          },
-        });
+            city: city,
+          }
+        },
+      });
 
-        if (signUpError) throw signUpError;
+      if (signUpError) throw signUpError;
 
-        // Wait a moment for the trigger to create the profile, then update it
-        if (signUpData.user) {
-          const expiresAt = new Date();
-          expiresAt.setMonth(expiresAt.getMonth() + 6);
-
-          // Wait for profile to be created by trigger
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          await supabase
-            .from("profiles")
-            .update({ 
-              status: "assisted_access",
-              assisted_reason: reason,
-              assisted_expires_at: expiresAt.toISOString(),
-              assisted_renewed_count: 0,
-            })
-            .eq("user_id", signUpData.user.id);
-        }
-        
-        toast({
-          title: "Assisted Access Granted!",
-          description: "Check your email to set your password and activate your account.",
-        });
-        navigate("/auth");
+      if (!signUpData.user) {
+        throw new Error("Failed to create account");
       }
+
+      console.log("Account created:", signUpData.user.id);
+
+      // Success! Redirect to confirmation page
+      toast({
+        title: "Application Submitted!",
+        description: "Check your email to set your password and activate your account.",
+      });
+      
+      // Navigate to confirmation/waiting page
+      navigate("/assisted-access/confirmation", { 
+        state: { email, newUser: true }
+      });
     } catch (error: any) {
       toast({
         title: "Error",

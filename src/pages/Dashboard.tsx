@@ -161,30 +161,62 @@ export default function Dashboard() {
     }
 
     setSaving(true);
-    const { data, error } = await supabase
-      .from("alert_settings")
-      .insert({
-        user_id: user.id,
-        city_postal: newCity.trim(),
-        radius_km: parseInt(newRadius),
-      })
-      .select()
-      .single();
-    setSaving(false);
 
-    if (error) {
+    try {
+      // Geocode the location (postal code OR city name)
+      const geocodeResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(newCity.trim())},Ontario,Canada&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+      );
+      const geocodeData = await geocodeResponse.json();
+
+      if (geocodeData.status !== 'OK' || !geocodeData.results?.[0]) {
+        toast({
+          title: "Could not find location",
+          description: "Please enter a valid postal code or city name",
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+
+      const { lat, lng } = geocodeData.results[0].geometry.location;
+
+      // Save with coordinates (works for both postal codes and city names)
+      const { data, error } = await supabase
+        .from("alert_settings")
+        .insert({
+          user_id: user.id,
+          city_postal: newCity.trim(),
+          radius_km: parseInt(newRadius),
+          latitude: lat,
+          longitude: lng,
+        })
+        .select()
+        .single();
+
+      setSaving(false);
+
+      if (error) {
+        toast({
+          title: "Error adding location",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        setAlertSettings([...alertSettings, data]);
+        setNewCity("");
+        setNewRadius("25");
+        toast({
+          title: "Location added!",
+          description: `You'll receive alerts for ${newCity.trim()}.`,
+        });
+      }
+    } catch (error) {
+      setSaving(false);
       toast({
-        title: "Error adding location",
-        description: error.message,
+        title: "Error geocoding location",
+        description: "Please try again",
         variant: "destructive",
-      });
-    } else {
-      setAlertSettings([...alertSettings, data]);
-      setNewCity("");
-      setNewRadius("25");
-      toast({
-        title: "Location added!",
-        description: `You'll receive alerts for ${newCity.trim()}.`,
       });
     }
   };

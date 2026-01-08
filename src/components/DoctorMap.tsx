@@ -33,16 +33,27 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
 
-  // Fetch API key from edge function
+  // Fetch API key - try env variable first, then edge function
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
+        // Check if API key is in environment variables first (recommended for simplicity)
+        const envApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        if (envApiKey) {
+          console.log("Using Google Maps API key from environment");
+          setApiKey(envApiKey);
+          return;
+        }
+
+        // Fallback to edge function if available (more secure for production)
+        console.log("Attempting to fetch Google Maps API key from edge function...");
         const { data, error } = await supabase.functions.invoke("get-maps-key");
         if (error) throw error;
         setApiKey(data.apiKey);
+        console.log("Google Maps API key fetched from edge function");
       } catch (err) {
         console.error("Failed to fetch maps API key:", err);
-        setError("Failed to load map configuration");
+        setError("Failed to load map configuration. Please add VITE_GOOGLE_MAPS_API_KEY to your environment variables or deploy the get-maps-key edge function.");
         setLoading(false);
       }
     };

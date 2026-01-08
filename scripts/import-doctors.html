@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Doctors - Find Your Doctor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .expected-format {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .expected-format h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .expected-format code {
+            display: block;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Import Doctors</h1>
+        <p class="subtitle">Upload your CSV file to import doctor data</p>
+        
+        <div class="expected-format">
+            <h3>Expected CSV Format:</h3>
+            <code>cpso_number,full_name,member_status,languages,address,city,province,postal_code,phone,latitude,longitude,google_place_id,google_formatted_address,source_url</code>
+            <p class="help-text" style="margin-top: 10px;">
+                ✅ Your CSV can include Google Maps fields - they'll be handled automatically!
+            </p>
+        </div>
+        
+        <div class="input-group">
+            <label for="supabaseUrl">Supabase URL</label>
+            <input 
+                type="text" 
+                id="supabaseUrl" 
+                placeholder="https://your-project-id.supabase.co"
+            >
+            <p class="help-text">Found in: Supabase Dashboard → Settings → API → Project URL</p>
+        </div>
+        
+        <div class="input-group">
+            <label for="supabaseKey">Supabase Service Role Key</label>
+            <input 
+                type="text" 
+                id="supabaseKey" 
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            >
+            <p class="help-text">Found in: Supabase Dashboard → Settings → API → service_role key (⚠️ Keep secret!)</p>
+        </div>
+        
+        <div class="input-group">
+            <label for="csvFile">CSV File</label>
+            <input 
+                type="file" 
+                id="csvFile" 
+                accept=".csv"
+            >
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" id="clearExisting" checked>
+            <label for="clearExisting">Clear existing doctors (replace all data)</label>
+        </div>
+        <p class="help-text" style="margin-top: -15px; margin-left: 30px;">
+            ⚠️ Uncheck to append instead of replace
+        </p>
+        
+        <button id="importBtn" onclick="importDoctors()">
+            Import Doctors
+        </button>
+        
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        async function importDoctors() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
+            const csvFile = document.getElementById('csvFile').files[0];
+            const clearExisting = document.getElementById('clearExisting').checked;
+            const statusDiv = document.getElementById('status');
+            const importBtn = document.getElementById('importBtn');
+            
+            // Validation
+            if (!supabaseUrl) {
+                showStatus('error', '❌ Please enter your Supabase URL');
+                return;
+            }
+            
+            if (!supabaseKey) {
+                showStatus('error', '❌ Please enter your Supabase Service Role Key');
+                return;
+            }
+            
+            if (!csvFile) {
+                showStatus('error', '❌ Please select a CSV file');
+                return;
+            }
+            
+            // Disable button and show loading
+            importBtn.disabled = true;
+            importBtn.textContent = 'Importing...';
+            showStatus('info', '⏳ Reading CSV file...');
+            
+            try {
+                // Read CSV file
+                const csvContent = await readFile(csvFile);
+                
+                showStatus('info', '⏳ Uploading to Supabase...');
+                
+                // Call the Edge Function
+                const functionUrl = `${supabaseUrl}/functions/v1/import-doctors`;
+                
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseKey}`
+                    },
+                    body: JSON.stringify({
+                        csvContent: csvContent,
+                        clearExisting: clearExisting
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', 
+                        `✅ Success!\n\n` +
+                        `✓ Inserted: ${result.inserted} doctors\n` +
+                        `${result.skipped > 0 ? `⊘ Skipped: ${result.skipped} duplicates\n` : ''}` +
+                        `📊 Total processed: ${result.total}`
+                    );
+                } else {
+                    showStatus('error', 
+                        `⚠️ Import completed with errors:\n\n` +
+                        `✓ Inserted: ${result.inserted} doctors\n` +
+                        `❌ Errors: ${result.errors?.join('\n') || 'Unknown error'}`
+                    );
+                }
+            } catch (error) {
+                showStatus('error', `❌ Error: ${error.message}`);
+                console.error('Import error:', error);
+            } finally {
+                importBtn.disabled = false;
+                importBtn.textContent = 'Import Doctors';
+            }
+        }
+        
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(new Error('Failed to read file'));
+                reader.readAsText(file);
+            });
+        }
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            statusDiv.textContent = message;
+            statusDiv.style.whiteSpace = 'pre-line';
+        }
+        
+        // Load saved credentials from localStorage (for convenience)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            if (savedUrl) {
+                document.getElementById('supabaseUrl').value = savedUrl;
+            }
+            
+            // Auto-save URL on change (not the key for security)
+            document.getElementById('supabaseUrl').addEventListener('change', (e) => {
+                localStorage.setItem('supabaseUrl', e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>

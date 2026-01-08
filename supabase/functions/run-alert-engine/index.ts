@@ -27,58 +27,9 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 }
 
-// Simple geocoding using city names (fallback coordinates for major Ontario cities)
-const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
-  "toronto": { lat: 43.6532, lng: -79.3832 },
-  "ottawa": { lat: 45.4215, lng: -75.6972 },
-  "mississauga": { lat: 43.5890, lng: -79.6441 },
-  "brampton": { lat: 43.7315, lng: -79.7624 },
-  "hamilton": { lat: 43.2557, lng: -79.8711 },
-  "london": { lat: 42.9849, lng: -81.2453 },
-  "markham": { lat: 43.8561, lng: -79.3370 },
-  "vaughan": { lat: 43.8563, lng: -79.5085 },
-  "kitchener": { lat: 43.4516, lng: -80.4925 },
-  "windsor": { lat: 42.3149, lng: -83.0364 },
-  "richmond hill": { lat: 43.8828, lng: -79.4403 },
-  "oakville": { lat: 43.4675, lng: -79.6877 },
-  "burlington": { lat: 43.3255, lng: -79.7990 },
-  "sudbury": { lat: 46.4917, lng: -80.9930 },
-  "oshawa": { lat: 43.8971, lng: -78.8658 },
-  "barrie": { lat: 44.3894, lng: -79.6903 },
-  "kingston": { lat: 44.2312, lng: -76.4860 },
-  "guelph": { lat: 43.5448, lng: -80.2482 },
-  "cambridge": { lat: 43.3616, lng: -80.3144 },
-  "waterloo": { lat: 43.4643, lng: -80.5204 },
-  "thunder bay": { lat: 48.3809, lng: -89.2477 },
-  "st. catharines": { lat: 43.1594, lng: -79.2469 },
-  "niagara falls": { lat: 43.0896, lng: -79.0849 },
-  "peterborough": { lat: 44.3091, lng: -78.3197 },
-  "ajax": { lat: 43.8509, lng: -79.0204 },
-  "whitby": { lat: 43.8975, lng: -78.9429 },
-  "newmarket": { lat: 44.0592, lng: -79.4614 },
-  "scarborough": { lat: 43.7731, lng: -79.2576 },
-  "north york": { lat: 43.7615, lng: -79.4111 },
-  "etobicoke": { lat: 43.6205, lng: -79.5132 },
-};
-
-function getCityCoordinates(cityPostal: string): { lat: number; lng: number } | null {
-  const normalized = cityPostal.toLowerCase().trim();
-  
-  // Check direct city match
-  if (CITY_COORDINATES[normalized]) {
-    return CITY_COORDINATES[normalized];
-  }
-  
-  // Check if any city name is contained in the input
-  for (const [city, coords] of Object.entries(CITY_COORDINATES)) {
-    if (normalized.includes(city) || city.includes(normalized)) {
-      return coords;
-    }
-  }
-  
-  // Default to Toronto if not found
-  return CITY_COORDINATES["toronto"];
-}
+// Note: City coordinates are now stored in the database with each alert_setting
+// via Google Geocoding API when the user adds a location. This provides
+// accurate coordinates for both postal codes and city names.
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -175,12 +126,18 @@ serve(async (req) => {
 
       // Check if doctor is within any of the subscriber's alert locations
       for (const alert of alertSettings) {
-        const alertCoords = getCityCoordinates(alert.city_postal);
-        if (!alertCoords) continue;
+        // Use stored coordinates from database (set during alert creation via geocoding)
+        if (!alert.latitude || !alert.longitude) {
+          logStep('Alert missing coordinates, skipping', { 
+            alertId: alert.id,
+            cityPostal: alert.city_postal 
+          });
+          continue;
+        }
 
         const distance = calculateDistance(
-          alertCoords.lat,
-          alertCoords.lng,
+          alert.latitude,
+          alert.longitude,
           Number(doctor.latitude),
           Number(doctor.longitude)
         );
