@@ -57,14 +57,9 @@ export function Header() {
               </Link>
             </Button>
           ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link to="/auth">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/auth?mode=signup">Get Started</Link>
-              </Button>
-            </>
+            <Button variant="ghost" asChild>
+              <Link to="/auth">Sign In</Link>
+            </Button>
           )}
         </div>
 
@@ -109,18 +104,11 @@ export function Header() {
                   </Link>
                 </Button>
               ) : (
-                <>
-                  <Button variant="ghost" asChild className="justify-start">
-                    <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button asChild>
-                    <Link to="/auth?mode=signup" onClick={() => setMobileMenuOpen(false)}>
-                      Get Started
-                    </Link>
-                  </Button>
-                </>
+                <Button variant="ghost" asChild className="justify-start">
+                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                    Sign In
+                  </Link>
+                </Button>
               )}
             </div>
           </nav>
