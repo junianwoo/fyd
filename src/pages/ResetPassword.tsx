@@ -16,6 +16,7 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
   const [checkingToken, setCheckingToken] = useState(true);
+  const [userStatus, setUserStatus] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -26,6 +27,17 @@ export default function ResetPassword() {
       
       if (session) {
         setIsValidToken(true);
+        
+        // Check user's status to customize messaging
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('status')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (profile) {
+          setUserStatus(profile.status);
+        }
       } else {
         toast({
           title: "Invalid or expired link",
@@ -173,12 +185,27 @@ export default function ResetPassword() {
               )}
             </Button>
 
-            <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-4">
-              <p className="text-xs text-center text-muted-foreground">
-                After setting your password, you'll be automatically signed in with
-                <span className="font-semibold text-foreground"> Assisted Access</span> privileges!
-              </p>
-            </div>
+            {userStatus && (
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-4">
+                <p className="text-xs text-center text-muted-foreground">
+                  {userStatus === 'alert_service' ? (
+                    <>
+                      🎉 Welcome to <span className="font-semibold text-foreground">Alert Service</span>!<br/>
+                      After setting your password, you'll be able to set up email alerts for up to 3 cities.
+                    </>
+                  ) : userStatus === 'assisted_access' ? (
+                    <>
+                      After setting your password, you'll be automatically signed in with
+                      <span className="font-semibold text-foreground"> Assisted Access</span> privileges!
+                    </>
+                  ) : (
+                    <>
+                      After setting your password, you'll be able to access your dashboard.
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

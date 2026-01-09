@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Check, Search, Bell, ArrowRight, Loader2, Shield, CreditCard, Clock, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Check, Search, Bell, ArrowRight, Loader2, Shield, CreditCard, Clock, Heart, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,9 +9,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useAuth } from "@/hooks/useAuth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 
 const freeFeatures = [
   "Browse all family doctors in Ontario",
@@ -30,23 +39,39 @@ const alertFeatures = [
   "Cancel anytime, no long-term commitment",
 ];
 
+const emailSchema = z.string().email("Please enter a valid email address");
+
 export default function Pricing() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-  const handleSubscribe = async () => {
-    if (!user) {
-      // Redirect to signup first
-      navigate("/auth?mode=signup");
+  const handleSubscribe = () => {
+    setShowEmailDialog(true);
+    setEmail("");
+    setEmailError("");
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate email
+    try {
+      emailSchema.parse(email);
+      setEmailError("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setEmailError(error.errors[0].message);
+      }
       return;
     }
 
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: {},
+        body: { email },
       });
 
       if (error) throw error;
@@ -59,13 +84,71 @@ export default function Pricing() {
         description: error.message || "Please try again later.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Email Collection Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Your Email</DialogTitle>
+            <DialogDescription>
+              We'll create your account automatically after payment. You'll receive a confirmation email with your login details.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={emailError ? "border-destructive pl-10" : "pl-10"}
+                  disabled={loading}
+                  autoFocus
+                />
+              </div>
+              {emailError && (
+                <p className="text-sm text-destructive">{emailError}</p>
+              )}
+            </div>
+            <div className="bg-accent/10 p-3 rounded-lg border border-accent/20">
+              <p className="text-xs text-muted-foreground">
+                <strong>What happens next:</strong> You'll be redirected to secure checkout. After payment, we'll create your account and email you the login details.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowEmailDialog(false)}
+                disabled={loading}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading} className="flex-1">
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Continue to Checkout"
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Hero */}
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">

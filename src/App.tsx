@@ -20,6 +20,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import CheckEmail from "./pages/CheckEmail";
 import Dashboard from "./pages/Dashboard";
 import AssistedAccess from "./pages/AssistedAccess";
 import AssistedAccessConfirmation from "./pages/AssistedAccessConfirmation";
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/check-email" element={<CheckEmail />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assisted-access" element={<AssistedAccess />} />
                 <Route path="/assisted-access/confirmation" element={<AssistedAccessConfirmation />} />

@@ -8,13 +8,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import heroImage from "@/assets/hero-grandfather-grandson.jpeg";
+import heroImage from "@/assets/AdobeStock_138357068_Preview.jpg.jpg";
+import communityImage from "@/assets/community.png";
 
 export default function Index() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative bg-background py-20 md:py-32 overflow-hidden min-h-[500px] md:min-h-[600px]">
+      <section className="relative bg-background overflow-hidden min-h-[550px] md:min-h-[650px] flex items-end">
         {/* Hero background image */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -24,16 +25,16 @@ export default function Index() {
           />
         </div>
         
-        <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+        <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
           <div className="max-w-xl text-left animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl text-primary mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#FFFFFF' }}>
               Find Your Family Doctor in Ontario
             </h1>
-            <p className="text-lg md:text-xl text-foreground/90 mb-8">
+            <p className="text-lg md:text-xl mb-8" style={{ color: '#FFFFFF' }}>
               2.5 million Ontarians are searching. We help you find one faster.
             </p>
             <SearchBar size="large" className="max-w-md mb-4" />
-            <p className="text-sm text-foreground/70">
+            <p className="text-sm" style={{ color: '#FFFFFF', opacity: 0.9 }}>
               Always free to search. No signup required.
             </p>
           </div>
@@ -189,9 +190,9 @@ export default function Index() {
       </section>
 
       {/* Community Section */}
-      <section className="bg-background-alt py-20 md:py-24">
+      <section className="bg-background-alt pt-20 md:pt-24 pb-0">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/10 mb-6">
               <Heart className="h-8 w-8 text-secondary" />
             </div>
@@ -207,6 +208,15 @@ export default function Index() {
             <Button size="lg" asChild>
               <Link to="/doctors">Help Update a Listing</Link>
             </Button>
+          </div>
+          
+          {/* Image at bottom, flush with no bottom padding */}
+          <div className="flex justify-center">
+            <img 
+              src={communityImage} 
+              alt="Community illustration" 
+              className="w-full max-w-5xl h-auto"
+            />
           </div>
         </div>
       </section>

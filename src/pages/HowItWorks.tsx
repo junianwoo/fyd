@@ -2,6 +2,11 @@ import { Link } from "react-router-dom";
 import { Search, Users, Bell, ArrowRight, Phone, RefreshCw, CheckCircle, MapPin, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-father-daughter.jpeg";
+import user1Image from "@/assets/user1.png";
+import user2Image from "@/assets/user2.png";
+import user3Image from "@/assets/user3.png";
+import user4Image from "@/assets/user4.png";
+import momDaughterImage from "@/assets/momdaughter.jpg";
 
 export default function HowItWorks() {
   return (
@@ -13,19 +18,20 @@ export default function HowItWorks() {
           <img 
             src={heroImage} 
             alt="" 
-            className="w-full h-full object-cover object-right"
+            className="w-full h-full object-cover object-center"
+            style={{ objectPosition: 'center 35%' }}
           />
         </div>
         
         <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
           <div className="max-w-xl text-left animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#102A43' }}>
-              You're Not Searching Alone
+            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#0F4C5C' }}>
+              You're Not Searching&nbsp;Alone
             </h1>
-            <p className="text-lg md:text-xl mb-8" style={{ color: '#102A43' }}>
+            <p className="text-lg md:text-xl mb-8" style={{ color: '#0F4C5C' }}>
               With 2.5 million Ontarians without a family doctor, many are actively searching right now. FindYourDoctor brings the community together to help everyone find care faster.
             </p>
-            <p className="text-base" style={{ color: '#102A43', opacity: 0.85 }}>
+            <p className="text-base" style={{ color: '#0F4C5C', opacity: 0.85 }}>
               The search can feel overwhelming, but you don't have to do it alone. Our community-powered approach means every search, every phone call, and every status update helps someone else get closer to finding a doctor.
             </p>
           </div>
@@ -285,8 +291,8 @@ export default function HowItWorks() {
       {/* Community Model */}
       <section className="bg-background-alt py-20 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl text-primary mb-4">
                 Community-Powered, Always Current
               </h2>
@@ -295,52 +301,102 @@ export default function HowItWorks() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-card p-6 rounded-lg border border-border">
-                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-secondary">1</span>
+            <div className="space-y-16">
+              {/* Step 1 */}
+              <div className="relative">
+                <div className="md:ml-32">
+                  <div className="bg-card p-6 md:pl-40 rounded-lg border border-border shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-secondary">1</span>
+                      </div>
+                      <h3 className="text-xl text-foreground">Someone searches and calls a clinic</h3>
+                    </div>
+                    <p className="text-muted-foreground ml-13">
+                      They learn whether the doctor is accepting patients right now.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl text-foreground mb-2">Someone searches and calls a clinic</h3>
-                <p className="text-muted-foreground">
-                  They learn whether the doctor is accepting patients right now.
-                </p>
-              </div>
-              
-              <div className="bg-card p-6 rounded-lg border border-border">
-                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-secondary">2</span>
+                <div className="md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 md:w-52 w-40 mx-auto md:mx-0 -mt-4 md:mt-0 z-10">
+                  <img 
+                    src={user1Image} 
+                    alt="Person calling clinic" 
+                    className="w-full h-auto drop-shadow-lg"
+                  />
                 </div>
-                <h3 className="text-xl text-foreground mb-2">They update the status on FindYourDoctor</h3>
-                <p className="text-muted-foreground">
-                  Takes 30 seconds. No account required.
-                </p>
               </div>
-              
-              <div className="bg-card p-6 rounded-lg border border-border">
-                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-secondary">3</span>
+
+              {/* Step 2 */}
+              <div className="relative">
+                <div className="md:ml-32">
+                  <div className="bg-card p-6 md:pl-40 rounded-lg border border-border shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-secondary">2</span>
+                      </div>
+                      <h3 className="text-xl text-foreground">They update the status on FindYourDoctor</h3>
+                    </div>
+                    <p className="text-muted-foreground ml-13">
+                      Takes 30 seconds. No account required.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl text-foreground mb-2">The next person searching sees current information</h3>
-                <p className="text-muted-foreground">
-                  They save time by knowing who to call first.
-                </p>
-              </div>
-              
-              <div className="bg-card p-6 rounded-lg border border-border">
-                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-secondary">4</span>
+                <div className="md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 md:w-52 w-40 mx-auto md:mx-0 -mt-4 md:mt-0 z-10">
+                  <img 
+                    src={user2Image} 
+                    alt="Person updating status" 
+                    className="w-full h-auto drop-shadow-lg"
+                  />
                 </div>
-                <h3 className="text-xl text-foreground mb-2">The cycle continues</h3>
-                <p className="text-muted-foreground">
-                  Every person who updates helps the next person searching.
-                </p>
               </div>
-            </div>
-            
-            <div className="mt-8 bg-secondary/5 p-6 rounded-lg border border-secondary/20 text-center">
-              <p className="text-lg text-foreground font-semibold">
-                Information that stays current without waiting for official updates or annual directory refreshes. The community keeps each other informed.
-              </p>
+
+              {/* Step 3 */}
+              <div className="relative">
+                <div className="md:ml-32">
+                  <div className="bg-card p-6 md:pl-40 rounded-lg border border-border shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-secondary">3</span>
+                      </div>
+                      <h3 className="text-xl text-foreground">The next person searching sees current information</h3>
+                    </div>
+                    <p className="text-muted-foreground ml-13">
+                      They save time by knowing who to call first.
+                    </p>
+                  </div>
+                </div>
+                <div className="md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 md:w-52 w-40 mx-auto md:mx-0 -mt-4 md:mt-0 z-10">
+                  <img 
+                    src={user3Image} 
+                    alt="Person viewing updated information" 
+                    className="w-full h-auto drop-shadow-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="relative">
+                <div className="md:ml-32">
+                  <div className="bg-card p-6 md:pl-40 rounded-lg border border-border shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-secondary">4</span>
+                      </div>
+                      <h3 className="text-xl text-foreground">The cycle continues</h3>
+                    </div>
+                    <p className="text-muted-foreground ml-13">
+                      Every person who updates helps the next person searching.
+                    </p>
+                  </div>
+                </div>
+                <div className="md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 md:w-52 w-40 mx-auto md:mx-0 -mt-4 md:mt-0 z-10">
+                  <img 
+                    src={user4Image} 
+                    alt="Community cycle" 
+                    className="w-full h-auto drop-shadow-lg"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -673,19 +729,28 @@ export default function HowItWorks() {
       </section>
 
       {/* Encouraging Hope */}
-      <section className="bg-background-alt py-20 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl text-primary mb-6">
+      <section className="relative bg-background py-12 md:py-16 overflow-hidden min-h-[350px] md:min-h-[400px]">
+        {/* Background image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={momDaughterImage} 
+            alt="Mother and daughter" 
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10 h-full flex items-center justify-center md:justify-end">
+          <div className="max-w-lg text-left animate-fade-in md:mr-12">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight whitespace-nowrap" style={{ color: '#0F4C5C' }}>
               You Will Find a Doctor
             </h2>
-            <p className="text-lg text-muted-foreground mb-6">
+            <p className="text-lg mb-6" style={{ color: '#0F4C5C' }}>
               The search takes time, and it can feel discouraging. But doctors do accept new patients every week. When you combine FindYourDoctor's community updates with persistence and a bit of luck, you improve your chances.
             </p>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg mb-6" style={{ color: '#0F4C5C' }}>
               You're part of a community of people helping each other navigate this challenge. Every status update, every search, and every shared bit of information moves everyone closer to finding care.
             </p>
-            <p className="text-xl text-foreground mt-8 font-semibold">
+            <p className="text-xl font-semibold" style={{ color: '#0F4C5C' }}>
               Keep searching. Stay hopeful. We're here to help.
             </p>
           </div>

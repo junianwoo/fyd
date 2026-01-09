@@ -38,3 +38,12 @@ verify_jwt = false
 
 [functions.import-doctors]
 verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.resend-password-reset]
+verify_jwt = false

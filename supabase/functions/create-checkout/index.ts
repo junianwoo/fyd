@@ -30,20 +30,31 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
+    // Get email from request body or from authenticated user
+    const body = await req.json();
+    let email = body.email;
+    let userId = null;
+
+    // Check if user is authenticated (optional)
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data } = await supabaseClient.auth.getUser(token);
+      if (data.user) {
+        userId = data.user.id;
+        email = email || data.user.email;
+        logStep("Authenticated user", { userId, email });
+      }
+    }
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    // Validate email
+    if (!email) throw new Error("Email is required");
+    logStep("Email provided", { email, authenticated: !!userId });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2024-11-20.acacia" });
     
     // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
@@ -54,12 +65,13 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
     
-    // Alert Service price ID
-    const priceId = "price_1SmQomEfiuQ9vCM5ZTvlL7V3";
+    // Alert Service price ID - get from environment or use default
+    const priceId = Deno.env.get("STRIPE_PRICE_ID") || "price_1SmQomEfiuQ9vCM5ZTvlL7V3";
+    logStep("Using price ID", { priceId });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : email,
       line_items: [
         {
           price: priceId,
@@ -67,10 +79,11 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/dashboard?success=true`,
+      success_url: `${origin}/check-email?email=${encodeURIComponent(email)}`,
       cancel_url: `${origin}/pricing`,
       metadata: {
-        user_id: user.id,
+        user_id: userId || "",
+        email: email,
       },
     });
 
