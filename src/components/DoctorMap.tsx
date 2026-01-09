@@ -8,6 +8,7 @@ interface DoctorMapProps {
   selectedDoctorId?: string;
   onDoctorSelect?: (doctorId: string) => void;
   userLocation?: { lat: number; lng: number } | null;
+  searchLocation?: { lat: number; lng: number } | null;
   className?: string;
 }
 
@@ -25,7 +26,7 @@ const statusColors: Record<string, string> = {
   unknown: "#6b7280",        // Gray - unknown/neutral
 };
 
-export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocation, className = "" }: DoctorMapProps) {
+export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocation, searchLocation, className = "" }: DoctorMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -167,16 +168,23 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
       const isSelected = selectedDoctorId === doctor.id;
       const markerColor = statusColors[doctor.acceptingStatus] || statusColors.unknown;
 
-      // Create SVG icon for the marker
-      const size = isSelected ? 40 : 32;
+      // Create SVG icon for the marker - pin shape with medical cross
+      const size = isSelected ? 50 : 40;
       const svgIcon = {
         url: `data:image/svg+xml,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-            <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 2}" fill="${markerColor}" stroke="${isSelected ? '#0F4C5C' : 'white'}" stroke-width="3"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size * 1.33}" viewBox="0 0 24 32">
+            <!-- Pin shape -->
+            <path d="M12 0C5.4 0 0 5.4 0 12c0 8 12 20 12 20s12-12 12-20c0-6.6-5.4-12-12-12z" 
+                  fill="${markerColor}" 
+                  stroke="${isSelected ? '#0F4C5C' : 'white'}" 
+                  stroke-width="${isSelected ? '2' : '1.5'}"/>
+            <!-- Medical cross -->
+            <rect x="10" y="6" width="4" height="12" fill="white" rx="0.5"/>
+            <rect x="6" y="10" width="12" height="4" fill="white" rx="0.5"/>
           </svg>
         `)}`,
-        scaledSize: new window.google.maps.Size(size, size),
-        anchor: new window.google.maps.Point(size/2, size/2),
+        scaledSize: new window.google.maps.Size(size, size * 1.33),
+        anchor: new window.google.maps.Point(size/2, size * 1.33),
       };
 
       const marker = new window.google.maps.Marker({
@@ -194,8 +202,45 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
       markersRef.current.push(marker);
     });
 
+    // Add search location marker if it exists and differs from user location
+    if (searchLocation && 
+        (!userLocation || 
+         searchLocation.lat !== userLocation.lat || 
+         searchLocation.lng !== userLocation.lng)) {
+      
+      bounds.extend(searchLocation);
+      
+      const searchMarkerSize = 45;
+      const searchMarkerIcon = {
+        url: `data:image/svg+xml,${encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="${searchMarkerSize}" height="${searchMarkerSize * 1.33}" viewBox="0 0 24 32">
+            <!-- Pin shape in gold -->
+            <path d="M12 0C5.4 0 0 5.4 0 12c0 8 12 20 12 20s12-12 12-20c0-6.6-5.4-12-12-12z" 
+                  fill="#FDB813" 
+                  stroke="white" 
+                  stroke-width="2"/>
+            <!-- Star icon -->
+            <path d="M12 7l1.545 4.755h5l-4.045 2.94 1.545 4.755L12 16.51l-4.045 2.94 1.545-4.755-4.045-2.94h5z" 
+                  fill="white"/>
+          </svg>
+        `)}`,
+        scaledSize: new window.google.maps.Size(searchMarkerSize, searchMarkerSize * 1.33),
+        anchor: new window.google.maps.Point(searchMarkerSize/2, searchMarkerSize * 1.33),
+      };
+
+      const searchMarker = new window.google.maps.Marker({
+        map: mapInstanceRef.current,
+        position: searchLocation,
+        icon: searchMarkerIcon,
+        title: "Your search location",
+        zIndex: 50, // Above regular markers, below selected
+      });
+
+      markersRef.current.push(searchMarker);
+    }
+
     // Fit bounds with padding
-    if (doctors.length > 0) {
+    if (doctors.length > 0 || searchLocation) {
       mapInstanceRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
       
       // Limit max zoom
@@ -207,7 +252,7 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
         window.google.maps.event.removeListener(listener);
       });
     }
-  }, [doctors, selectedDoctorId, onDoctorSelect]);
+  }, [doctors, selectedDoctorId, onDoctorSelect, searchLocation, userLocation]);
 
   if (error) {
     return (

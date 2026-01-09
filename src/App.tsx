@@ -29,7 +29,16 @@ import Admin from "./pages/Admin";
 import AdminResourceEditor from "./pages/AdminResourceEditor";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
+      gcTime: 1000 * 60 * 10, // Cache is kept for 10 minutes
+      refetchOnWindowFocus: true, // Refetch when window regains focus
+      refetchOnMount: true, // Refetch when component mounts
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

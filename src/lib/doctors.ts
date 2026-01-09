@@ -100,10 +100,60 @@ export async function fetchDoctorById(id: string): Promise<Doctor | null> {
   return data ? mapDoctorRowToDoctor(data) : null;
 }
 
-// Check if query looks like a postal code (Canadian format starts with letter-digit)
-function isPostalCodeSearch(query: string): boolean {
-  const cleaned = query.replace(/\s/g, "").toUpperCase();
-  return /^[A-Z]\d[A-Z]?\d?[A-Z]?\d?$/.test(cleaned);
+// Geocode a postal code to lat/lng coordinates using Google Maps API
+async function geocodePostalCode(postalCode: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    // Try client-side API key first
+    let apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    
+    // If not available, fetch from edge function
+    if (!apiKey) {
+      const response = await supabase.functions.invoke("get-maps-key");
+      if (response.error) throw response.error;
+      apiKey = response.data?.apiKey;
+    }
+    
+    if (!apiKey) {
+      console.error("No Google Maps API key available");
+      return null;
+    }
+    
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(postalCode)},Ontario,Canada&key=${apiKey}`
+    );
+    const data = await response.json();
+    
+    if (data.status === 'OK' && data.results?.[0]) {
+      return data.results[0].geometry.location;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    return null;
+  }
+}
+
+// Analyze postal code to determine type and validity
+function analyzePostalCode(query: string): { 
+  isPostalCode: boolean; 
+  isFull: boolean; 
+  isPartial: boolean;
+  isInvalid: boolean;
+  cleaned: string;
+} {
+  const cleaned = query.replace(/\s/g, '').toUpperCase();
+  const isPostalCode = /^[A-Z]\d[A-Z]?\d?[A-Z]?\d?$/.test(cleaned);
+  
+  if (!isPostalCode) {
+    return { isPostalCode: false, isFull: false, isPartial: false, isInvalid: false, cleaned };
+  }
+  
+  const isFull = cleaned.length === 6 && /^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned);
+  const isPartial = cleaned.length === 3 && /^[A-Z]\d[A-Z]$/.test(cleaned);
+  const isInvalid = cleaned.length >= 4 && cleaned.length <= 5;
+  
+  return { isPostalCode, isFull, isPartial, isInvalid, cleaned };
 }
 
 export async function searchDoctors(query: string): Promise<{ doctors: Doctor[]; searchLocation: { lat: number; lng: number } | null }> {
@@ -113,22 +163,52 @@ export async function searchDoctors(query: string): Promise<{ doctors: Doctor[];
   }
   
   const lowerQuery = cleanedQuery.toLowerCase();
-  const isPostalCode = isPostalCodeSearch(cleanedQuery);
+  const postalAnalysis = analyzePostalCode(cleanedQuery);
   
-  // Paginate through search results to bypass 1000 row limit
+  // INVALID POSTAL CODE (4-5 chars): Return empty results
+  if (postalAnalysis.isInvalid) {
+    console.log('Invalid postal code length (4-5 chars):', postalAnalysis.cleaned);
+    return { doctors: [], searchLocation: null };
+  }
+  
+  let searchLocation: { lat: number; lng: number } | null = null;
+  let shouldLoadAllDoctors = false;
+  let postalPrefix = '';
+  
+  // FULL POSTAL CODE (6 chars): Try geocoding first
+  if (postalAnalysis.isFull) {
+    searchLocation = await geocodePostalCode(postalAnalysis.cleaned);
+    
+    if (searchLocation) {
+      // Geocoding succeeded - load all doctors for radius filtering
+      shouldLoadAllDoctors = true;
+    } else {
+      // Geocoding failed - fall back to first 3 char prefix match
+      postalPrefix = postalAnalysis.cleaned.substring(0, 3);
+    }
+  }
+  
+  // PARTIAL POSTAL CODE (3 chars): Use prefix match
+  if (postalAnalysis.isPartial) {
+    postalPrefix = postalAnalysis.cleaned;
+  }
+  
   const allDoctors: DoctorRow[] = [];
   let page = 0;
   const pageSize = 1000;
   
+  // Load doctors based on search strategy
   while (true) {
     let queryBuilder = supabase.from("doctors").select("*");
     
-    if (isPostalCode) {
-      // For postal codes, search for postal codes starting with the query (prefix match)
-      const postalPrefix = cleanedQuery.replace(/\s/g, "").toUpperCase();
+    if (shouldLoadAllDoctors) {
+      // Load all doctors - will be filtered by distance in frontend
+      // No filters applied
+    } else if (postalPrefix) {
+      // 3-char prefix match
       queryBuilder = queryBuilder.ilike("postal_code", `${postalPrefix}%`);
-    } else {
-      // For city/name searches, use contains matching
+    } else if (!postalAnalysis.isPostalCode) {
+      // City/name search
       queryBuilder = queryBuilder.or(
         `city.ilike.%${lowerQuery}%,full_name.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`
       );
@@ -153,11 +233,8 @@ export async function searchDoctors(query: string): Promise<{ doctors: Doctor[];
 
   const doctors = allDoctors.map(mapDoctorRowToDoctor);
   
-  // Calculate search location as the center of first few results for accurate distance filtering
-  let searchLocation: { lat: number; lng: number } | null = null;
-  if (doctors.length > 0) {
-    // Use the first result's location as the reference point
-    // This is more accurate than averaging all results
+  // If we didn't geocode, use first doctor's location as fallback
+  if (!searchLocation && doctors.length > 0) {
     searchLocation = {
       lat: doctors[0].latitude,
       lng: doctors[0].longitude,

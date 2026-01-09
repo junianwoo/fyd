@@ -226,6 +226,7 @@ export default function Doctors() {
           selectedDoctorId={selectedDoctorId}
           onDoctorSelect={handleDoctorSelect}
           userLocation={userLocation}
+          searchLocation={searchLocation}
           className="h-96 md:h-[30rem]"
         />
       </div>
