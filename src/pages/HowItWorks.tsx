@@ -18,11 +18,10 @@ export default function HowItWorks() {
           <img 
             src={heroImage} 
             alt="" 
-            className="w-full h-full object-cover object-center"
-            style={{ objectPosition: 'center 35%' }}
+            className="w-full h-full object-cover object-center md:object-[center_35%]"
           />
           {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30 md:bg-gradient-to-r md:from-black/50 md:via-black/20 md:to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
@@ -735,9 +734,9 @@ export default function HowItWorks() {
       </section>
 
       {/* Encouraging Hope */}
-      <section className="relative bg-background py-12 md:py-16 overflow-hidden min-h-[350px] md:min-h-[400px]">
-        {/* Background image */}
-        <div className="absolute inset-0 z-0">
+      <section className="relative bg-background py-12 md:py-16 overflow-hidden md:min-h-[400px]">
+        {/* Background image - hidden on mobile */}
+        <div className="absolute inset-0 z-0 hidden md:block">
           <img 
             src={momDaughterImage} 
             alt="Mother and daughter" 
@@ -747,7 +746,7 @@ export default function HowItWorks() {
         
         <div className="container mx-auto px-4 relative z-10 h-full flex items-center justify-center md:justify-end">
           <div className="max-w-lg text-left animate-fade-in md:mr-12">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight whitespace-nowrap" style={{ color: '#0F4C5C' }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 md:mb-6 leading-tight" style={{ color: '#0F4C5C' }}>
               You Will Find a Doctor
             </h2>
             <p className="text-lg mb-6" style={{ color: '#0F4C5C' }}>
