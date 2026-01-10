@@ -100,7 +100,7 @@ export default function CheckEmail() {
             </p>
             <ul className="text-sm text-muted-foreground space-y-1 ml-4">
               <li>• Check your spam/junk folder</li>
-              <li>• Look for email from: <code className="text-xs bg-background px-1 py-0.5 rounded">noreply@mail.app.supabase.io</code></li>
+              <li>• Look for email from: <code className="text-xs bg-background px-1 py-0.5 rounded">no-reply@findyourdoctor.ca</code></li>
               <li>• Email may take a few minutes to arrive</li>
             </ul>
           </div>
