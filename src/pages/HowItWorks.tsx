@@ -189,7 +189,7 @@ export default function HowItWorks() {
             
             <div className="space-y-6">
               <p className="text-lg text-muted-foreground">
-                This is where you help the community. After calling a clinic—whether they're accepting patients or not—take 30 seconds to update their status on FindYourDoctor.
+                This is where you help the community. After calling a clinic, whether they're accepting patients or not, take 30 seconds to update their status on FindYourDoctor.
               </p>
               
               <div className="bg-card p-6 rounded-lg border border-border">
@@ -260,7 +260,7 @@ export default function HowItWorks() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
-                    <span>Act fast—you'll be among the first to know</span>
+                    <span>Act fast. You'll be among the first to know</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
@@ -272,7 +272,7 @@ export default function HowItWorks() {
               <div className="bg-card p-6 rounded-lg border border-border">
                 <h3 className="text-lg text-foreground mb-3 font-semibold">Who Alert Service Is For:</h3>
                 <p className="text-muted-foreground">
-                  Alert Service is designed for people who are actively searching for a family doctor—whether for themselves or for loved ones in other cities. Many subscribers use alerts to help aging parents, family members, or friends find doctors in their area.
+                  Alert Service is designed for people who are actively searching for a family doctor, whether for themselves or for loved ones in other cities. Many subscribers use alerts to help aging parents, family members, or friends find doctors in their area.
                 </p>
               </div>
               
@@ -302,7 +302,7 @@ export default function HowItWorks() {
                 Community-Powered, Always Current
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                FindYourDoctor works because it's built on community participation. We don't scrape outdated directories or wait months between updates. Our information stays current because real people—just like you—share what they learn.
+                FindYourDoctor works because it's built on community participation. We don't scrape outdated directories or wait months between updates. Our information stays current because real people, just like you, share what they learn.
               </p>
             </div>
             
@@ -424,7 +424,7 @@ export default function HowItWorks() {
                   Accepting New Patients
                 </h3>
                 <p className="text-muted-foreground">
-                  The doctor is currently accepting new patients. Call soon—rosters can fill quickly.
+                  The doctor is currently accepting new patients. Call soon. Rosters can fill quickly.
                 </p>
               </div>
               

@@ -378,7 +378,7 @@ export default function Pricing() {
             <div className="bg-card p-8 rounded-lg border border-border text-left mb-8">
               <h3 className="text-xl text-foreground mb-3">What Is Assisted Access?</h3>
               <p className="text-muted-foreground mb-4">
-                Assisted Access provides free Alert Service to those facing financial barriers. We don't ask for proof or documentation—we trust you to assess your own situation.
+                Assisted Access provides free Alert Service to those facing financial barriers. We don't ask for proof or documentation. We trust you to assess your own situation.
               </p>
               <Button size="lg" asChild>
                 <Link to="/assisted-access">Apply for Assisted Access</Link>
@@ -698,22 +698,8 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Testimonials Placeholder */}
+{/* Still Have Questions */}
       <section className="bg-background py-20 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl text-primary mb-6">
-              What People Are Saying
-            </h2>
-            <p className="text-muted-foreground">
-              Testimonials coming soon from FindYourDoctor users.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Still Have Questions */}
-      <section className="bg-background-alt py-20 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl text-primary mb-6">
@@ -735,7 +721,7 @@ export default function Pricing() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="bg-background py-20 md:py-24">
+      <section className="bg-background-alt py-20 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-10">
             <h2 className="text-3xl md:text-4xl text-primary mb-4">
@@ -777,7 +763,7 @@ export default function Pricing() {
       </section>
 
       {/* Trust Signals */}
-      <section className="bg-background-alt py-12 border-t border-border">
+      <section className="bg-background py-12 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">

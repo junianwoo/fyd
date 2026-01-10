@@ -202,7 +202,7 @@ export default function Index() {
               Built by the Community. For the Community.
             </h2>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              FindYourDoctor works because people like you keep it accurate. Called a clinic recently? Update their status—it takes 30 seconds and helps someone find care faster.
+              FindYourDoctor works because people like you keep it accurate. Called a clinic recently? Update their status. It takes 30 seconds and helps someone find care faster.
             </p>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               Like you, 2.5 million Ontarians need a family doctor. Your update helps someone in your community get one step closer.
@@ -343,7 +343,7 @@ export default function Index() {
                   How are email alerts different from free search?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Free search lets you browse doctors whenever you want. Email alerts actively monitor doctors in your chosen cities and notify you the moment one starts accepting patients—so you can be among the first to call.
+                  Free search lets you browse doctors whenever you want. Email alerts actively monitor doctors in your chosen cities and notify you the moment one starts accepting patients. So you can be among the first to call.
                 </AccordionContent>
               </AccordionItem>
               

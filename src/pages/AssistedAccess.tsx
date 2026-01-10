@@ -248,7 +248,7 @@ export default function AssistedAccess() {
             We've Got You Covered
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            If $7.99/month is a barrier for you right now, we'll provide Alert Service at no cost. Everyone deserves access to tools that help them find healthcare.
+            If paying for something monthly is a barrier for you right now, we'll provide our Alert Service to you at no cost. Everyone deserves access to tools that help them find healthcare.
           </p>
         </div>
       </section>
@@ -393,14 +393,14 @@ export default function AssistedAccess() {
                   <Label htmlFor="reason">Brief Note *</Label>
                   <Textarea
                     id="reason"
-                    placeholder="Help us understand your situation in a few words..."
+                    placeholder="Help us understand your situation..."
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     rows={4}
                     required
                   />
                   <p className="text-sm text-muted-foreground">
-                    Help us understand your situation in a few words. This helps us improve the program.
+                    Just a few words will do. This helps us improve the program.
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Character count: ({reason.length}/20 minimum)
