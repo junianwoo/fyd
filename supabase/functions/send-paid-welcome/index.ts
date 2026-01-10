@@ -148,7 +148,7 @@ serve(async (req) => {
     
     const emailResponse = await resend.emails.send({
       from: DEFAULT_EMAIL_OPTIONS.from!,
-      replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
+      reply_to: DEFAULT_EMAIL_OPTIONS.replyTo!,
       to: [email],
       subject: 'Welcome to FindYourDoctor Alert Service! 🎉',
       html,

@@ -248,7 +248,7 @@ serve(async (req) => {
             
             await resend.emails.send({
               from: ALERT_EMAIL_OPTIONS.from!,
-              replyTo: ALERT_EMAIL_OPTIONS.replyTo!,
+              reply_to: ALERT_EMAIL_OPTIONS.replyTo!,
               to: [subscriber.email],
               subject: `🎉 Doctor Alert: ${doctor.full_name} is now accepting patients in ${doctor.city}!`,
               html,

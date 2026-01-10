@@ -118,7 +118,7 @@ serve(async (req) => {
         
         await resend.emails.send({
           from: DEFAULT_EMAIL_OPTIONS.from!,
-          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
+          reply_to: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "Your Assisted Access expires in 30 days",
           html: html30,
@@ -187,7 +187,7 @@ serve(async (req) => {
         
         await resend.emails.send({
           from: DEFAULT_EMAIL_OPTIONS.from!,
-          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
+          reply_to: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "⚠️ Your Assisted Access expires in 7 days",
           html: html7,
@@ -263,7 +263,7 @@ serve(async (req) => {
         
         await resend.emails.send({
           from: DEFAULT_EMAIL_OPTIONS.from!,
-          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
+          reply_to: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "Your Assisted Access has expired",
           html: htmlExpired,

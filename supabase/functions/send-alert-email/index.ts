@@ -92,7 +92,7 @@ serve(async (req) => {
     
     const emailResponse = await resend.emails.send({
       from: ALERT_EMAIL_OPTIONS.from!,
-      replyTo: ALERT_EMAIL_OPTIONS.replyTo!,
+      reply_to: ALERT_EMAIL_OPTIONS.replyTo!,
       to: [recipientEmail],
       subject: `🎉 Doctor Alert: ${doctorName} is now accepting patients in ${city}!`,
       html,
