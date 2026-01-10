@@ -116,7 +116,7 @@ export default function Auth() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
                   <Link 
-                    to="/reset-password" 
+                    to="/forgot-password" 
                     className="text-xs text-secondary hover:underline"
                   >
                     Forgot password?

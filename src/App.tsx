@@ -19,6 +19,7 @@ import ResourceDetail from "./pages/ResourceDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CheckEmail from "./pages/CheckEmail";
 import Dashboard from "./pages/Dashboard";
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/check-email" element={<CheckEmail />} />
                 <Route path="/dashboard" element={<Dashboard />} />
