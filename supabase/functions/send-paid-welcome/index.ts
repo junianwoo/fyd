@@ -96,7 +96,7 @@ serve(async (req) => {
       </p>
       
       <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        Thank you for subscribing to FindYourDoctor Alert Service! Your support helps us assist thousands of Ontarians in finding family doctors.
+        Thank you for subscribing to FindYourDoctor Alert Service!
       </p>
       
       ${subscriptionDetailsCard}
