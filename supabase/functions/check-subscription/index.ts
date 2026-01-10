@@ -43,21 +43,68 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // First, check if user has Assisted Access
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("status, assisted_expires_at")
+      .eq("user_id", user.id)
+      .single();
+
+    if (profile?.status === "assisted_access") {
+      logStep("User has Assisted Access, checking expiry");
+      
+      if (profile.assisted_expires_at) {
+        const expiryDate = new Date(profile.assisted_expires_at);
+        const now = new Date();
+        
+        if (expiryDate > now) {
+          logStep("Assisted Access is still valid", { expiresAt: profile.assisted_expires_at });
+          return new Response(JSON.stringify({ 
+            subscribed: true,
+            status: "assisted_access",
+            expires_at: profile.assisted_expires_at
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        } else {
+          logStep("Assisted Access has expired, downgrading to free");
+          // Expired, downgrade to free
+          await supabaseClient
+            .from("profiles")
+            .update({ status: "free" })
+            .eq("user_id", user.id);
+          
+          return new Response(JSON.stringify({ 
+            subscribed: false,
+            status: "free",
+            message: "Assisted Access has expired"
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      }
+    }
+
+    // Check Stripe subscription
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-11-20.acacia" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
       logStep("No customer found, returning unsubscribed state");
       
-      // Update profile to free status
-      await supabaseClient
-        .from("profiles")
-        .update({ status: "free", subscription_status: null })
-        .eq("user_id", user.id);
+      // Only update to free if they're not already assisted_access
+      if (profile?.status !== "assisted_access") {
+        await supabaseClient
+          .from("profiles")
+          .update({ status: "free", subscription_status: null })
+          .eq("user_id", user.id);
+      }
       
       return new Response(JSON.stringify({ 
         subscribed: false,
-        status: "free"
+        status: profile?.status === "assisted_access" ? "assisted_access" : "free"
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

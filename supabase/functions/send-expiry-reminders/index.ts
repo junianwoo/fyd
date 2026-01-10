@@ -53,9 +53,8 @@ serve(async (req) => {
       const expiryDate = new Date(user.assisted_expires_at);
       const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
 
-      // Generate renewal token (simple: base64(userId + timestamp))
-      const renewalToken = btoa(user.user_id + Date.now().toString()).substring(0, 32);
-      const renewalUrl = `${siteUrl}/functions/v1/renew-assisted-access?user_id=${user.user_id}&token=${renewalToken}`;
+      // Generate renewal URL (using Vercel API route)
+      const renewalUrl = `${siteUrl}/api/renew-assisted-access?userId=${user.user_id}`;
 
       // Send 30-day reminder
       if (daysUntilExpiry <= 30 && daysUntilExpiry > 28) {
