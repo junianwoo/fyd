@@ -142,16 +142,13 @@ export function analyzePostalCode(query: string): {
   isInvalid: boolean;
   cleaned: string;
 } {
-  const cleaned = query.replace(/\s/g, '').toUpperCase();
-  const isPostalCode = /^[A-Z]\d[A-Z]?\d?[A-Z]?\d?$/.test(cleaned);
+  const cleaned = query.replace(/\s+/g, '').toUpperCase();
   
-  if (!isPostalCode) {
-    return { isPostalCode: false, isFull: false, isPartial: false, isInvalid: false, cleaned };
-  }
-  
-  const isFull = cleaned.length === 6 && /^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned);
-  const isPartial = cleaned.length === 3 && /^[A-Z]\d[A-Z]$/.test(cleaned);
-  const isInvalid = cleaned.length >= 4 && cleaned.length <= 5;
+  // Canadian postal code must be exactly 3 or 6 characters after cleaning
+  const isFull = /^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned);
+  const isPartial = /^[A-Z]\d[A-Z]$/.test(cleaned);
+  const isPostalCode = isFull || isPartial || (cleaned.length >= 2 && /^[A-Z]\d/.test(cleaned));
+  const isInvalid = cleaned.length >= 4 && cleaned.length <= 5 && /^[A-Z]\d[A-Z]/.test(cleaned);
   
   return { isPostalCode, isFull, isPartial, isInvalid, cleaned };
 }

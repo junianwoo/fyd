@@ -57,6 +57,10 @@ export default function AdminUsers() {
       .select("*")
       .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error("Error loading profiles:", error);
+    }
+
     if (!error && data) {
       setProfiles(data);
       setStats({

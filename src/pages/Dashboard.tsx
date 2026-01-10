@@ -203,7 +203,18 @@ export default function Dashboard() {
 
     // Validate postal code format if it looks like a postal code
     const postalAnalysis = analyzePostalCode(newCity.trim());
-    if (postalAnalysis.isPostalCode && !postalAnalysis.isFull) {
+    console.log("Postal analysis:", postalAnalysis);
+    
+    if (postalAnalysis.isInvalid) {
+      toast({
+        title: "Invalid postal code format",
+        description: "Please enter a complete postal code (e.g., M1S 5B2 or M1S5B2) or a city name",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (postalAnalysis.isPostalCode && !postalAnalysis.isFull && !postalAnalysis.isPartial) {
       toast({
         title: "Invalid postal code",
         description: "Please enter a complete postal code (e.g., M1S 5B2) or a city name",
