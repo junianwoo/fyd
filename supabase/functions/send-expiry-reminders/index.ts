@@ -97,7 +97,7 @@ serve(async (req) => {
           ${renewalNote30}
           
           <div style="text-align: center; margin: 32px 0;">
-            ${getButton(renewalUrl, "Renew for 6 More Months")}
+            ${getButton("Renew for 6 More Months", renewalUrl, '#00A6A6')}
           </div>
           
           <div style="background: #F3FBFA; padding: 16px; border-radius: 8px; margin: 24px 0;">
@@ -175,7 +175,7 @@ serve(async (req) => {
           ${optionsCard7}
           
           <div style="text-align: center; margin: 32px 0;">
-            ${getButton(renewalUrl, "Renew for 6 More Months")}
+            ${getButton("Renew for 6 More Months", renewalUrl, '#F4A261')}
           </div>
           
           <p style="margin: 24px 0 0 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
