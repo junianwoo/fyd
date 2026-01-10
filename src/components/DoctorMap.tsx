@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { Doctor } from "@/lib/doctors";
 import { Loader2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +26,7 @@ const statusColors: Record<string, string> = {
   unknown: "#6b7280",        // Gray - unknown/neutral
 };
 
-export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocation, searchLocation, className = "" }: DoctorMapProps) {
+const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocation, searchLocation, className = "" }: DoctorMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -279,4 +279,6 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
   return (
     <div ref={mapRef} className={`w-full ${className}`} />
   );
-}
+});
+
+export { DoctorMap };
