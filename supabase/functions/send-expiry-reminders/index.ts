@@ -53,6 +53,10 @@ serve(async (req) => {
       const expiryDate = new Date(user.assisted_expires_at);
       const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
 
+      // Generate renewal token (simple: base64(userId + timestamp))
+      const renewalToken = btoa(user.user_id + Date.now().toString()).substring(0, 32);
+      const renewalUrl = `${siteUrl}/functions/v1/renew-assisted-access?user_id=${user.user_id}&token=${renewalToken}`;
+
       // Send 30-day reminder
       if (daysUntilExpiry <= 30 && daysUntilExpiry > 28) {
         logStep("Sending 30-day reminder", { email: user.email, daysUntilExpiry });
@@ -91,7 +95,7 @@ serve(async (req) => {
           ${renewalNote30}
           
           <div style="text-align: center; margin: 32px 0;">
-            ${getButton('Renew Assisted Access', `${siteUrl}/dashboard`, '#00A6A6')}
+            ${getButton(renewalUrl, "Renew for 6 More Months")}
           </div>
           
           <div style="background: #F3FBFA; padding: 16px; border-radius: 8px; margin: 24px 0;">
@@ -169,7 +173,7 @@ serve(async (req) => {
           ${optionsCard7}
           
           <div style="text-align: center; margin: 32px 0;">
-            ${getButton('Renew Now', `${siteUrl}/dashboard`, '#F4A261')}
+            ${getButton(renewalUrl, "Renew for 6 More Months")}
           </div>
           
           <p style="margin: 24px 0 0 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -219,7 +223,7 @@ serve(async (req) => {
           <h3 style="margin: 0 0 16px 0; color: #0F4C5C; font-size: 18px; font-family: Georgia, 'Times New Roman', serif;">Continue Receiving Alerts</h3>
           <ul style="margin: 0; padding: 0; list-style: none;">
             <li style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              <strong style="color: #0F4C5C;"><a href="${siteUrl}/assisted-access" style="color: #0F4C5C; text-decoration: none;">Reapply for Assisted Access</a></strong><br/>
+              <strong style="color: #0F4C5C;"><a href="${renewalUrl}" style="color: #0F4C5C; text-decoration: none;">Renew Assisted Access (One Click)</a></strong><br/>
               <span style="color: #666; font-size: 14px;">If you still need financial assistance</span>
             </li>
             <li style="padding: 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
