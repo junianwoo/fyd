@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/send-expiry-reminders",
+      "schedule": "0 10 * * *"
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
