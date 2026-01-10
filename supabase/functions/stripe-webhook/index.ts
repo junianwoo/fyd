@@ -119,8 +119,29 @@ serve(async (req) => {
                     logStep("Profile created successfully", { userId });
                   }
 
-                  // Send branded welcome email for paid subscribers
+                  // Generate password reset link for new user
                   const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
+                  logStep("Generating password reset link", { email, siteUrl });
+                  
+                  let passwordResetUrl = `${siteUrl}/reset-password`;
+                  try {
+                    const { data: resetData, error: resetError } = await supabase.auth.admin.generateLink({
+                      type: 'recovery',
+                      email: email,
+                      options: {
+                        redirectTo: `${siteUrl}/reset-password`
+                      }
+                    });
+                    
+                    if (!resetError && resetData) {
+                      passwordResetUrl = resetData.properties?.action_link || passwordResetUrl;
+                      logStep("Password reset link generated", { email });
+                    }
+                  } catch (linkError) {
+                    logStep("ERROR generating password reset link", { error: linkError });
+                  }
+                  
+                  // Send branded welcome email with password setup link
                   logStep("Sending paid welcome email", { email, siteUrl });
                   
                   try {
@@ -141,21 +162,12 @@ serve(async (req) => {
                         email,
                         subscriptionId,
                         amount,
+                        passwordResetUrl,
                       },
                     });
-                    logStep("Paid welcome email sent", { email });
+                    logStep("Paid welcome email sent with password setup link", { email });
                   } catch (welcomeError) {
                     logStep("ERROR sending paid welcome email", { error: welcomeError });
-                  }
-                  
-                  // Also send password reset email
-                  try {
-                    await supabase.functions.invoke("send-password-reset", {
-                      body: { email },
-                    });
-                    logStep("Password reset email sent", { email });
-                  } catch (resetError) {
-                    logStep("ERROR sending password reset email", { error: resetError });
                   }
                 }
               } catch (error) {

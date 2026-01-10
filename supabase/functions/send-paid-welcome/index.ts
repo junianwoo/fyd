@@ -14,6 +14,7 @@ interface WelcomeEmailRequest {
   email: string;
   subscriptionId?: string;
   amount?: string;
+  passwordResetUrl?: string;
 }
 
 serve(async (req) => {
@@ -24,7 +25,7 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { email, subscriptionId, amount }: WelcomeEmailRequest = await req.json();
+    const { email, subscriptionId, amount, passwordResetUrl }: WelcomeEmailRequest = await req.json();
     
     if (!email) {
       throw new Error("Email is required");
@@ -34,6 +35,7 @@ serve(async (req) => {
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
     const displayAmount = amount || "$7.99";
+    const setupUrl = passwordResetUrl || `${siteUrl}/reset-password`;
     
     // Build email body content
     const thankYouCard = getCard(`
@@ -101,18 +103,25 @@ serve(async (req) => {
       
       ${featuresCard}
       
+      <div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
+        <h3 style="margin: 0 0 8px 0; color: #92400E; font-size: 16px; font-family: Georgia, 'Times New Roman', serif;">⚡ First Step: Set Your Password</h3>
+        <p style="margin: 8px 0 0 0; font-size: 14px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          Before you can access your dashboard and set up alerts, you'll need to create your password. Click the button below to get started:
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        ${getButton('Set Your Password', setupUrl, '#F4A261')}
+      </div>
+      
       <div style="background: #F3FBFA; border-left: 4px solid #00A6A6; padding: 16px; border-radius: 8px; margin: 24px 0;">
-        <h3 style="margin: 0 0 8px 0; color: #0F4C5C; font-size: 16px; font-family: Georgia, 'Times New Roman', serif;">Getting Started</h3>
+        <h3 style="margin: 0 0 8px 0; color: #0F4C5C; font-size: 16px; font-family: Georgia, 'Times New Roman', serif;">After Setting Your Password</h3>
         <ol style="margin: 8px 0 0 0; padding-left: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           <li style="margin-bottom: 8px; color: #666;">Sign in to your dashboard</li>
           <li style="margin-bottom: 8px; color: #666;">Add up to 3 cities you want to monitor</li>
           <li style="margin-bottom: 8px; color: #666;">Customize your alert preferences (optional)</li>
           <li style="color: #666;">We'll email you whenever a doctor in your areas starts accepting patients!</li>
         </ol>
-      </div>
-      
-      <div style="text-align: center; margin: 32px 0;">
-        ${getButton('Set Up Your Alerts', `${siteUrl}/dashboard`, '#00A6A6')}
       </div>
       
       <div style="background: #FEF3C7; padding: 16px; border-radius: 8px; margin: 24px 0;">
