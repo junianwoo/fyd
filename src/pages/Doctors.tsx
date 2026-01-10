@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { MapPin, Phone, Calendar, ExternalLink, Loader2, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -173,13 +173,13 @@ export default function Doctors() {
     });
   };
 
-  const handleDoctorSelect = (doctorId: string) => {
+  const handleDoctorSelect = useCallback((doctorId: string) => {
     setSelectedDoctorId(doctorId);
     const element = document.getElementById(`doctor-${doctorId}`);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  };
+  }, []);
 
   const clearFilters = () => {
     setStatusFilter("all");
