@@ -53,11 +53,8 @@ serve(async (req) => {
       const expiryDate = new Date(user.assisted_expires_at);
       const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
 
-      // Generate renewal URL (using Vercel API route)
-      const renewalUrl = `${siteUrl}/api/renew-assisted-access?userId=${user.user_id}`;
-      
-      // Note: This function should be triggered by a Supabase cron job daily
-      // pg_cron schedule: '0 10 * * *' (runs at 10 AM UTC daily)
+      // Generate renewal URL (goes to branded confirmation page)
+      const renewalUrl = `${siteUrl}/assisted-access/renew?userId=${user.user_id}`;
 
       // Send 30-day reminder
       if (daysUntilExpiry <= 30 && daysUntilExpiry > 28) {

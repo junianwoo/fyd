@@ -24,6 +24,7 @@ import CheckEmail from "./pages/CheckEmail";
 import Dashboard from "./pages/Dashboard";
 import AssistedAccess from "./pages/AssistedAccess";
 import AssistedAccessConfirmation from "./pages/AssistedAccessConfirmation";
+import AssistedAccessRenewal from "./pages/AssistedAccessRenewal";
 import ClaimVerify from "./pages/ClaimVerify";
 import Admin from "./pages/Admin";
 import AdminResourceEditor from "./pages/AdminResourceEditor";
@@ -71,6 +72,7 @@ const App = () => (
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assisted-access" element={<AssistedAccess />} />
                 <Route path="/assisted-access/confirmation" element={<AssistedAccessConfirmation />} />
+                <Route path="/assisted-access/renew" element={<AssistedAccessRenewal />} />
                 <Route path="/claim-verify" element={<ClaimVerify />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/resources/:id" element={<AdminResourceEditor />} />
