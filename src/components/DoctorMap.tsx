@@ -175,12 +175,12 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
       const key = `${doctor.latitude.toFixed(6)},${doctor.longitude.toFixed(6)}`;
       const group = locationGroups.get(key)!;
       
-      // If multiple doctors at same location, offset them in a small circle
+      // If multiple doctors at same location, offset them in a visible circle
       let position = { lat: doctor.latitude, lng: doctor.longitude };
       if (group.length > 1) {
         const index = group.indexOf(doctor);
         const angle = (index / group.length) * 2 * Math.PI;
-        const offset = 0.0003; // ~30 meters offset
+        const offset = 0.002; // ~200 meters offset - clearly visible at normal zoom
         position = {
           lat: doctor.latitude + (Math.cos(angle) * offset),
           lng: doctor.longitude + (Math.sin(angle) * offset),
