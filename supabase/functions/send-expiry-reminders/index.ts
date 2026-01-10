@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { buildEmail, getButton, getCard, DEFAULT_EMAIL_OPTIONS } from "../_shared/email-templates.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -56,55 +57,71 @@ serve(async (req) => {
       if (daysUntilExpiry <= 30 && daysUntilExpiry > 28) {
         logStep("Sending 30-day reminder", { email: user.email, daysUntilExpiry });
         
+        const expiryCard30 = getCard(`
+          <div style="text-align: center; padding: 12px 0;">
+            <div style="font-size: 48px; margin-bottom: 12px;">⏰</div>
+            <h2 style="margin: 0 0 8px 0; color: #F4A261; font-size: 24px; font-family: Georgia, 'Times New Roman', serif;">30 Days Until Expiry</h2>
+            <p style="margin: 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              Your Assisted Access expires on ${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+        `, '#F4A261');
+        
+        const renewalNote30 = user.assisted_renewed_count && user.assisted_renewed_count >= 2
+          ? `<div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
+              <p style="margin: 0; font-size: 14px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <strong>Note:</strong> You've renewed twice already. Further renewals may require review.
+              </p>
+            </div>`
+          : `<p style="margin: 16px 0; font-size: 15px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              You can renew for another 6 months with a single click.
+            </p>`;
+        
+        const bodyContent30 = `
+          ${expiryCard30}
+          
+          <p style="margin: 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Hi there,
+          </p>
+          
+          <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            This is a friendly reminder that your Assisted Access subscription expires in <strong>30 days</strong>. If you still need financial assistance, you can renew your access before it expires.
+          </p>
+          
+          ${renewalNote30}
+          
+          <div style="text-align: center; margin: 32px 0;">
+            ${getButton('Renew Assisted Access', `${siteUrl}/dashboard`, '#00A6A6')}
+          </div>
+          
+          <div style="background: #F3FBFA; padding: 16px; border-radius: 8px; margin: 24px 0;">
+            <p style="margin: 0 0 8px 0; font-size: 14px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong>💛 If your situation has improved</strong>
+            </p>
+            <p style="margin: 0; font-size: 14px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              If you can now afford the $7.99/month Alert Service, we'd appreciate you upgrading. Your paid subscription helps us continue offering Assisted Access to others who need it.
+            </p>
+          </div>
+          
+          <p style="margin: 24px 0 0 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Questions? Reply to this email or visit your dashboard for more options.
+          </p>
+        `;
+        
+        const html30 = buildEmail({
+          headerTitle: 'Assisted Access Reminder',
+          headerSubtitle: 'Your access expires in 30 days',
+          bodyContent: bodyContent30,
+          siteUrl,
+          includeUnsubscribe: false,
+        });
+        
         await resend.emails.send({
-          from: "FindYourDoctor <support@findyourdoctor.ca>",
+          from: DEFAULT_EMAIL_OPTIONS.from!,
+          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "Your Assisted Access expires in 30 days",
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: #0F4C5C; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Assisted Access Reminder</h1>
-              </div>
-              
-              <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
-                <p style="font-size: 16px;">Hi there,</p>
-                
-                <p style="font-size: 16px;">
-                  Your Assisted Access subscription expires in <strong>30 days</strong> 
-                  (${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}).
-                </p>
-                
-                <p style="font-size: 16px;">
-                  If you still need financial assistance, you can renew your access before it expires.
-                  ${user.assisted_renewed_count && user.assisted_renewed_count >= 2 
-                    ? "Note: You've renewed twice already. Further renewals may require review." 
-                    : ""}
-                </p>
-                
-                <div style="margin: 24px 0; text-align: center;">
-                  <a href="${siteUrl}/dashboard" style="display: inline-block; background: #0F4C5C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                    Go to Dashboard
-                  </a>
-                </div>
-                
-                <p style="font-size: 14px; color: #666;">
-                  If your financial situation has improved, consider our Alert Service at $7.99/month 
-                  to continue receiving doctor alerts.
-                </p>
-              </div>
-              
-              <div style="padding: 20px; text-align: center; font-size: 12px; color: #999;">
-                <p><a href="${siteUrl}" style="color: #00A6A6;">FindYourDoctor.ca</a></p>
-              </div>
-            </body>
-            </html>
-          `,
+          html: html30,
         });
         
         remindersSent++;
@@ -114,52 +131,66 @@ serve(async (req) => {
       if (daysUntilExpiry <= 7 && daysUntilExpiry > 5) {
         logStep("Sending 7-day reminder", { email: user.email, daysUntilExpiry });
         
+        const expiryCard7 = getCard(`
+          <div style="text-align: center; padding: 12px 0;">
+            <div style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
+            <h2 style="margin: 0 0 8px 0; color: #F4A261; font-size: 24px; font-family: Georgia, 'Times New Roman', serif;">7 Days Until Expiry</h2>
+            <p style="margin: 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              Your Assisted Access expires on ${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+        `, '#F4A261');
+        
+        const optionsCard7 = getCard(`
+          <h3 style="margin: 0 0 16px 0; color: #0F4C5C; font-size: 18px; font-family: Georgia, 'Times New Roman', serif;">Your Options</h3>
+          <ul style="margin: 0; padding: 0; list-style: none;">
+            <li style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong style="color: #0F4C5C;">Renew Assisted Access</strong><br/>
+              <span style="color: #666; font-size: 14px;">If you still need financial assistance</span>
+            </li>
+            <li style="padding: 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong style="color: #0F4C5C;">Subscribe to Alert Service</strong><br/>
+              <span style="color: #666; font-size: 14px;">$7.99/month with no commitment</span>
+            </li>
+          </ul>
+        `, '#FFF3CD');
+        
+        const bodyContent7 = `
+          ${expiryCard7}
+          
+          <p style="margin: 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Hi there,
+          </p>
+          
+          <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Your Assisted Access expires in <strong>7 days</strong>. After ${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric" })}, you won't receive doctor alerts unless you renew or subscribe.
+          </p>
+          
+          ${optionsCard7}
+          
+          <div style="text-align: center; margin: 32px 0;">
+            ${getButton('Renew Now', `${siteUrl}/dashboard`, '#F4A261')}
+          </div>
+          
+          <p style="margin: 24px 0 0 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Questions? Reply to this email anytime.
+          </p>
+        `;
+        
+        const html7 = buildEmail({
+          headerTitle: '⚠️ Expiring Soon!',
+          headerSubtitle: 'Your access expires in 7 days',
+          bodyContent: bodyContent7,
+          siteUrl,
+          includeUnsubscribe: false,
+        });
+        
         await resend.emails.send({
-          from: "FindYourDoctor <support@findyourdoctor.ca>",
+          from: DEFAULT_EMAIL_OPTIONS.from!,
+          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "⚠️ Your Assisted Access expires in 7 days",
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: #F4A261; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">⚠️ Expiring Soon!</h1>
-              </div>
-              
-              <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
-                <p style="font-size: 16px;">Hi there,</p>
-                
-                <p style="font-size: 16px;">
-                  Your Assisted Access expires in <strong>7 days</strong>. 
-                  After ${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric" })}, 
-                  you won't receive doctor alerts.
-                </p>
-                
-                <div style="background: #fff3cd; padding: 16px; border-radius: 8px; margin: 16px 0;">
-                  <p style="margin: 0; font-size: 14px;">
-                    <strong>Options:</strong><br>
-                    • Renew Assisted Access (if still needed)<br>
-                    • Subscribe to Alert Service ($7.99/month)
-                  </p>
-                </div>
-                
-                <div style="margin: 24px 0; text-align: center;">
-                  <a href="${siteUrl}/dashboard" style="display: inline-block; background: #F4A261; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                    Renew Now
-                  </a>
-                </div>
-              </div>
-              
-              <div style="padding: 20px; text-align: center; font-size: 12px; color: #999;">
-                <p><a href="${siteUrl}" style="color: #00A6A6;">FindYourDoctor.ca</a></p>
-              </div>
-            </body>
-            </html>
-          `,
+          html: html7,
         });
         
         remindersSent++;
@@ -174,50 +205,68 @@ serve(async (req) => {
           .update({ status: "free" })
           .eq("user_id", user.user_id);
 
+        const expiredCard = getCard(`
+          <div style="text-align: center; padding: 12px 0;">
+            <div style="font-size: 48px; margin-bottom: 12px;">📋</div>
+            <h2 style="margin: 0 0 8px 0; color: #6b7280; font-size: 24px; font-family: Georgia, 'Times New Roman', serif;">Your Access Has Expired</h2>
+            <p style="margin: 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              Assisted Access ended on ${expiryDate.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+        `, '#6b7280');
+        
+        const optionsCardExpired = getCard(`
+          <h3 style="margin: 0 0 16px 0; color: #0F4C5C; font-size: 18px; font-family: Georgia, 'Times New Roman', serif;">Continue Receiving Alerts</h3>
+          <ul style="margin: 0; padding: 0; list-style: none;">
+            <li style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong style="color: #0F4C5C;"><a href="${siteUrl}/assisted-access" style="color: #0F4C5C; text-decoration: none;">Reapply for Assisted Access</a></strong><br/>
+              <span style="color: #666; font-size: 14px;">If you still need financial assistance</span>
+            </li>
+            <li style="padding: 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong style="color: #0F4C5C;"><a href="${siteUrl}/pricing" style="color: #0F4C5C; text-decoration: none;">Subscribe to Alert Service</a></strong><br/>
+              <span style="color: #666; font-size: 14px;">$7.99/month, cancel anytime</span>
+            </li>
+          </ul>
+        `, '#f8f9fa');
+        
+        const bodyContentExpired = `
+          ${expiredCard}
+          
+          <p style="margin: 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Hi there,
+          </p>
+          
+          <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            Your Assisted Access has expired. You can still use FindYourDoctor.ca to search for doctors, but you won't receive email alerts when doctors start accepting patients.
+          </p>
+          
+          ${optionsCardExpired}
+          
+          <div style="background: #F3FBFA; padding: 16px; border-radius: 8px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <strong>Always Free:</strong> Search our doctor database anytime at <a href="${siteUrl}/doctors" style="color: #00A6A6; text-decoration: none;">findyourdoctor.ca/doctors</a>
+            </p>
+          </div>
+          
+          <p style="margin: 24px 0 0 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <em>Thank you for using FindYourDoctor.ca. We hope you found the care you were looking for!</em>
+          </p>
+        `;
+        
+        const htmlExpired = buildEmail({
+          headerTitle: 'Access Expired',
+          headerSubtitle: 'Your Assisted Access has ended',
+          bodyContent: bodyContentExpired,
+          siteUrl,
+          includeUnsubscribe: false,
+        });
+        
         await resend.emails.send({
-          from: "FindYourDoctor <support@findyourdoctor.ca>",
+          from: DEFAULT_EMAIL_OPTIONS.from!,
+          replyTo: DEFAULT_EMAIL_OPTIONS.replyTo!,
           to: [user.email],
           subject: "Your Assisted Access has expired",
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: #6b7280; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Access Expired</h1>
-              </div>
-              
-              <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
-                <p style="font-size: 16px;">Hi there,</p>
-                
-                <p style="font-size: 16px;">
-                  Your Assisted Access has expired. You can still use FindYourDoctor.ca to search for doctors, 
-                  but you won't receive email alerts.
-                </p>
-                
-                <p style="font-size: 16px;">
-                  To continue receiving alerts when doctors near you start accepting patients:
-                </p>
-                
-                <ul style="font-size: 14px;">
-                  <li><a href="${siteUrl}/assisted-access" style="color: #00A6A6;">Reapply for Assisted Access</a> (if still needed)</li>
-                  <li><a href="${siteUrl}/pricing" style="color: #00A6A6;">Subscribe to Alert Service</a> ($7.99/month)</li>
-                </ul>
-                
-                <p style="font-size: 14px; color: #666;">
-                  Thank you for using FindYourDoctor.ca. We hope you found what you were looking for!
-                </p>
-              </div>
-              
-              <div style="padding: 20px; text-align: center; font-size: 12px; color: #999;">
-                <p><a href="${siteUrl}" style="color: #00A6A6;">FindYourDoctor.ca</a></p>
-              </div>
-            </body>
-            </html>
-          `,
+          html: htmlExpired,
         });
         
         remindersSent++;

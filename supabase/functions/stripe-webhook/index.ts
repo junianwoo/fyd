@@ -119,41 +119,44 @@ serve(async (req) => {
                     logStep("Profile created successfully", { userId });
                   }
 
-                  // Send password reset email
+                  // Send branded welcome email for paid subscribers
                   const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
-                  logStep("Attempting to send password reset email", { email, siteUrl });
+                  logStep("Sending paid welcome email", { email, siteUrl });
                   
-                  const { data: resetData, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: `${siteUrl}/reset-password`,
-                  });
-
-                  if (resetError) {
-                    logStep("ERROR sending password reset email", { 
-                      error: resetError.message,
-                      code: resetError.code,
-                      email 
-                    });
-                    
-                    // Try to send a custom welcome email via edge function
-                    try {
-                      await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-welcome-email`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-                        },
-                        body: JSON.stringify({ 
-                          email,
-                          userId,
-                          resetUrl: `${siteUrl}/reset-password`
-                        }),
-                      });
-                      logStep("Fallback welcome email sent", { email });
-                    } catch (fallbackError) {
-                      logStep("ERROR sending fallback email", { error: fallbackError });
+                  try {
+                    // Get subscription amount from Stripe
+                    let amount = "$7.99";
+                    if (subscriptionId) {
+                      try {
+                        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+                        const priceAmount = sub.items.data[0]?.price.unit_amount || 799;
+                        amount = `$${(priceAmount / 100).toFixed(2)}`;
+                      } catch (subError) {
+                        logStep("Could not retrieve subscription details", { error: subError });
+                      }
                     }
-                  } else {
-                    logStep("Password reset email sent successfully", { email, resetData });
+                    
+                    await supabase.functions.invoke("send-paid-welcome", {
+                      body: {
+                        email,
+                        customerName: session.customer_details?.name,
+                        subscriptionId,
+                        amount,
+                      },
+                    });
+                    logStep("Paid welcome email sent", { email });
+                  } catch (welcomeError) {
+                    logStep("ERROR sending paid welcome email", { error: welcomeError });
+                  }
+                  
+                  // Also send password reset email
+                  try {
+                    await supabase.functions.invoke("send-password-reset", {
+                      body: { email },
+                    });
+                    logStep("Password reset email sent", { email });
+                  } catch (resetError) {
+                    logStep("ERROR sending password reset email", { error: resetError });
                   }
                 }
               } catch (error) {

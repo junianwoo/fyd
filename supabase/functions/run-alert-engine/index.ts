@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { buildEmail, getCard, getPhoneButton, ALERT_EMAIL_OPTIONS } from "../_shared/email-templates.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -200,59 +201,57 @@ serve(async (req) => {
 
           // Send alert email
           try {
+            // Build email body content
+            const doctorCard = getCard(`
+              <h2 style="margin: 0 0 8px 0; color: #1a1a1a; font-size: 22px; font-family: Georgia, 'Times New Roman', serif;">${doctor.full_name}</h2>
+              <p style="margin: 0 0 16px 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${doctor.clinic_name}</p>
+              
+              <div style="margin-bottom: 20px;">
+                <p style="margin: 0 0 4px 0; font-size: 15px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  📍 ${doctor.address}, ${doctor.city}, ${doctor.province} ${doctor.postal_code}
+                </p>
+                <p style="margin: 4px 0 0 0; font-size: 14px; color: #00A6A6; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  📏 ~${Math.round(distance)} km from ${alert.city_postal}
+                </p>
+              </div>
+              
+              ${getPhoneButton(doctor.phone, doctor.phone)}
+              
+              <div style="margin-top: 16px;">
+                <a href="${siteUrl}/doctors/${doctor.id}" style="color: #00A6A6; font-size: 14px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  View Full Details →
+                </a>
+              </div>
+            `, '#2ECC71');
+            
+            const bodyContent = `
+              ${doctorCard}
+              
+              <div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
+                <p style="margin: 0; font-size: 15px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <strong>⚡ Act fast!</strong> Doctors fill up quickly. We recommend calling as soon as possible to secure your spot.
+                </p>
+              </div>
+              
+              <p style="margin: 16px 0 0 0; font-size: 13px; color: #999; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                You're receiving this because you have alerts set for ${alert.city_postal}.
+              </p>
+            `;
+            
+            const html = buildEmail({
+              headerTitle: '🎉 Great News!',
+              headerSubtitle: `A doctor near ${alert.city_postal} is now accepting patients`,
+              bodyContent,
+              siteUrl,
+              includeUnsubscribe: true,
+            });
+            
             await resend.emails.send({
-              from: "FindYourDoctor <alerts@findyourdoctor.ca>",
+              from: ALERT_EMAIL_OPTIONS.from!,
+              replyTo: ALERT_EMAIL_OPTIONS.replyTo!,
               to: [subscriber.email],
               subject: `🎉 Doctor Alert: ${doctor.full_name} is now accepting patients in ${doctor.city}!`,
-              html: `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                  <meta charset="utf-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                  <div style="background: linear-gradient(135deg, #00857C 0%, #00A6A6 100%); padding: 30px; border-radius: 12px 12px 0 0;">
-                    <h1 style="color: white; margin: 0; font-size: 24px;">🎉 Great News!</h1>
-                    <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">
-                      A doctor near ${alert.city_postal} is now accepting patients
-                    </p>
-                  </div>
-                  
-                  <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
-                    <div style="background: white; padding: 24px; border-radius: 8px; border-left: 4px solid #22c55e;">
-                      <h2 style="margin: 0 0 8px 0; color: #1a1a1a; font-size: 20px;">${doctor.full_name}</h2>
-                      <p style="margin: 0 0 16px 0; color: #666; font-size: 16px;">${doctor.clinic_name}</p>
-                      
-                      <div style="margin-bottom: 16px;">
-                        <p style="margin: 0; font-size: 14px; color: #666;">📍 ${doctor.address}, ${doctor.city}, ${doctor.province} ${doctor.postal_code}</p>
-                        <p style="margin: 4px 0 0 0; font-size: 14px; color: #666;">📏 ~${Math.round(distance)} km from ${alert.city_postal}</p>
-                      </div>
-                      
-                      <a href="tel:${doctor.phone.replace(/[^0-9]/g, "")}" style="display: inline-block; background: #00857C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                        📞 Call Now: ${doctor.phone}
-                      </a>
-                    </div>
-                    
-                    <p style="margin: 24px 0 0 0; font-size: 14px; color: #666;">
-                      <strong>⚡ Act fast!</strong> Doctors fill up quickly. We recommend calling immediately.
-                    </p>
-                    
-                    <a href="${siteUrl}/doctors/${doctor.id}" style="display: inline-block; margin-top: 16px; color: #00857C; font-size: 14px;">
-                      View Full Details →
-                    </a>
-                  </div>
-                  
-                  <div style="padding: 20px; text-align: center; font-size: 12px; color: #999;">
-                    <p>You're receiving this because you have alerts set for ${alert.city_postal}.</p>
-                    <p>
-                      <a href="${siteUrl}/dashboard" style="color: #00857C;">Manage your alerts</a> | 
-                      <a href="${siteUrl}" style="color: #00857C;">FindYourDoctor.ca</a>
-                    </p>
-                  </div>
-                </body>
-                </html>
-              `,
+              html,
             });
             
             alertsSent++;

@@ -49,15 +49,9 @@ serve(async (req) => {
 
     console.log("[RESEND-PASSWORD] Profile found for user:", profile.user_id);
 
-    // Use a different approach - create an anon client to trigger the password reset
-    // This works because resetPasswordForEmail is a public method
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || supabaseServiceKey;
-    const anonClient = createClient(supabaseUrl, anonKey);
-    
-    const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
-    
-    const { data, error } = await anonClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/reset-password`,
+    // Call our branded password reset email function
+    const { data, error } = await supabase.functions.invoke('send-password-reset', {
+      body: { email }
     });
 
     if (error) {

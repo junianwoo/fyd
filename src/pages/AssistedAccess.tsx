@@ -218,6 +218,20 @@ export default function AssistedAccess() {
 
       console.log("Account created:", signUpData.user.id);
 
+      // Send branded welcome email with password setup link
+      try {
+        await supabase.functions.invoke("send-assisted-access-welcome", {
+          body: {
+            email,
+            userId: signUpData.user.id,
+          },
+        });
+        console.log("Welcome email sent successfully");
+      } catch (emailError) {
+        console.error("Error sending welcome email:", emailError);
+        // Don't fail the entire flow if email fails
+      }
+
       // Success! Redirect to confirmation page
       toast({
         title: "Application Submitted!",
