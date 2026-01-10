@@ -29,14 +29,14 @@ export default function ForgotPassword() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const { data, error } = await supabase.functions.invoke("send-password-reset", {
+      body: { email },
     });
 
-    if (error) {
+    if (error || !data?.success) {
       toast({
         title: "Error sending reset email",
-        description: error.message,
+        description: error?.message || data?.error || "Failed to send reset email",
         variant: "destructive",
       });
       setLoading(false);
