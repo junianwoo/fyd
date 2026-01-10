@@ -436,40 +436,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleRefreshSubscription = async () => {
-    setSaving(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      
-      if (error) throw error;
-      
-      // Refetch profile
-      if (user) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        
-        setProfile(profileData);
-        
-        toast({
-          title: "Subscription status updated",
-          description: profileData?.status === "alert_service" 
-            ? "Your subscription is active" 
-            : "No active subscription found",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error checking subscription",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
 
   if (authLoading || loading) {
     return (
@@ -820,18 +786,9 @@ export default function Dashboard() {
                     <p className="text-muted-foreground">
                       You're subscribed to the Alert Service at $7.99/month.
                     </p>
-                    <div className="flex gap-3">
-                      <Button variant="outline" onClick={handleManageBilling}>
-                        Manage Billing
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        onClick={handleRefreshSubscription}
-                        disabled={saving}
-                      >
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
-                      </Button>
-                    </div>
+                    <Button variant="outline" onClick={handleManageBilling}>
+                      Manage Billing
+                    </Button>
                   </div>
                 ) : profile?.status === "assisted_access" ? (
                   <div className="space-y-4">
@@ -847,18 +804,9 @@ export default function Dashboard() {
                         })}
                       </p>
                     )}
-                    <div className="flex gap-3">
-                      <Button variant="outline" onClick={handleCheckout}>
-                        Upgrade to Paid Subscription
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        onClick={handleRefreshSubscription}
-                        disabled={saving}
-                      >
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
-                      </Button>
-                    </div>
+                    <Button variant="outline" onClick={handleCheckout}>
+                      Upgrade to Paid Subscription
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -871,13 +819,6 @@ export default function Dashboard() {
                       </Button>
                       <Button variant="outline" asChild>
                         <Link to="/assisted-access">Apply for Free Access</Link>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        onClick={handleRefreshSubscription}
-                        disabled={saving}
-                      >
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh Status"}
                       </Button>
                     </div>
                   </div>
