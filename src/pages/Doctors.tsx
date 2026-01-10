@@ -189,6 +189,23 @@ export default function Doctors() {
     setVirtualFilter(false);
   };
 
+  // Smart map display: Show all filtered doctors if reasonable count, otherwise limit to closest
+  const mapDoctors = useMemo(() => {
+    const MAX_MAP_MARKERS = 100; // Limit to prevent performance issues
+    
+    if (filteredDoctors.length <= MAX_MAP_MARKERS) {
+      return filteredDoctors;
+    }
+    
+    // If too many, show closest doctors + all accepting doctors
+    const acceptingDoctors = filteredDoctors.filter(d => d.acceptingStatus === 'accepting');
+    const otherDoctors = filteredDoctors.filter(d => d.acceptingStatus !== 'accepting');
+    
+    // Always show accepting doctors, fill remaining with closest others
+    const remainingSlots = MAX_MAP_MARKERS - acceptingDoctors.length;
+    return [...acceptingDoctors, ...otherDoctors.slice(0, Math.max(0, remainingSlots))];
+  }, [filteredDoctors]);
+
   // Show location prompt if user hasn't shared location yet
   if (!userLocation) {
     return (
@@ -216,23 +233,6 @@ export default function Doctors() {
       isPaidUser={isPaidUser}
     />
   );
-
-  // Smart map display: Show all filtered doctors if reasonable count, otherwise limit to closest
-  const mapDoctors = useMemo(() => {
-    const MAX_MAP_MARKERS = 100; // Limit to prevent performance issues
-    
-    if (filteredDoctors.length <= MAX_MAP_MARKERS) {
-      return filteredDoctors;
-    }
-    
-    // If too many, show closest doctors + all accepting doctors
-    const acceptingDoctors = filteredDoctors.filter(d => d.acceptingStatus === 'accepting');
-    const otherDoctors = filteredDoctors.filter(d => d.acceptingStatus !== 'accepting');
-    
-    // Always show accepting doctors, fill remaining with closest others
-    const remainingSlots = MAX_MAP_MARKERS - acceptingDoctors.length;
-    return [...acceptingDoctors, ...otherDoctors.slice(0, Math.max(0, remainingSlots))];
-  }, [filteredDoctors]);
 
   return (
     <div className="min-h-screen bg-background">
