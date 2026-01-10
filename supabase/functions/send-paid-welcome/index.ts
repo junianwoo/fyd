@@ -96,7 +96,7 @@ serve(async (req) => {
       </p>
       
       <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        Thank you for subscribing to FindYourDoctor Alert Service! Your support helps us assist thousands of Ontarians in finding family doctors, including those who use our free Assisted Access program.
+        Thank you for subscribing to FindYourDoctor Alert Service! Your support helps us assist thousands of Ontarians in finding family doctors.
       </p>
       
       ${subscriptionDetailsCard}
@@ -122,13 +122,6 @@ serve(async (req) => {
           <li style="margin-bottom: 8px; color: #666;">Customize your alert preferences (optional)</li>
           <li style="color: #666;">We'll email you whenever a doctor in your areas starts accepting patients!</li>
         </ol>
-      </div>
-      
-      <div style="background: #FEF3C7; padding: 16px; border-radius: 8px; margin: 24px 0;">
-        <p style="margin: 0; font-size: 14px; color: #92400E; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <strong>💛 Your subscription helps others</strong><br/>
-          Your support makes it possible for us to offer free Assisted Access to Ontarians facing financial barriers.
-        </p>
       </div>
       
       <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin: 24px 0;">
