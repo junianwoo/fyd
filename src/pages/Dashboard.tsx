@@ -226,9 +226,28 @@ export default function Dashboard() {
     setSaving(true);
 
     try {
+      // Get API key from env or edge function
+      let apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      
+      if (!apiKey) {
+        const response = await supabase.functions.invoke("get-maps-key");
+        if (response.error) throw response.error;
+        apiKey = response.data?.apiKey;
+      }
+
+      if (!apiKey) {
+        toast({
+          title: "Configuration error",
+          description: "Maps API key not available. Please contact support.",
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+
       // Geocode the location (postal code OR city name)
       const geocodeResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(newCity.trim())},Ontario,Canada&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(newCity.trim())},Ontario,Canada&key=${apiKey}`
       );
       const geocodeData = await geocodeResponse.json();
 
