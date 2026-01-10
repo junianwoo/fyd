@@ -217,12 +217,29 @@ export default function Doctors() {
     />
   );
 
+  // Smart map display: Show all filtered doctors if reasonable count, otherwise limit to closest
+  const mapDoctors = useMemo(() => {
+    const MAX_MAP_MARKERS = 100; // Limit to prevent performance issues
+    
+    if (filteredDoctors.length <= MAX_MAP_MARKERS) {
+      return filteredDoctors;
+    }
+    
+    // If too many, show closest doctors + all accepting doctors
+    const acceptingDoctors = filteredDoctors.filter(d => d.acceptingStatus === 'accepting');
+    const otherDoctors = filteredDoctors.filter(d => d.acceptingStatus !== 'accepting');
+    
+    // Always show accepting doctors, fill remaining with closest others
+    const remainingSlots = MAX_MAP_MARKERS - acceptingDoctors.length;
+    return [...acceptingDoctors, ...otherDoctors.slice(0, Math.max(0, remainingSlots))];
+  }, [filteredDoctors]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Map Section */}
       <div className="bg-background-alt border-b border-border">
         <DoctorMap 
-          doctors={filteredDoctors} 
+          doctors={mapDoctors} 
           selectedDoctorId={selectedDoctorId}
           onDoctorSelect={handleDoctorSelect}
           userLocation={userLocation}
