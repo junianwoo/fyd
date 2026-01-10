@@ -161,8 +161,32 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
 
     const bounds = new window.google.maps.LatLngBounds();
 
+    // Group doctors by location to detect overlaps
+    const locationGroups = new Map<string, Doctor[]>();
     doctors.forEach((doctor) => {
-      const position = { lat: doctor.latitude, lng: doctor.longitude };
+      const key = `${doctor.latitude.toFixed(6)},${doctor.longitude.toFixed(6)}`;
+      if (!locationGroups.has(key)) {
+        locationGroups.set(key, []);
+      }
+      locationGroups.get(key)!.push(doctor);
+    });
+
+    doctors.forEach((doctor) => {
+      const key = `${doctor.latitude.toFixed(6)},${doctor.longitude.toFixed(6)}`;
+      const group = locationGroups.get(key)!;
+      
+      // If multiple doctors at same location, offset them in a small circle
+      let position = { lat: doctor.latitude, lng: doctor.longitude };
+      if (group.length > 1) {
+        const index = group.indexOf(doctor);
+        const angle = (index / group.length) * 2 * Math.PI;
+        const offset = 0.0003; // ~30 meters offset
+        position = {
+          lat: doctor.latitude + (Math.cos(angle) * offset),
+          lng: doctor.longitude + (Math.sin(angle) * offset),
+        };
+      }
+      
       bounds.extend(position);
 
       const isSelected = selectedDoctorId === doctor.id;
@@ -187,12 +211,23 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
         anchor: new window.google.maps.Point(size/2, size * 1.33),
       };
 
+      // Higher zIndex for: 1) Selected markers, 2) Accepting doctors, 3) Others
+      let zIndex = 1;
+      if (isSelected) {
+        zIndex = 100;
+      } else if (doctor.acceptingStatus === 'accepting') {
+        zIndex = 10;
+      } else if (doctor.acceptingStatus === 'waitlist') {
+        zIndex = 5;
+      }
+
       const marker = new window.google.maps.Marker({
         map: mapInstanceRef.current,
         position,
         icon: svgIcon,
-        title: doctor.fullName,
-        zIndex: isSelected ? 100 : 1,
+        title: `${doctor.fullName} - ${doctor.acceptingStatus}`,
+        zIndex,
+        optimized: false, // Better rendering for overlapping markers
       });
 
       marker.addListener("click", () => {
