@@ -203,7 +203,7 @@ export default function Dashboard() {
 
     // Validate postal code format if it looks like a postal code
     const postalAnalysis = analyzePostalCode(newCity.trim());
-    console.log("Postal analysis:", postalAnalysis);
+    console.log("Postal analysis for:", newCity, postalAnalysis);
     
     if (postalAnalysis.isInvalid) {
       toast({
