@@ -139,7 +139,6 @@ serve(async (req) => {
                     await supabase.functions.invoke("send-paid-welcome", {
                       body: {
                         email,
-                        customerName: session.customer_details?.name,
                         subscriptionId,
                         amount,
                       },

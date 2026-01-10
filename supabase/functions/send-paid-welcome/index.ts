@@ -12,7 +12,6 @@ const logStep = (step: string, details?: any) => {
 
 interface WelcomeEmailRequest {
   email: string;
-  customerName?: string;
   subscriptionId?: string;
   amount?: string;
 }
@@ -25,7 +24,7 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { email, customerName, subscriptionId, amount }: WelcomeEmailRequest = await req.json();
+    const { email, subscriptionId, amount }: WelcomeEmailRequest = await req.json();
     
     if (!email) {
       throw new Error("Email is required");
@@ -34,7 +33,6 @@ serve(async (req) => {
     logStep("Sending paid welcome email", { email, subscriptionId });
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
-    const displayName = customerName || "there";
     const displayAmount = amount || "$7.99";
     
     // Build email body content
@@ -92,7 +90,7 @@ serve(async (req) => {
       ${thankYouCard}
       
       <p style="margin: 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        Hi ${displayName},
+        Hi there,
       </p>
       
       <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
