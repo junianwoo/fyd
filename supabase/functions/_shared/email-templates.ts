@@ -16,12 +16,13 @@ export interface EmailOptions {
 /**
  * Generate email header with logo and gradient background
  */
-export function getEmailHeader(title: string, subtitle?: string): string {
+export function getEmailHeader(title: string, subtitle?: string, siteUrl?: string): string {
+  const logoUrl = siteUrl ? `${siteUrl}/logo-white.png` : 'https://findyourdoctor-tan.vercel.app/logo-white.png';
   return `
     <div style="background: linear-gradient(135deg, #0F4C5C 0%, #00A6A6 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
       <!-- Logo - Using public URL that will be hosted -->
       <div style="margin-bottom: 20px;">
-        <img src="https://findyourdoctor.ca/logo-white.png" alt="FindYourDoctor" style="height: 50px; width: auto;" />
+        <img src="${logoUrl}" alt="FindYourDoctor" style="height: 50px; width: auto;" />
       </div>
       <h1 style="color: white; margin: 0 0 10px 0; font-size: 28px; font-weight: 600; font-family: Georgia, 'Times New Roman', serif;">${title}</h1>
       ${subtitle ? `<p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${subtitle}</p>` : ''}
@@ -146,7 +147,7 @@ export function buildEmail(options: {
   const { headerTitle, headerSubtitle, bodyContent, siteUrl, includeUnsubscribe = true } = options;
   
   const content = `
-    ${getEmailHeader(headerTitle, headerSubtitle)}
+    ${getEmailHeader(headerTitle, headerSubtitle, siteUrl)}
     <div style="padding: 30px;">
       ${bodyContent}
     </div>
