@@ -24,24 +24,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    // Debug logging
-    console.log('[RENEW-ASSISTED-ACCESS] Env check:', {
-      hasUrl: !!supabaseUrl,
-      hasKey: !!supabaseKey,
-      urlSource: process.env.SUPABASE_URL ? 'SUPABASE_URL' : (process.env.VITE_SUPABASE_URL ? 'VITE_SUPABASE_URL' : 'none'),
-      availableKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
-    });
-
     if (!supabaseUrl || !supabaseKey) {
-      console.error('[RENEW-ASSISTED-ACCESS] Missing env vars');
-      return res.status(500).json({ 
-        error: 'Server configuration error',
-        debug: {
-          hasUrl: !!supabaseUrl,
-          hasKey: !!supabaseKey,
-          availableEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
-        }
-      });
+      console.error('[RENEW-ASSISTED-ACCESS] Missing environment variables');
+      return res.status(500).json({ error: 'Server configuration error' });
     }
 
     const supabase = createClient(
