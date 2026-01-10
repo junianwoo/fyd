@@ -55,6 +55,9 @@ serve(async (req) => {
 
       // Generate renewal URL (using Vercel API route)
       const renewalUrl = `${siteUrl}/api/renew-assisted-access?userId=${user.user_id}`;
+      
+      // Note: This function should be triggered by a Supabase cron job daily
+      // pg_cron schedule: '0 10 * * *' (runs at 10 AM UTC daily)
 
       // Send 30-day reminder
       if (daysUntilExpiry <= 30 && daysUntilExpiry > 28) {
