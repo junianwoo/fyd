@@ -59,6 +59,29 @@ serve(async (req) => {
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
       logStep("Existing customer found", { customerId });
+      
+      // Check for existing active subscriptions to prevent duplicates
+      const existingSubscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+        limit: 1,
+      });
+
+      if (existingSubscriptions.data.length > 0) {
+        logStep("Customer already has active subscription", { 
+          customerId, 
+          subscriptionId: existingSubscriptions.data[0].id 
+        });
+        
+        const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
+        return new Response(JSON.stringify({ 
+          error: "You already have an active subscription. Please manage your existing subscription from your dashboard.",
+          redirectUrl: `${origin}/dashboard`
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
     } else {
       logStep("No existing customer, will create new");
     }

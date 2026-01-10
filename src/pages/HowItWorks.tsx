@@ -243,11 +243,15 @@ export default function HowItWorks() {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
-                    <span>Choose up to 3 Ontario cities to monitor</span>
+                    <span>Choose up to 3 Ontario cities to monitor with optional language and accessibility filters</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
                     <span>Receive email alerts when a doctor's status changes to "Accepting"</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
+                    <span>Set optional filters to only receive alerts for doctors with specific languages or accessibility features</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />

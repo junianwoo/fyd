@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import coupleFooterImage from "@/assets/couple-footer.png";
 
 const faqCategories = [
   {
@@ -154,17 +155,29 @@ export default function FAQ() {
       </section>
 
       {/* Contact CTA */}
-      <section className="bg-background-alt py-16 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl text-primary mb-4">
-            Still have questions?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            We're here to help. Reach out to our support team.
-          </p>
-          <Button asChild>
-            <Link to="/contact">Contact Us</Link>
-          </Button>
+      <section className="bg-background-alt pt-8 md:pt-12 overflow-visible">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-end justify-center gap-8">
+            <div className="text-center md:text-left mb-8 md:mb-0 self-center">
+              <h2 className="text-2xl text-primary mb-4">
+                Still have questions?
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                We're here to help. Reach out to our support team.
+              </p>
+              <Button asChild>
+                <Link to="/contact">Contact Us</Link>
+              </Button>
+            </div>
+            {/* Image at bottom, flush with no bottom padding */}
+            <div className="flex justify-end flex-shrink-0">
+              <img 
+                src={coupleFooterImage} 
+                alt="Community connecting" 
+                className="w-full max-w-2xl h-auto"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>

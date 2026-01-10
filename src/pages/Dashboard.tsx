@@ -10,11 +10,13 @@ import {
   Plus, 
   Trash2,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Filter
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +42,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { analyzePostalCode } from "@/lib/doctors";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   assisted_reason?: string | null;
@@ -47,6 +50,28 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   assisted_renewed_count?: number | null;
 };
 type AlertSetting = Database["public"]["Tables"]["alert_settings"]["Row"];
+
+const languages = [
+  "English",
+  "French",
+  "Mandarin",
+  "Cantonese",
+  "Spanish",
+  "Arabic",
+  "Punjabi",
+  "Tagalog",
+  "Italian",
+  "Portuguese",
+  "Polish",
+  "Korean",
+  "Vietnamese",
+  "Tamil",
+  "Urdu",
+  "Farsi",
+  "Russian",
+  "Ukrainian",
+  "Greek",
+];
 
 export default function Dashboard() {
   const [searchParams] = useSearchParams();
@@ -64,6 +89,12 @@ export default function Dashboard() {
   // New alert form
   const [newCity, setNewCity] = useState("");
   const [newRadius, setNewRadius] = useState("25");
+  
+  // Advanced filter settings
+  const [applyFilters, setApplyFilters] = useState(false);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [wheelchairAccessible, setWheelchairAccessible] = useState(false);
+  const [accessibleParking, setAccessibleParking] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -131,6 +162,16 @@ export default function Dashboard() {
         .order("created_at");
       
       setAlertSettings(alertData || []);
+      
+      // Load filter settings from the first alert (filters apply globally to all alerts)
+      if (alertData && alertData.length > 0) {
+        const firstAlert = alertData[0];
+        setApplyFilters(firstAlert.apply_filters || false);
+        setSelectedLanguages(firstAlert.languages || []);
+        setWheelchairAccessible(firstAlert.wheelchair_accessible || false);
+        setAccessibleParking(firstAlert.accessible_parking || false);
+      }
+      
       setLoading(false);
     };
     
@@ -155,6 +196,17 @@ export default function Dashboard() {
       toast({
         title: "Maximum 3 locations",
         description: "Remove an existing location to add a new one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate postal code format if it looks like a postal code
+    const postalAnalysis = analyzePostalCode(newCity.trim());
+    if (postalAnalysis.isPostalCode && !postalAnalysis.isFull) {
+      toast({
+        title: "Invalid postal code",
+        description: "Please enter a complete postal code (e.g., M1S 5B2) or a city name",
         variant: "destructive",
       });
       return;
@@ -241,6 +293,69 @@ export default function Dashboard() {
     }
   };
 
+  const handleSaveFilters = async () => {
+    if (!user) return;
+
+    setSaving(true);
+    try {
+      console.log("Saving filters:", {
+        applyFilters,
+        selectedLanguages,
+        wheelchairAccessible,
+        accessibleParking,
+        alertSettings: alertSettings.length
+      });
+
+      // Update all alert settings with the new filter preferences
+      const updates = alertSettings.map((alert) => {
+        const updateData = {
+          apply_filters: applyFilters,
+          languages: applyFilters && selectedLanguages.length > 0 ? selectedLanguages : null,
+          wheelchair_accessible: applyFilters ? wheelchairAccessible : false,
+          accessible_parking: applyFilters ? accessibleParking : false,
+        };
+        console.log("Updating alert:", alert.id, updateData);
+        
+        return supabase
+          .from("alert_settings")
+          .update(updateData)
+          .eq("id", alert.id);
+      });
+
+      const results = await Promise.all(updates);
+      const errors = results.filter((r) => r.error);
+
+      if (errors.length > 0) {
+        console.error("Filter update errors:", errors);
+        throw new Error(errors[0].error?.message || "Failed to update some alert settings");
+      }
+
+      // Refresh alert settings
+      const { data: alertData } = await supabase
+        .from("alert_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at");
+
+      setAlertSettings(alertData || []);
+
+      toast({
+        title: "Filters saved!",
+        description: applyFilters 
+          ? "Your alerts will now only include doctors matching your preferences." 
+          : "Filter preferences saved. Toggle 'Apply filters' to activate them.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving filters",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleCheckout = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
@@ -248,6 +363,20 @@ export default function Dashboard() {
       });
 
       if (error) throw error;
+      
+      // Check if user already has a subscription
+      if (data?.error) {
+        toast({
+          title: "Already subscribed",
+          description: data.error,
+          variant: "destructive",
+        });
+        if (data.redirectUrl) {
+          setTimeout(() => window.location.href = data.redirectUrl, 2000);
+        }
+        return;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
       }
@@ -496,6 +625,130 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Advanced Filters Card */}
+            {isSubscribed && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Filter className="h-5 w-5 text-secondary" />
+                    Advanced Filters (Optional)
+                  </CardTitle>
+                  <CardDescription>
+                    Refine your alerts to only receive notifications for doctors matching your preferences.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Apply Filters Checkbox */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Checkbox 
+                        id="apply-filters"
+                        checked={applyFilters}
+                        onCheckedChange={(checked) => setApplyFilters(checked === true)}
+                      />
+                      <label htmlFor="apply-filters" className="text-sm text-foreground cursor-pointer">
+                        Apply these filters to my alerts
+                      </label>
+                    </div>
+                    {applyFilters && (
+                      <div className="ml-6 mt-2 p-2 bg-accent/10 rounded-md border border-accent/20">
+                        <p className="text-sm text-muted-foreground">
+                          ⚠️ Only doctors matching any of these filters will trigger alerts
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Language Filters */}
+                  {applyFilters && (
+                    <>
+                      <div className="space-y-3 border-t pt-6">
+                        <Label className="text-sm text-muted-foreground">Languages (Select up to 10)</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-2 border rounded-md bg-background-alt">
+                          {languages.map((language) => (
+                            <div key={language} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`lang-${language}`}
+                                checked={selectedLanguages.includes(language)}
+                                disabled={!selectedLanguages.includes(language) && selectedLanguages.length >= 10}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    if (selectedLanguages.length < 10) {
+                                      setSelectedLanguages([...selectedLanguages, language]);
+                                    }
+                                  } else {
+                                    setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`lang-${language}`}
+                                className="text-sm text-foreground cursor-pointer"
+                              >
+                                {language}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        {selectedLanguages.length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {selectedLanguages.length}/10 languages selected
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Accessibility Filters */}
+                      <div className="space-y-3 border-t pt-6">
+                        <Label className="text-sm text-muted-foreground">Accessibility</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id="wheelchair"
+                              checked={wheelchairAccessible}
+                              onCheckedChange={(checked) => setWheelchairAccessible(checked === true)}
+                            />
+                            <label
+                              htmlFor="wheelchair"
+                              className="text-sm text-foreground cursor-pointer"
+                            >
+                              Wheelchair Accessible
+                            </label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id="parking"
+                              checked={accessibleParking}
+                              onCheckedChange={(checked) => setAccessibleParking(checked === true)}
+                            />
+                            <label
+                              htmlFor="parking"
+                              className="text-sm text-foreground cursor-pointer"
+                            >
+                              Accessible Parking
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Save Filters Button */}
+                      <div className="border-t pt-6">
+                        <Button onClick={handleSaveFilters} disabled={saving}>
+                          {saving ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            "Save Filters"
+                          )}
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Account Tab */}

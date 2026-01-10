@@ -123,7 +123,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Get Instant Alerts</h3>
               <p className="text-muted-foreground mb-4">
-                Monitor up to 3 cities. Receive email alerts the moment a doctor starts accepting patients. $7.99/month.
+                Monitor up to 3 cities with optional language and accessibility filters. Get email alerts when doctors matching your preferences start accepting patients. $7.99/month.
               </p>
               <Link 
                 to="/pricing" 
@@ -350,6 +350,18 @@ export default function Index() {
                 className="bg-card border border-border rounded-lg px-6"
               >
                 <AccordionTrigger className="text-left hover:no-underline">
+                  Can I filter alerts by language or accessibility?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Yes! Alert Service subscribers can set optional filters for languages and accessibility features. Only doctors matching your preferences will trigger alerts, saving you time.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem 
+                value="item-5"
+                className="bg-card border border-border rounded-lg px-6"
+              >
+                <AccordionTrigger className="text-left hover:no-underline">
                   What should I do in a medical emergency?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
@@ -358,7 +370,7 @@ export default function Index() {
               </AccordionItem>
               
               <AccordionItem 
-                value="item-5"
+                value="item-6"
                 className="bg-card border border-border rounded-lg px-6"
               >
                 <AccordionTrigger className="text-left hover:no-underline">

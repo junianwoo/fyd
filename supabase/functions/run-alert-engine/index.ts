@@ -152,6 +152,52 @@ serve(async (req) => {
             radius: radiusKm
           });
 
+          // Check if user wants to apply filters
+          if (alert.apply_filters) {
+            let filterMatch = true;
+            
+            // Language filter: doctor must have at least one of user's languages
+            if (alert.languages && alert.languages.length > 0) {
+              const doctorLanguages = doctor.languages || [];
+              const hasMatchingLanguage = alert.languages.some((lang: string) => 
+                doctorLanguages.includes(lang)
+              );
+              if (!hasMatchingLanguage) {
+                filterMatch = false;
+                logStep("Language filter mismatch", {
+                  doctorLanguages,
+                  userLanguages: alert.languages
+                });
+              }
+            }
+            
+            // Accessibility filters
+            if (filterMatch && alert.wheelchair_accessible) {
+              const doctorAccessibility = doctor.accessibility_features || [];
+              if (!doctorAccessibility.includes('Wheelchair Accessible')) {
+                filterMatch = false;
+                logStep("Wheelchair accessibility filter mismatch");
+              }
+            }
+            
+            if (filterMatch && alert.accessible_parking) {
+              const doctorAccessibility = doctor.accessibility_features || [];
+              if (!doctorAccessibility.includes('Accessible Parking')) {
+                filterMatch = false;
+                logStep("Accessible parking filter mismatch");
+              }
+            }
+            
+            // Skip this alert if filters don't match
+            if (!filterMatch) {
+              logStep("Doctor doesn't match user's filters, skipping", {
+                doctorId: doctor.id,
+                alertId: alert.id
+              });
+              continue;
+            }
+          }
+
           // Send alert email
           try {
             await resend.emails.send({

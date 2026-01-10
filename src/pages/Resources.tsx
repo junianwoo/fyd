@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { fetchResources, Resource } from "@/lib/resources";
+import coupleFooterImage from "@/assets/couple-footer.png";
 
 const categories = [
   "All Resources",
@@ -280,20 +281,32 @@ export default function Resources() {
       </section>
 
       {/* CTA */}
-      <section className="bg-background-alt py-16 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl text-primary mb-4">
-            Ready to Find Your Doctor?
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Use our free search to find family doctors accepting patients near you.
-          </p>
-          <Link 
-            to="/doctors"
-            className="inline-flex items-center text-secondary hover:text-primary transition-colors font-semibold"
-          >
-            Start Searching <ArrowRight className="h-4 w-4 ml-1" />
-          </Link>
+      <section className="bg-background-alt pt-8 md:pt-12 overflow-visible">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-end justify-center gap-8">
+            <div className="text-center md:text-left mb-8 md:mb-0 self-center">
+              <h2 className="text-2xl text-primary mb-4">
+                Ready to Find Your Doctor?
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Use our free search to find family doctors accepting patients near you.
+              </p>
+              <Link 
+                to="/doctors"
+                className="inline-flex items-center text-secondary hover:text-primary transition-colors font-semibold"
+              >
+                Start Searching <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            {/* Image at bottom, flush with no bottom padding */}
+            <div className="flex justify-end flex-shrink-0">
+              <img 
+                src={coupleFooterImage} 
+                alt="Community connecting" 
+                className="w-full max-w-2xl h-auto"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Check, Search, Bell, ArrowRight, Loader2, Shield, CreditCard, Clock, Heart, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { z } from "zod";
 
 const freeFeatures = [
@@ -34,6 +35,7 @@ const freeFeatures = [
 const alertFeatures = [
   "Everything in Free, Plus:",
   "Email alerts for up to 3 cities",
+  "Optional language and accessibility filters",
   "Instant notifications when status changes to 'Accepting'",
   "Monitor multiple locations (for yourself and loved ones)",
   "Cancel anytime, no long-term commitment",
@@ -43,12 +45,44 @@ const emailSchema = z.string().email("Please enter a valid email address");
 
 export default function Pricing() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [userStatus, setUserStatus] = useState<string | null>(null);
+
+  // Check if user is already subscribed
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("status")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        
+        setUserStatus(profile?.status || null);
+      }
+    };
+
+    checkSubscription();
+  }, [user]);
+
+  const isSubscribed = userStatus === "alert_service" || userStatus === "assisted_access";
 
   const handleSubscribe = () => {
+    // If already subscribed, redirect to dashboard
+    if (isSubscribed) {
+      toast({
+        title: "Already subscribed",
+        description: "You already have an active subscription. Redirecting to your dashboard...",
+        variant: "default",
+      });
+      setTimeout(() => window.location.href = "/dashboard", 1500);
+      return;
+    }
+
     setShowEmailDialog(true);
     setEmail("");
     setEmailError("");
@@ -75,6 +109,22 @@ export default function Pricing() {
       });
 
       if (error) throw error;
+      
+      // Check if user already has a subscription
+      if (data?.error) {
+        toast({
+          title: "Already subscribed",
+          description: data.error,
+          variant: "destructive",
+        });
+        setLoading(false);
+        setShowEmailDialog(false);
+        if (data.redirectUrl) {
+          setTimeout(() => window.location.href = data.redirectUrl, 2000);
+        }
+        return;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
       }
@@ -241,12 +291,14 @@ export default function Pricing() {
                   </p>
                 </div>
 
-                <Button className="w-full" size="lg" onClick={handleSubscribe} disabled={loading}>
+                <Button className="w-full" size="lg" onClick={handleSubscribe} disabled={loading || isSubscribed}>
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Loading...
                     </>
+                  ) : isSubscribed ? (
+                    "Already Subscribed - Go to Dashboard"
                   ) : (
                     "Subscribe to Alert Service"
                   )}
@@ -294,7 +346,7 @@ export default function Pricing() {
                 </div>
                 <h3 className="text-xl text-foreground mb-3">Set It and Forget It</h3>
                 <p className="text-muted-foreground">
-                  Instead of manually checking the site every day, Alert Service does the monitoring for you. You'll only hear from us when there's an opportunity worth calling about.
+                  Set your locations and optional filters (language, accessibility), then let Alert Service do the monitoring for you. You'll only hear from us when there's a doctor worth calling about.
                 </p>
               </div>
               
@@ -707,12 +759,14 @@ export default function Pricing() {
               <p className="text-muted-foreground mb-6">
                 Ready to get notified the moment doctors start accepting?
               </p>
-              <Button size="lg" className="w-full" onClick={handleSubscribe} disabled={loading}>
+              <Button size="lg" className="w-full" onClick={handleSubscribe} disabled={loading || isSubscribed}>
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Loading...
                   </>
+                ) : isSubscribed ? (
+                  "Already Subscribed - Go to Dashboard"
                 ) : (
                   "Subscribe Now - $7.99/month"
                 )}

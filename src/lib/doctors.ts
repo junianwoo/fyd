@@ -135,7 +135,7 @@ async function geocodePostalCode(postalCode: string): Promise<{ lat: number; lng
 }
 
 // Analyze postal code to determine type and validity
-function analyzePostalCode(query: string): { 
+export function analyzePostalCode(query: string): { 
   isPostalCode: boolean; 
   isFull: boolean; 
   isPartial: boolean;

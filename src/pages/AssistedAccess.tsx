@@ -241,42 +241,41 @@ export default function AssistedAccess() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section with Image */}
+      {/* Hero Section */}
       <section className="bg-background py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto">
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl text-primary mb-6">
-                We've Got You Covered
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                If $7.99/month is a barrier for you right now, we'll provide Alert Service at no cost. Everyone deserves access to tools that help them find healthcare.
-              </p>
-            </div>
-            <div className="flex-shrink-0 w-full md:w-1/2 max-w-md">
-              <img 
-                src={communityImage} 
-                alt="Community support" 
-                className="w-full h-auto rounded-lg"
-              />
-            </div>
-          </div>
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl text-primary mb-6">
+            We've Got You Covered
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            If $7.99/month is a barrier for you right now, we'll provide Alert Service at no cost. Everyone deserves access to tools that help them find healthcare.
+          </p>
         </div>
       </section>
 
       {/* What Is Assisted Access */}
-      <section className="bg-background py-20 md:py-24 border-t border-border">
+      <section className="bg-background py-20 md:py-24 border-t border-border relative overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl text-primary mb-6">
-              What Is Assisted Access?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-6">
-              Assisted Access provides free Alert Service for 6 months to those facing financial barriers. We believe cost shouldn't prevent anyone from getting the support they need to find a family doctor.
-            </p>
-            <p className="text-lg text-muted-foreground">
-              This program is funded by our paid Alert Service subscribers, who make it possible for us to help those in need.
-            </p>
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-stretch gap-8">
+            <div className="flex-1 flex flex-col justify-center">
+              <h2 className="text-3xl md:text-4xl text-primary mb-6 text-left">
+                What Is Assisted Access?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-6 text-left">
+                Assisted Access provides free Alert Service for 6 months to those facing financial barriers. We believe cost shouldn't prevent anyone from getting the support they need to find a family doctor.
+              </p>
+              <p className="text-lg text-muted-foreground text-left">
+                This program is funded by our paid Alert Service subscribers, who make it possible for us to help those in need.
+              </p>
+            </div>
+            <div className="flex-shrink-0 w-full md:w-1/2 self-end pb-0">
+              <img 
+                src={communityImage} 
+                alt="Community support" 
+                className="w-full h-auto object-cover"
+                style={{ maxHeight: '500px' }}
+              />
+            </div>
           </div>
         </div>
       </section>
