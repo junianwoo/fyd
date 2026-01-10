@@ -353,7 +353,7 @@ export default function FAQ() {
       </section>
 
       {/* Additional Help Section */}
-      <section className="bg-background-alt py-12 md:py-16">
+      <section className="bg-background py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl text-primary mb-4">
@@ -375,7 +375,7 @@ export default function FAQ() {
       </section>
 
       {/* Contact CTA */}
-      <section className="bg-background pt-8 md:pt-12 overflow-visible">
+      <section className="bg-background-alt pt-8 md:pt-12 overflow-visible">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-end justify-center gap-8">
             <div className="text-center md:text-left mb-8 md:mb-0 self-center">
