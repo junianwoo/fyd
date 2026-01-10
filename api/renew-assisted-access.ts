@@ -21,9 +21,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[RENEW-ASSISTED-ACCESS] Processing renewal for user:', userId);
 
     // Create Supabase admin client
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('[RENEW-ASSISTED-ACCESS] Missing env vars', { 
+        hasUrl: !!supabaseUrl, 
+        hasKey: !!supabaseKey 
+      });
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     const supabase = createClient(
-      process.env.VITE_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      supabaseUrl,
+      supabaseKey,
       { auth: { persistSession: false } }
     );
 
