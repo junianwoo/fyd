@@ -27,13 +27,31 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { doctorId, reportedStatus, details, reporterIp } = await req.json();
+    const { doctorId, reportedStatus, details } = await req.json();
     
     if (!doctorId || !reportedStatus) {
       throw new Error("Missing required fields: doctorId, reportedStatus");
     }
 
-    logStep("Processing update", { doctorId, reportedStatus, reporterIp });
+    // Get IP address from request headers (server-side capture)
+    const reporterIp = req.headers.get("x-forwarded-for")?.split(",")[0] || 
+                       req.headers.get("x-real-ip") || 
+                       "unknown";
+
+    // Get authenticated user ID if available
+    const authHeader = req.headers.get("authorization");
+    let userId: string | null = null;
+    if (authHeader) {
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: { user } } = await supabaseClient.auth.getUser(token);
+        userId = user?.id || null;
+      } catch (err) {
+        logStep("Could not extract user from auth token", { error: err.message });
+      }
+    }
+
+    logStep("Processing update", { doctorId, reportedStatus, reporterIp, userId });
 
     // Get current doctor status
     const { data: doctor, error: doctorError } = await supabaseClient
@@ -47,7 +65,7 @@ serve(async (req) => {
     const previousStatus = doctor.accepting_status;
     logStep("Current doctor status", { previousStatus });
 
-    // Insert community report
+    // Insert community report (for audit trail)
     const { error: reportError } = await supabaseClient
       .from("community_reports")
       .insert({
@@ -55,6 +73,7 @@ serve(async (req) => {
         reported_status: reportedStatus,
         details: details || null,
         reporter_ip: reporterIp || null,
+        user_id: userId || null,
       });
 
     if (reportError) {
@@ -75,23 +94,42 @@ serve(async (req) => {
     let newCount = 1;
 
     if (existingUpdate) {
-      // Check if IP already reported
+      // Check if IP or User ID already reported (duplicate detection)
       const ipAddresses = existingUpdate.ip_addresses || [];
-      if (reporterIp && ipAddresses.includes(reporterIp)) {
-        logStep("IP already reported for this status", { reporterIp });
+      const userIds = existingUpdate.user_ids || [];
+      
+      // Block if same IP already reported
+      if (reporterIp && reporterIp !== "unknown" && ipAddresses.includes(reporterIp)) {
+        logStep("Duplicate report detected - same IP already reported", { reporterIp });
         return new Response(JSON.stringify({ 
-          success: true, 
-          message: "Thank you! Your update has been recorded.",
-          statusUpdated: false 
+          success: false, 
+          message: "You've already submitted an update for this doctor today. Thank you!",
+          statusUpdated: false,
+          duplicate: true
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      // Block if same user ID already reported
+      if (userId && userIds.includes(userId)) {
+        logStep("Duplicate report detected - same user already reported", { userId });
+        return new Response(JSON.stringify({ 
+          success: false, 
+          message: "You've already submitted an update for this doctor today. Thank you!",
+          statusUpdated: false,
+          duplicate: true
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
         });
       }
 
-      // Update count and add IP
+      // Update count and add IP/User ID
       newCount = existingUpdate.count + 1;
-      const newIpAddresses = reporterIp ? [...ipAddresses, reporterIp] : ipAddresses;
+      const newIpAddresses = reporterIp && reporterIp !== "unknown" ? [...ipAddresses, reporterIp] : ipAddresses;
+      const newUserIds = userId ? [...userIds, userId] : userIds;
 
       if (newCount >= THRESHOLD) {
         // Threshold met! Update doctor status
@@ -147,6 +185,7 @@ serve(async (req) => {
           .update({
             count: newCount,
             ip_addresses: newIpAddresses,
+            user_ids: newUserIds,
             updated_at: new Date().toISOString(),
           })
           .eq("id", existingUpdate.id);
@@ -162,7 +201,8 @@ serve(async (req) => {
           doctor_id: doctorId,
           status: reportedStatus,
           count: 1,
-          ip_addresses: reporterIp ? [reporterIp] : [],
+          ip_addresses: (reporterIp && reporterIp !== "unknown") ? [reporterIp] : [],
+          user_ids: userId ? [userId] : [],
         });
 
       if (insertError) throw insertError;

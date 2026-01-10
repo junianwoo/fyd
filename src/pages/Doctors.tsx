@@ -222,7 +222,7 @@ export default function Doctors() {
       {/* Map Section */}
       <div className="bg-background-alt border-b border-border">
         <DoctorMap 
-          doctors={paginatedDoctors} 
+          doctors={filteredDoctors} 
           selectedDoctorId={selectedDoctorId}
           onDoctorSelect={handleDoctorSelect}
           userLocation={userLocation}
