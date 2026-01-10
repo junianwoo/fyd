@@ -172,12 +172,12 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
       const size = isSelected ? 50 : 40;
       const svgIcon = {
         url: `data:image/svg+xml,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size * 1.33}" viewBox="0 0 24 32">
+          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size * 1.33}" viewBox="-2 -2 28 36">
             <!-- Pin shape -->
             <path d="M12 0C5.4 0 0 5.4 0 12c0 8 12 20 12 20s12-12 12-20c0-6.6-5.4-12-12-12z" 
                   fill="${markerColor}" 
-                  stroke="${isSelected ? '#0F4C5C' : 'white'}" 
-                  stroke-width="${isSelected ? '2' : '1.5'}"/>
+                  stroke="${isSelected ? '#0F4C5C' : markerColor}" 
+                  stroke-width="${isSelected ? '2' : '0'}"/>
             <!-- Medical cross -->
             <rect x="10" y="6" width="4" height="12" fill="white" rx="0.5"/>
             <rect x="6" y="10" width="12" height="4" fill="white" rx="0.5"/>
@@ -213,11 +213,11 @@ export function DoctorMap({ doctors, selectedDoctorId, onDoctorSelect, userLocat
       const searchMarkerSize = 45;
       const searchMarkerIcon = {
         url: `data:image/svg+xml,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="${searchMarkerSize}" height="${searchMarkerSize * 1.33}" viewBox="0 0 24 32">
+          <svg xmlns="http://www.w3.org/2000/svg" width="${searchMarkerSize}" height="${searchMarkerSize * 1.33}" viewBox="-2 -2 28 36">
             <!-- Pin shape in gold -->
             <path d="M12 0C5.4 0 0 5.4 0 12c0 8 12 20 12 20s12-12 12-20c0-6.6-5.4-12-12-12z" 
                   fill="#FDB813" 
-                  stroke="white" 
+                  stroke="#0F4C5C" 
                   stroke-width="2"/>
             <!-- Star icon -->
             <path d="M12 7l1.545 4.755h5l-4.045 2.94 1.545 4.755L12 16.51l-4.045 2.94 1.545-4.755-4.045-2.94h5z" 

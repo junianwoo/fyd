@@ -8,7 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import heroImage from "@/assets/AdobeStock_138357068_Preview.jpg.jpg";
+import heroImage from "@/assets/black-couple.jpg";
 import communityImage from "@/assets/community.png";
 
 export default function Index() {
@@ -23,6 +23,8 @@ export default function Index() {
             alt="" 
             className="w-full h-full object-cover object-right"
           />
+          {/* Dark gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
@@ -113,7 +115,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Community Powered</h3>
               <p className="text-muted-foreground">
-                Real people update doctor status after calling clinics. Doctors can verify their own listings. Everyone helps everyone find care faster.
+                Real people update doctor status after calling clinics. Doctors can verify their listings. Everyone helps everyone find care faster.
               </p>
             </div>
             
@@ -199,11 +201,11 @@ export default function Index() {
             <h2 className="text-3xl md:text-4xl text-primary mb-6">
               Built by the Community. For the Community.
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              FindYourDoctor works because people like you help keep it accurate. Called a clinic recently? Update their status. It takes 30 seconds and helps someone else find care faster.
+            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+              FindYourDoctor works because people like you keep it accurate. Called a clinic recently? Update their status—it takes 30 seconds and helps someone find care faster.
             </p>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Just like you, 2.5 million Ontarians need a family doctor. When you update a listing, you're helping someone in your community get one step closer to finding care.
+              Like you, 2.5 million Ontarians need a family doctor. Your update helps someone in your community get one step closer.
             </p>
             <Button size="lg" asChild>
               <Link to="/doctors">Help Update a Listing</Link>
@@ -268,7 +270,7 @@ export default function Index() {
               <div className="flex-1">
                 <h3 className="text-2xl text-primary mb-3">Help the Community</h3>
                 <p className="text-lg text-muted-foreground mb-3">
-                  After you call, update the doctor's status on FindYourDoctor. Your 30-second update helps the next person searching.
+                  After calling, update the doctor's status. Your 30-second update helps the next person searching.
                 </p>
               </div>
             </div>
@@ -415,7 +417,7 @@ export default function Index() {
             <div className="bg-card p-8 rounded-xl shadow-sm border border-border text-center">
               <h3 className="text-2xl text-foreground mb-3">Start Searching Now</h3>
               <p className="text-muted-foreground mb-6">
-                Browse doctors, see who's accepting, call clinics.
+                Browse doctors, see who's accepting patients, and call clinics.
               </p>
               <ul className="text-left space-y-2 mb-6 text-muted-foreground">
                 <li className="flex items-center gap-2">

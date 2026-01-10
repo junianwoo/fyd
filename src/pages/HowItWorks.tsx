@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Search, Users, Bell, ArrowRight, Phone, RefreshCw, CheckCircle, MapPin, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-father-daughter.jpeg";
+import heroImage from "@/assets/father-daughter.jpg";
 import user1Image from "@/assets/user1.png";
 import user2Image from "@/assets/user2.png";
 import user3Image from "@/assets/user3.png";
@@ -12,7 +12,7 @@ export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Image */}
-      <section className="relative bg-background py-20 md:py-32 overflow-hidden min-h-[400px] md:min-h-[500px]">
+      <section className="relative bg-background overflow-hidden min-h-[550px] md:min-h-[650px] flex items-end">
         {/* Hero background image */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -21,17 +21,19 @@ export default function HowItWorks() {
             className="w-full h-full object-cover object-center"
             style={{ objectPosition: 'center 35%' }}
           />
+          {/* Dark gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent"></div>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+        <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
           <div className="max-w-xl text-left animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#0F4C5C' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#FFFFFF' }}>
               You're Not Searching&nbsp;Alone
             </h1>
-            <p className="text-lg md:text-xl mb-8" style={{ color: '#0F4C5C' }}>
+            <p className="text-lg md:text-xl mb-8" style={{ color: '#FFFFFF' }}>
               With 2.5 million Ontarians without a family doctor, many are actively searching right now. FindYourDoctor brings the community together to help everyone find care faster.
             </p>
-            <p className="text-base" style={{ color: '#0F4C5C', opacity: 0.85 }}>
+            <p className="text-base" style={{ color: '#FFFFFF', opacity: 0.9 }}>
               The search can feel overwhelming, but you don't have to do it alone. Our community-powered approach means every search, every phone call, and every status update helps someone else get closer to finding a doctor.
             </p>
           </div>

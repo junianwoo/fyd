@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import communityImage from "@/assets/Gemini_Generated_Image_r0ajmr0ajmr0ajmr (1).png";
+import communityImage from "@/assets/people-umbrella.png";
 
 // reCAPTCHA site key (v2 checkbox)
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
