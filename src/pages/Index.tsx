@@ -24,7 +24,7 @@ export default function Index() {
             className="w-full h-full object-cover object-[70%_center]"
           />
           {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20 md:from-black/70 md:via-black/40 md:to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">

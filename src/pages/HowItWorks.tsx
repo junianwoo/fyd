@@ -21,7 +21,7 @@ export default function HowItWorks() {
             className="w-full h-full object-cover object-center md:object-[center_35%]"
           />
           {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30 md:bg-gradient-to-r md:from-black/50 md:via-black/20 md:to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 md:from-black/70 md:via-black/40 md:to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
