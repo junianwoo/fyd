@@ -227,7 +227,7 @@ export default function Doctors() {
           onDoctorSelect={handleDoctorSelect}
           userLocation={userLocation}
           searchLocation={searchLocation}
-          className="h-96 md:h-[30rem]"
+          className="h-[550px] md:h-[650px]"
         />
       </div>
 
@@ -239,26 +239,26 @@ export default function Doctors() {
       </div>
 
       {/* Search Bar */}
-      <div className="sticky top-16 z-40 bg-background border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 py-4">
-          <form onSubmit={handleSearch} className="flex gap-4">
+      <div className="sticky top-16 z-40 bg-background border-b border-border shadow-md">
+        <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
+          <form onSubmit={handleSearch} className="flex gap-3 md:gap-4">
             <div className="flex-1">
               <Input
                 type="text"
                 placeholder="City, postal code, or doctor name"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="h-11"
+                className="h-14 md:h-16 text-base md:text-lg px-4 md:px-6"
               />
             </div>
-            <Button type="submit" className="h-11">
+            <Button type="submit" className="h-14 md:h-16 px-6 md:px-8 text-base md:text-lg font-semibold">
               Search
             </Button>
             {/* Mobile Filter Toggle */}
             <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="h-11 w-11 lg:hidden">
-                  <Menu className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="h-14 w-14 lg:hidden">
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-80 p-6">
@@ -274,7 +274,7 @@ export default function Doctors() {
         <div className="flex gap-8">
           {/* Left Column - Filters (Desktop Only) */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
-            <div className="sticky top-36">
+            <div className="sticky top-44">
               {FiltersContent}
             </div>
           </aside>
