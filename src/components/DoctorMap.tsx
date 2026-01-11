@@ -30,6 +30,7 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const shouldFitBoundsRef = useRef<boolean>(true); // Track if we should auto-fit bounds
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -306,11 +307,17 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
       markersRef.current.push(searchMarker);
     }
 
-    // Fit bounds with padding
-    if (doctors.length > 0 || searchLocation) {
+    // Fit bounds with padding - only on initial load or when doctors/search changes, not on zoom
+    if ((doctors.length > 0 || searchLocation) && shouldFitBoundsRef.current) {
       mapInstanceRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+      shouldFitBoundsRef.current = false; // Disable auto-fit after first time
     }
   }, [doctors, selectedDoctorId, onDoctorSelect, searchLocation, userLocation, markerSizeCategory]);
+  
+  // Reset shouldFitBounds when doctors or search location changes (but not on zoom)
+  useEffect(() => {
+    shouldFitBoundsRef.current = true;
+  }, [doctors, searchLocation]);
 
   if (error) {
     return (

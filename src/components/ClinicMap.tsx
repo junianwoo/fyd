@@ -44,6 +44,7 @@ const ClinicMap = memo(function ClinicMap({
   const markersRef = useRef<google.maps.Marker[]>([]);
   const circleRef = useRef<google.maps.Circle | null>(null);
   const infoCardRef = useRef<HTMLDivElement | null>(null);
+  const shouldFitBoundsRef = useRef<boolean>(true); // Track if we should auto-fit bounds
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -320,11 +321,17 @@ const ClinicMap = memo(function ClinicMap({
       markersRef.current.push(marker);
     });
 
-    // Fit bounds with padding
-    if (clinics.length > 0 || searchLocation) {
+    // Fit bounds with padding - only on initial load or when clinics/search changes, not on zoom
+    if ((clinics.length > 0 || searchLocation) && shouldFitBoundsRef.current) {
       mapInstanceRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 100, left: 50 });
+      shouldFitBoundsRef.current = false; // Disable auto-fit after first time
     }
   }, [clinics, selectedClinicId, onClinicSelect, searchLocation, markerSizeCategory]);
+  
+  // Reset shouldFitBounds when clinics or search location changes (but not on zoom)
+  useEffect(() => {
+    shouldFitBoundsRef.current = true;
+  }, [clinics, searchLocation]);
 
   // Close info card when clicking on map
   useEffect(() => {
