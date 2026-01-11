@@ -165,7 +165,7 @@ const ClinicMap = memo(function ClinicMap({
     });
   }, [loading, error, userLocation]);
 
-  // Update radius circle
+  // Update radius circle and center map on search location
   useEffect(() => {
     if (!mapInstanceRef.current || !window.google?.maps || !searchLocation) return;
 
@@ -187,6 +187,10 @@ const ClinicMap = memo(function ClinicMap({
     });
 
     circleRef.current = circle;
+
+    // Center map on search location
+    mapInstanceRef.current.setCenter(searchLocation);
+    mapInstanceRef.current.setZoom(12);
 
     return () => {
       if (circleRef.current) {

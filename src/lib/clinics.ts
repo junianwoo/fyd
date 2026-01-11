@@ -30,7 +30,7 @@ export interface Clinic {
 export function mapClinicRowToClinic(row: ClinicRow): Clinic {
   return {
     id: row.id,
-    name: row.name,
+    name: row.clinic_name,
     address: row.address,
     city: row.city,
     province: row.province,
@@ -48,7 +48,7 @@ export function mapClinicRowToClinic(row: ClinicRow): Clinic {
     ageGroupsServed: row.age_groups_served || ["Adults"],
     virtualAppointments: row.virtual_appointments || false,
     communityReportCount: row.community_report_count || 0,
-    claimedByClinic: row.claimed_by_clinic || false,
+    claimedByClinic: row.claimed_by_doctor || false,
   };
 }
 
@@ -62,7 +62,7 @@ export async function fetchClinics(): Promise<Clinic[]> {
     const { data, error } = await supabase
       .from("clinics")
       .select("*")
-      .order("name")
+      .order("clinic_name")
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
     if (error) {
