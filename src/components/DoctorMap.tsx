@@ -309,15 +309,6 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
     // Fit bounds with padding
     if (doctors.length > 0 || searchLocation) {
       mapInstanceRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
-      
-      // Limit max zoom
-      const listener = window.google.maps.event.addListener(mapInstanceRef.current, "idle", () => {
-        const zoom = mapInstanceRef.current?.getZoom();
-        if (zoom && zoom > 15) {
-          mapInstanceRef.current?.setZoom(15);
-        }
-        window.google.maps.event.removeListener(listener);
-      });
     }
   }, [doctors, selectedDoctorId, onDoctorSelect, searchLocation, userLocation, markerSizeCategory]);
 

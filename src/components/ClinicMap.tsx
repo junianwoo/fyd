@@ -323,15 +323,6 @@ const ClinicMap = memo(function ClinicMap({
     // Fit bounds with padding
     if (clinics.length > 0 || searchLocation) {
       mapInstanceRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 100, left: 50 });
-      
-      // Limit max zoom
-      const listener = window.google.maps.event.addListener(mapInstanceRef.current, "idle", () => {
-        const zoom = mapInstanceRef.current?.getZoom();
-        if (zoom && zoom > 15) {
-          mapInstanceRef.current?.setZoom(15);
-        }
-        window.google.maps.event.removeListener(listener);
-      });
     }
   }, [clinics, selectedClinicId, onClinicSelect, searchLocation, markerSizeCategory]);
 
