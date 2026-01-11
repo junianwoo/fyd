@@ -702,7 +702,7 @@ export default function HowItWorks() {
                 </li>
               </ul>
               <Button size="lg" className="w-full" asChild>
-                <Link to="/doctors">Start Your Search</Link>
+                <Link to="/clinics">Start Your Search</Link>
               </Button>
             </div>
             

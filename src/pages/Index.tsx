@@ -208,7 +208,7 @@ export default function Index() {
               Like you, 2.5 million Ontarians need a family doctor. Your update helps someone in your community get one step closer.
             </p>
             <Button size="lg" asChild>
-              <Link to="/doctors">Help Update a Listing</Link>
+              <Link to="/clinics">Help Update a Listing</Link>
             </Button>
           </div>
           
@@ -434,7 +434,7 @@ export default function Index() {
                 </li>
               </ul>
               <Button size="lg" className="w-full" asChild>
-                <Link to="/doctors">Start Your Search</Link>
+                <Link to="/clinics">Start Your Search</Link>
               </Button>
             </div>
             

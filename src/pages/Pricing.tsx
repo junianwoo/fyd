@@ -250,7 +250,7 @@ export default function Pricing() {
                 </div>
 
                 <Button variant="outline" className="w-full" size="lg" asChild>
-                  <Link to="/doctors">Start Searching for Free</Link>
+                  <Link to="/clinics">Start Searching for Free</Link>
                 </Button>
               </CardContent>
             </Card>

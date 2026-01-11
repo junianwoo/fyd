@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import logoColour from "@/assets/logo-colour.png";
 
 const navLinks = [
-  { label: "Find Doctors", href: "/doctors" },
+  { label: "Find Doctors", href: "/clinics" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Resources", href: "/resources" },
   { label: "FAQ", href: "/faq" },

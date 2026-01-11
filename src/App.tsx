@@ -10,6 +10,8 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import DoctorDetails from "./pages/DoctorDetails";
+import Clinics from "./pages/Clinics";
+import ClinicDetails from "./pages/ClinicDetails";
 import Pricing from "./pages/Pricing";
 import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
@@ -55,8 +57,12 @@ const App = () => (
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/doctors" element={<Doctors />} />
-                <Route path="/doctors/:id" element={<DoctorDetails />} />
+                {/* New clinic routes */}
+                <Route path="/clinics" element={<Clinics />} />
+                <Route path="/clinics/:id" element={<ClinicDetails />} />
+                {/* Legacy doctor routes - keep for backward compatibility */}
+                <Route path="/doctors" element={<Clinics />} />
+                <Route path="/doctors/:id" element={<ClinicDetails />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/faq" element={<FAQ />} />

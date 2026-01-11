@@ -16,9 +16,9 @@ export function SearchBar({ size = "default", className = "" }: SearchBarProps) 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/doctors?search=${encodeURIComponent(query.trim())}`);
+      navigate(`/clinics?search=${encodeURIComponent(query.trim())}`);
     } else {
-      navigate("/doctors");
+      navigate("/clinics");
     }
   };
 

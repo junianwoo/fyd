@@ -21,7 +21,7 @@ const NotFound = () => {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/doctors">
+            <Link to="/clinics">
               <Search className="h-4 w-4 mr-2" />
               Find Doctors
             </Link>

@@ -386,7 +386,7 @@ export default function FAQ() {
                 Use our free search to find family doctors accepting patients near you.
               </p>
               <Button asChild size="lg">
-                <Link to="/doctors">Start Searching for Free</Link>
+                <Link to="/clinics">Start Searching for Free</Link>
               </Button>
             </div>
             {/* Image at bottom, flush with no bottom padding */}
