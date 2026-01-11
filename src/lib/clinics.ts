@@ -211,12 +211,12 @@ export async function searchClinics(query: string): Promise<{ clinics: Clinic[];
     } else if (!postalAnalysis.isPostalCode) {
       // City/name search
       queryBuilder = queryBuilder.or(
-        `city.ilike.%${lowerQuery}%,name.ilike.%${lowerQuery}%`
+        `city.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`
       );
     }
     
     const { data, error } = await queryBuilder
-      .order("name")
+      .order("clinic_name")
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
     if (error) {
