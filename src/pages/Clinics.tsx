@@ -121,25 +121,22 @@ export default function Clinics() {
       result = result.filter((clinic) => clinic.acceptingStatus === statusFilter);
     }
 
-    // Language filter
-    if (languageFilter.length > 0) {
-      result = result.filter((clinic) =>
-        languageFilter.some((lang) => clinic.languages.includes(lang))
-      );
-    }
-
-    // Accessibility filter
-    if (accessibilityFilter) {
-      result = result.filter((clinic) => clinic.accessibilityFeatures.length > 0);
-    }
-
-    // Virtual appointments filter
-    if (virtualFilter) {
-      result = result.filter((clinic) => clinic.virtualAppointments);
-    }
+    // Advanced filters (language, accessibility, virtual) temporarily disabled
+    // Uncomment when data becomes available:
+    // if (languageFilter.length > 0) {
+    //   result = result.filter((clinic) =>
+    //     languageFilter.some((lang) => clinic.languages.includes(lang))
+    //   );
+    // }
+    // if (accessibilityFilter) {
+    //   result = result.filter((clinic) => clinic.accessibilityFeatures.length > 0);
+    // }
+    // if (virtualFilter) {
+    //   result = result.filter((clinic) => clinic.virtualAppointments);
+    // }
 
     return result;
-  }, [clinics, filterCenter, statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter]);
+  }, [clinics, filterCenter, statusFilter, distanceFilter]);
 
   // Paginated clinics for display
   const paginatedClinics = useMemo(() => {
@@ -150,7 +147,7 @@ export default function Clinics() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter, activeQuery]);
+  }, [statusFilter, distanceFilter, activeQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

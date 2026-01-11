@@ -13,6 +13,9 @@ import {
   CheckCircle,
   Filter
 } from "lucide-react";
+
+// Feature flag to enable/disable advanced filters (language, accessibility)
+const ADVANCED_FILTERS_ENABLED = false;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -622,8 +625,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Advanced Filters Card */}
-            {isSubscribed && (
+            {/* Advanced Filters Card - Temporarily Hidden (no data available) */}
+            {ADVANCED_FILTERS_ENABLED && isSubscribed && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

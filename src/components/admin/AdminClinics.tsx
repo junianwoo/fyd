@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { AdminDoctorImport } from "./AdminDoctorImport";
+import { AdminClinicImport } from "./AdminClinicImport";
 import {
   Stethoscope, 
   Search, 
@@ -53,7 +53,7 @@ import { toast } from "sonner";
 type Doctor = Database["public"]["Tables"]["doctors"]["Row"];
 type AcceptingStatus = Database["public"]["Enums"]["accepting_status"];
 
-export default function AdminDoctors() {
+export default function AdminClinics() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,11 +85,11 @@ export default function AdminDoctors() {
     let query = supabase
       .from("doctors")
       .select("*", { count: "exact" })
-      .order("full_name", { ascending: true });
+      .order("clinic_name", { ascending: true });
     
-    // Apply search filter server-side (now includes postal_code!)
+    // Apply search filter server-side (removed full_name)
     if (searchQuery.trim()) {
-      query = query.or(`full_name.ilike.%${searchQuery}%,clinic_name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
+      query = query.or(`clinic_name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
     }
     
     // Apply status filter server-side
@@ -140,7 +140,6 @@ export default function AdminDoctors() {
   const openEditDialog = (doctor: Doctor) => {
     setEditingDoctor(doctor);
     setEditForm({
-      full_name: doctor.full_name,
       clinic_name: doctor.clinic_name,
       address: doctor.address,
       city: doctor.city,
@@ -169,10 +168,10 @@ export default function AdminDoctors() {
       .eq("id", editingDoctor.id);
 
     if (error) {
-      toast.error("Failed to update doctor");
+      toast.error("Failed to update clinic");
       console.error(error);
     } else {
-      toast.success("Doctor updated successfully");
+      toast.success("Clinic updated successfully");
       setEditingDoctor(null);
       loadDoctors();
     }
@@ -250,7 +249,7 @@ export default function AdminDoctors() {
   return (
     <div className="space-y-6">
       {/* Import Section */}
-      <AdminDoctorImport />
+      <AdminClinicImport />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
@@ -304,19 +303,19 @@ export default function AdminDoctors() {
         </Card>
       </div>
 
-      {/* Doctors Table */}
+      {/* Clinics Table */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <CardTitle className="flex items-center gap-2">
               <Stethoscope className="h-5 w-5" />
-              Doctor/Clinic Management
+              Clinic Management
             </CardTitle>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search name, clinic, city..."
+                  placeholder="Search clinic name, city..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -348,13 +347,13 @@ export default function AdminDoctors() {
           ) : filteredDoctors.length === 0 ? (
             <div className="text-center py-8">
               <Stethoscope className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No doctors found</p>
+              <p className="text-muted-foreground">No clinics found</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Doctor / Clinic</TableHead>
+                  <TableHead>Clinic Name</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Verified By</TableHead>
@@ -366,17 +365,14 @@ export default function AdminDoctors() {
                 {filteredDoctors.map((doctor) => (
                   <TableRow key={doctor.id}>
                     <TableCell>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{doctor.full_name}</span>
-                          {doctor.claimed_by_doctor && (
-                            <Badge variant="outline" className="text-xs">
-                              <CheckCircle className="h-3 w-3 mr-1 text-blue-500" />
-                              Claimed
-                            </Badge>
-                          )}
-                        </div>
-                        <span className="text-sm text-muted-foreground">{doctor.clinic_name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{doctor.clinic_name}</span>
+                        {doctor.claimed_by_doctor && (
+                          <Badge variant="outline" className="text-xs">
+                            <CheckCircle className="h-3 w-3 mr-1 text-blue-500" />
+                            Claimed
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -433,42 +429,32 @@ export default function AdminDoctors() {
           {!loading && filteredDoctors.length > 0 && (
             <p className="text-sm text-muted-foreground mt-4 text-center">
               {searchQuery || statusFilter !== "all" 
-                ? `Showing ${filteredDoctors.length} matching doctors (of ${stats.total} total)`
-                : `Showing ${filteredDoctors.length} doctors (of ${stats.total} total) - Use search to find specific doctors`
+                ? `Showing ${filteredDoctors.length} matching clinics (of ${stats.total} total)`
+                : `Showing ${filteredDoctors.length} clinics (of ${stats.total} total) - Use search to find specific clinics`
               }
             </p>
           )}
         </CardContent>
       </Card>
 
-      {/* Edit Doctor Dialog */}
+      {/* Edit Clinic Dialog */}
       <Dialog open={!!editingDoctor} onOpenChange={() => setEditingDoctor(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Doctor / Clinic</DialogTitle>
+            <DialogTitle>Edit Clinic</DialogTitle>
             <DialogDescription>
-              Update doctor information and accepting status.
+              Update clinic information and accepting status.
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Doctor Name</Label>
-                <Input
-                  id="full_name"
-                  value={editForm.full_name || ""}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="clinic_name">Clinic Name</Label>
-                <Input
-                  id="clinic_name"
-                  value={editForm.clinic_name || ""}
-                  onChange={(e) => setEditForm({ ...editForm, clinic_name: e.target.value })}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="clinic_name">Clinic Name</Label>
+              <Input
+                id="clinic_name"
+                value={editForm.clinic_name || ""}
+                onChange={(e) => setEditForm({ ...editForm, clinic_name: e.target.value })}
+              />
             </div>
 
             <div className="space-y-2">

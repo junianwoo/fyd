@@ -6,20 +6,21 @@ const corsHeaders = {
 };
 
 interface CSVDoctor {
-  cpso_number: string;
-  full_name: string;
-  member_status: string;
-  languages: string;
+  cpso_number?: string;
+  full_name?: string;
+  clinic_name?: string;
+  member_status?: string;
+  languages?: string;
   address: string;
   city: string;
-  province: string;
+  province?: string;
   postal_code: string;
   phone: string;
   latitude: string;
   longitude: string;
-  google_place_id: string;
-  google_formatted_address: string;
-  source_url: string;
+  google_place_id?: string;
+  google_formatted_address?: string;
+  source_url?: string;
 }
 
 // Parse CSV content into array of objects
@@ -223,7 +224,7 @@ Deno.serve(async (req) => {
       const filteredBatch = clearExisting 
         ? batch 
         : batch.filter(doc => {
-            if (existingCpsoNumbers.has(doc.cpso_number)) {
+            if (doc.cpso_number && existingCpsoNumbers.has(doc.cpso_number)) {
               skipped++;
               return false;
             }
@@ -235,11 +236,11 @@ Deno.serve(async (req) => {
       }
       
       const transformedBatch = filteredBatch.map((doc) => ({
-        cpso_number: doc.cpso_number,
-        full_name: formatName(doc.full_name),
-        clinic_name: extractClinicName(doc.address, doc.full_name),
+        cpso_number: doc.cpso_number || null,
+        full_name: doc.full_name ? formatName(doc.full_name) : null,
+        clinic_name: doc.clinic_name || extractClinicName(doc.address, doc.full_name || ""),
         address: doc.address,
-        city: extractCity(doc.google_formatted_address, doc.city),
+        city: doc.google_formatted_address ? extractCity(doc.google_formatted_address, doc.city) : doc.city,
         province: doc.province || "ON",
         postal_code: doc.postal_code,
         phone: doc.phone,
@@ -247,7 +248,7 @@ Deno.serve(async (req) => {
         longitude: parseFloat(doc.longitude),
         accepting_status: "unknown" as const,
         status_verified_by: "community" as const,
-        languages: parseLanguages(doc.languages),
+        languages: parseLanguages(doc.languages || ""),
         accessibility_features: [],
         age_groups_served: ["Adults"],
         virtual_appointments: false,

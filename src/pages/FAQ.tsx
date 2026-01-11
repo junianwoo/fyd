@@ -38,7 +38,7 @@ const faqCategories = [
       },
       {
         question: "Can clinics update their own listings?",
-        answer: "Yes. Clinic staff can claim their listings through an email verification process. Once verified, they can update their practice information, accepting status, languages spoken, accessibility features, and other details directly. Listings updated by verified clinics are marked as \"Clinic Verified\" to indicate direct provider confirmation.",
+        answer: "Yes. Clinic staff can claim their listings through an email verification process. Once verified, they can update their practice information, accepting status, and other details directly. Listings updated by verified clinics are marked as \"Clinic Verified\" to indicate direct provider confirmation.",
       },
     ],
   },
@@ -72,7 +72,7 @@ const faqCategories = [
     faqs: [
       {
         question: "How does the Alert Service work?",
-        answer: "When you subscribe to Alert Service ($7.99 CAD per month), you can monitor up to 3 Ontario cities or postal code areas. Whenever a clinic in those locations changes their status to \"accepting patients\" and matches your optional filter preferences (language, accessibility features), we send you an email alert with their information within minutes. This gives you a time advantage to call before their roster fills.",
+        answer: "When you subscribe to Alert Service ($7.99 CAD per month), you can monitor up to 3 Ontario cities or postal code areas. Whenever a clinic in those locations changes their status to \"accepting patients\", we send you an email alert with their information within minutes. This gives you a time advantage to call before their roster fills.",
       },
       {
         question: "What information is included in alert emails?",
@@ -99,10 +99,6 @@ const faqCategories = [
         answer: "Free search lets you browse clinics whenever you want, requiring you to check manually. Email alerts actively monitor clinics in your chosen cities 24/7 and notify you the moment one starts accepting patients. This means you can be among the first to call, significantly improving your chances of securing a spot before the roster fills.",
       },
       {
-        question: "Can I filter alerts by language or accessibility?",
-        answer: "Yes! Alert Service subscribers can set optional filters for languages (up to 10 languages) and accessibility features (wheelchair accessible, accessible parking). Only clinics matching your preferences will trigger alerts, saving you time and ensuring you only receive relevant notifications.",
-      },
-      {
         question: "How quickly do alerts go out?",
         answer: "Email alerts are sent within minutes of a status change. Our system monitors for changes continuously and delivers notifications as soon as a doctor matching your criteria becomes available. This speed gives you a crucial time advantage.",
       },
@@ -113,7 +109,7 @@ const faqCategories = [
     faqs: [
       {
         question: "How much does Alert Service cost?",
-        answer: "Alert Service costs $7.99 CAD per month. This price includes monitoring up to 3 cities, unlimited alerts, optional language and accessibility filters, and the ability to change your monitored locations anytime. Pricing is subject to applicable taxes.",
+        answer: "Alert Service costs $7.99 CAD per month. This price includes monitoring up to 3 cities, unlimited alerts, and the ability to change your monitored locations anytime. Pricing is subject to applicable taxes.",
       },
       {
         question: "What payment methods do you accept?",
@@ -170,7 +166,7 @@ const faqCategories = [
       },
       {
         question: "Is Assisted Access really the same as paid Alert Service?",
-        answer: "Yes. Assisted Access users receive the exact same Alert Service features as paid subscribers: up to 3 monitored cities, instant email notifications, optional language and accessibility filters, and the ability to change cities anytime. There is no reduced functionality or degraded service level.",
+        answer: "Yes. Assisted Access users receive the exact same Alert Service features as paid subscribers: up to 3 monitored cities, instant email notifications, and the ability to change cities anytime. There is no reduced functionality or degraded service level.",
       },
       {
         question: "Will anyone know I'm using Assisted Access?",

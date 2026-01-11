@@ -6,8 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, AlertTriangle, CheckCircle, Loader2, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Upload, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 
 export function AdminClinicImport() {
   const [importing, setImporting] = useState(false);
@@ -43,7 +42,7 @@ export function AdminClinicImport() {
       setProgress(30);
 
       // Call the edge function
-      const { data, error } = await supabase.functions.invoke("import-clinics", {
+      const { data, error } = await supabase.functions.invoke("import-doctors", {
         body: { csvContent: content, clearExisting: importMode === "replace" },
       });
 
@@ -88,7 +87,7 @@ export function AdminClinicImport() {
           Import Clinics from CSV
         </CardTitle>
         <CardDescription>
-          Upload a CSV file with clinic data. Choose append mode to add new clinics or replace mode to completely refresh the database.
+          Upload a CSV file with clinic data. Choose to append or replace existing clinics.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -104,23 +103,17 @@ export function AdminClinicImport() {
               <RadioGroupItem value="append" id="append" />
               <Label htmlFor="append" className="font-normal cursor-pointer">
                 <span className="font-medium">Append</span>
-                <span className="text-muted-foreground ml-1">(add new clinics, skip duplicates by name)</span>
+                <span className="text-muted-foreground ml-1">(add new clinics, skip duplicates)</span>
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="replace" id="replace" />
               <Label htmlFor="replace" className="font-normal cursor-pointer">
-                <span className="font-medium text-red-600">Replace</span>
+                <span className="font-medium">Replace</span>
                 <span className="text-muted-foreground ml-1">(delete all existing, then import)</span>
               </Label>
             </div>
           </RadioGroup>
-          {importMode === "replace" && (
-            <p className="text-sm text-red-600 flex items-center gap-1.5">
-              <AlertTriangle className="h-4 w-4" />
-              Warning: This is destructive and cannot be undone!
-            </p>
-          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -182,37 +175,18 @@ export function AdminClinicImport() {
           </div>
         )}
 
-        <div className="border-t pt-4 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <FileText className="h-4 w-4" />
-            CSV Format Requirements
-          </div>
-          
-          <div className="text-sm text-muted-foreground space-y-2">
-            <p className="font-medium">Required columns:</p>
-            <code className="text-xs bg-muted p-2 rounded block overflow-x-auto">
-              name, address, city, province, postal_code, phone, latitude, longitude
-            </code>
-            
-            <p className="font-medium mt-3">Optional columns:</p>
-            <code className="text-xs bg-muted p-2 rounded block overflow-x-auto">
-              languages, google_place_id, google_formatted_address, source_url
-            </code>
-            
-            <p className="mt-3 text-xs">
-              <strong>Note:</strong> Duplicate detection in append mode is based on clinic name (case-insensitive).
-            </p>
-          </div>
-          
-          <a 
-            href="/scripts/CSV_FORMAT_GUIDE_CLINICS.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-primary transition-colors"
-          >
-            <FileText className="h-3.5 w-3.5" />
-            View detailed CSV format guide
-          </a>
+        <div className="text-sm text-muted-foreground">
+          <p className="font-medium mb-1">Required CSV columns:</p>
+          <code className="text-xs bg-muted p-2 rounded block overflow-x-auto mb-2">
+            clinic_name,address,city,postal_code,phone,latitude,longitude
+          </code>
+          <p className="font-medium mb-1 mt-3">Optional columns:</p>
+          <code className="text-xs bg-muted p-2 rounded block overflow-x-auto">
+            province,languages,email,website,cpso_number
+          </code>
+          <p className="text-xs text-muted-foreground mt-2">
+            Note: province defaults to 'ON', languages defaults to 'English'
+          </p>
         </div>
       </CardContent>
     </Card>

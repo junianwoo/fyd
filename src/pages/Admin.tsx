@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Admin sub-components
 import AdminUsers from "@/components/admin/AdminUsers";
-import AdminDoctors from "@/components/admin/AdminDoctors";
+import AdminClinics from "@/components/admin/AdminClinics";
 import AdminModeration from "@/components/admin/AdminModeration";
 import AdminResources from "@/components/admin/AdminResources";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
@@ -84,7 +84,7 @@ export default function Admin() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl text-foreground">Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Manage users, doctors, and content</p>
+              <p className="text-sm text-muted-foreground">Manage users, clinics, and content</p>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">{user.email}</span>
@@ -105,9 +105,9 @@ export default function Admin() {
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="doctors" className="flex items-center gap-2">
+            <TabsTrigger value="clinics" className="flex items-center gap-2">
               <Stethoscope className="h-4 w-4" />
-              <span className="hidden sm:inline">Doctors</span>
+              <span className="hidden sm:inline">Clinics</span>
             </TabsTrigger>
             <TabsTrigger value="moderation" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
@@ -127,8 +127,8 @@ export default function Admin() {
             <AdminUsers />
           </TabsContent>
 
-          <TabsContent value="doctors">
-            <AdminDoctors />
+          <TabsContent value="clinics">
+            <AdminClinics />
           </TabsContent>
 
           <TabsContent value="moderation">

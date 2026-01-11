@@ -281,7 +281,7 @@ export default function AdminModeration() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Doctor / Clinic</TableHead>
+                  <TableHead>Clinic</TableHead>
                   <TableHead>Current Status</TableHead>
                   <TableHead>Reported Status</TableHead>
                   <TableHead>Report Count</TableHead>
@@ -295,11 +295,11 @@ export default function AdminModeration() {
                     <TableCell>
                       <div>
                         <span className="font-medium">
-                          {update.doctors?.full_name || "Unknown"}
+                          {update.doctors?.clinic_name || "Unknown"}
                         </span>
                         <br />
                         <span className="text-sm text-muted-foreground">
-                          {update.doctors?.clinic_name} — {update.doctors?.city}
+                          {update.doctors?.city}
                         </span>
                       </div>
                     </TableCell>
@@ -380,7 +380,7 @@ export default function AdminModeration() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Doctor / Clinic</TableHead>
+                  <TableHead>Clinic</TableHead>
                   <TableHead>Reported Status</TableHead>
                   <TableHead>Details</TableHead>
                   <TableHead>Reported At</TableHead>
@@ -393,11 +393,11 @@ export default function AdminModeration() {
                     <TableCell>
                       <div>
                         <span className="font-medium">
-                          {report.doctors?.full_name || "Unknown"}
+                          {report.doctors?.clinic_name || "Unknown"}
                         </span>
                         <br />
                         <span className="text-sm text-muted-foreground">
-                          {report.doctors?.clinic_name} — {report.doctors?.city}
+                          {report.doctors?.city}
                         </span>
                       </div>
                     </TableCell>

@@ -35,7 +35,6 @@ const freeFeatures = [
 const alertFeatures = [
   "Everything in Free, Plus:",
   "Email alerts for up to 3 cities",
-  "Optional language and accessibility filters",
   "Instant notifications when status changes to 'Accepting'",
   "Monitor multiple locations (for yourself and loved ones)",
   "Cancel anytime, no long-term commitment",
@@ -346,7 +345,7 @@ export default function Pricing() {
                 </div>
                 <h3 className="text-xl text-foreground mb-3">Set It and Forget It</h3>
                 <p className="text-muted-foreground">
-                  Set your locations and optional filters (language, accessibility), then let Alert Service do the monitoring for you. You'll only hear from us when there's a doctor worth calling about.
+                  Set your locations, then let Alert Service do the monitoring for you. You'll only hear from us when there's a clinic worth calling about.
                 </p>
               </div>
               

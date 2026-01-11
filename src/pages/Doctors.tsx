@@ -121,25 +121,22 @@ export default function Doctors() {
       result = result.filter((doctor) => doctor.acceptingStatus === statusFilter);
     }
 
-    // Language filter
-    if (languageFilter.length > 0) {
-      result = result.filter((doctor) =>
-        languageFilter.some((lang) => doctor.languages.includes(lang))
-      );
-    }
-
-    // Accessibility filter
-    if (accessibilityFilter) {
-      result = result.filter((doctor) => doctor.accessibilityFeatures.length > 0);
-    }
-
-    // Virtual appointments filter
-    if (virtualFilter) {
-      result = result.filter((doctor) => doctor.virtualAppointments);
-    }
+    // Advanced filters (language, accessibility, virtual) temporarily disabled
+    // Uncomment when data becomes available:
+    // if (languageFilter.length > 0) {
+    //   result = result.filter((doctor) =>
+    //     languageFilter.some((lang) => doctor.languages.includes(lang))
+    //   );
+    // }
+    // if (accessibilityFilter) {
+    //   result = result.filter((doctor) => doctor.accessibilityFeatures.length > 0);
+    // }
+    // if (virtualFilter) {
+    //   result = result.filter((doctor) => doctor.virtualAppointments);
+    // }
 
     return result;
-  }, [doctors, filterCenter, statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter]);
+  }, [doctors, filterCenter, statusFilter, distanceFilter]);
 
   // Paginated doctors for display
   const paginatedDoctors = useMemo(() => {
@@ -150,7 +147,7 @@ export default function Doctors() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, distanceFilter, languageFilter, accessibilityFilter, virtualFilter, activeQuery]);
+  }, [statusFilter, distanceFilter, activeQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
