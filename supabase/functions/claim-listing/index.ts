@@ -35,26 +35,26 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { doctorId, email } = await req.json();
+    const { clinicId, email } = await req.json();
     
-    if (!doctorId || !email) {
-      throw new Error("Missing required fields: doctorId, email");
+    if (!clinicId || !email) {
+      throw new Error("Missing required fields: clinicId, email");
     }
 
-    logStep("Processing claim request", { doctorId, email });
+    logStep("Processing claim request", { clinicId, email });
 
-    // Get doctor details
-    const { data: doctor, error: doctorError } = await supabaseClient
-      .from("doctors")
+    // Get clinic details
+    const { data: clinic, error: clinicError } = await supabaseClient
+      .from("clinics")
       .select("*")
-      .eq("id", doctorId)
+      .eq("id", clinicId)
       .single();
 
-    if (doctorError || !doctor) {
-      throw new Error("Doctor not found");
+    if (clinicError || !clinic) {
+      throw new Error("Clinic not found");
     }
 
-    logStep("Doctor found", { name: doctor.full_name, clinic: doctor.clinic_name });
+    logStep("Clinic found", { name: clinic.name });
 
     // Generate verification token
     const token = generateToken();
@@ -64,7 +64,7 @@ serve(async (req) => {
     const { error: tokenError } = await supabaseClient
       .from("verification_tokens")
       .insert({
-        doctor_id: doctorId,
+        clinic_id: clinicId,
         token: token,
         email: email,
         expires_at: expiresAt.toISOString(),
@@ -82,7 +82,7 @@ serve(async (req) => {
     const emailResponse = await resend.emails.send({
       from: "FindYourDoctor <noreply@findyourdoctor.ca>",
       to: [email],
-      subject: `Verify your clinic listing: ${doctor.clinic_name}`,
+      subject: `Verify your clinic listing: ${clinic.name}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -103,9 +103,8 @@ serve(async (req) => {
             </p>
             
             <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #00857C;">
-              <h3 style="margin: 0 0 8px 0;">${doctor.full_name}</h3>
-              <p style="margin: 0; color: #666;">${doctor.clinic_name}</p>
-              <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">${doctor.address}, ${doctor.city}</p>
+              <h3 style="margin: 0 0 8px 0;">${clinic.name}</h3>
+              <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">${clinic.address}, ${clinic.city}</p>
             </div>
             
             <p style="margin: 0 0 24px 0;">

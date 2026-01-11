@@ -27,10 +27,10 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { doctorId, reportedStatus, details } = await req.json();
+    const { clinicId, reportedStatus, details } = await req.json();
     
-    if (!doctorId || !reportedStatus) {
-      throw new Error("Missing required fields: doctorId, reportedStatus");
+    if (!clinicId || !reportedStatus) {
+      throw new Error("Missing required fields: clinicId, reportedStatus");
     }
 
     // Get IP address from request headers (server-side capture)
@@ -51,25 +51,25 @@ serve(async (req) => {
       }
     }
 
-    logStep("Processing update", { doctorId, reportedStatus, reporterIp, userId });
+    logStep("Processing update", { clinicId, reportedStatus, reporterIp, userId });
 
-    // Get current doctor status
-    const { data: doctor, error: doctorError } = await supabaseClient
-      .from("doctors")
+    // Get current clinic status
+    const { data: clinic, error: clinicError } = await supabaseClient
+      .from("clinics")
       .select("accepting_status")
-      .eq("id", doctorId)
+      .eq("id", clinicId)
       .single();
 
-    if (doctorError) throw doctorError;
+    if (clinicError) throw clinicError;
     
-    const previousStatus = doctor.accepting_status;
-    logStep("Current doctor status", { previousStatus });
+    const previousStatus = clinic.accepting_status;
+    logStep("Current clinic status", { previousStatus });
 
     // Insert community report (for audit trail)
     const { error: reportError } = await supabaseClient
       .from("community_reports")
       .insert({
-        doctor_id: doctorId,
+        clinic_id: clinicId,
         reported_status: reportedStatus,
         details: details || null,
         reporter_ip: reporterIp || null,
@@ -84,7 +84,7 @@ serve(async (req) => {
     const { data: existingUpdate, error: existingError } = await supabaseClient
       .from("pending_updates")
       .select("*")
-      .eq("doctor_id", doctorId)
+      .eq("clinic_id", clinicId)
       .eq("status", reportedStatus)
       .maybeSingle();
 
@@ -103,7 +103,7 @@ serve(async (req) => {
         logStep("Duplicate report detected - same IP already reported", { reporterIp });
         return new Response(JSON.stringify({ 
           success: false, 
-          message: "You've already submitted an update for this doctor today. Thank you!",
+          message: "You've already submitted an update for this clinic today. Thank you!",
           statusUpdated: false,
           duplicate: true
         }), {
@@ -117,7 +117,7 @@ serve(async (req) => {
         logStep("Duplicate report detected - same user already reported", { userId });
         return new Response(JSON.stringify({ 
           success: false, 
-          message: "You've already submitted an update for this doctor today. Thank you!",
+          message: "You've already submitted an update for this clinic today. Thank you!",
           statusUpdated: false,
           duplicate: true
         }), {
@@ -132,27 +132,27 @@ serve(async (req) => {
       const newUserIds = userId ? [...userIds, userId] : userIds;
 
       if (newCount >= THRESHOLD) {
-        // Threshold met! Update doctor status
-        logStep("Threshold met, updating doctor status", { newCount, reportedStatus });
+        // Threshold met! Update clinic status
+        logStep("Threshold met, updating clinic status", { newCount, reportedStatus });
         
-        // Update doctor status
-        const { error: updateDoctorError } = await supabaseClient
-          .from("doctors")
+        // Update clinic status
+        const { error: updateClinicError } = await supabaseClient
+          .from("clinics")
           .update({
             accepting_status: reportedStatus,
             status_last_updated_at: new Date().toISOString(),
             status_verified_by: "community",
             community_report_count: (existingUpdate.count || 0) + 1,
           })
-          .eq("id", doctorId);
+          .eq("id", clinicId);
 
-        if (updateDoctorError) throw updateDoctorError;
+        if (updateClinicError) throw updateClinicError;
 
-        // Delete ALL pending updates for this doctor (reset counters)
+        // Delete ALL pending updates for this clinic (reset counters)
         const { error: deleteError } = await supabaseClient
           .from("pending_updates")
           .delete()
-          .eq("doctor_id", doctorId);
+          .eq("clinic_id", clinicId);
 
         if (deleteError) {
           logStep("Error deleting pending updates", { error: deleteError.message });
@@ -171,7 +171,7 @@ serve(async (req) => {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
             },
-            body: JSON.stringify({ doctorId }),
+            body: JSON.stringify({ clinicId }),
           }).then(() => {
             logStep("Alert engine invoked");
           }).catch(err => {
@@ -198,7 +198,7 @@ serve(async (req) => {
       const { error: insertError } = await supabaseClient
         .from("pending_updates")
         .insert({
-          doctor_id: doctorId,
+          clinic_id: clinicId,
           status: reportedStatus,
           count: 1,
           ip_addresses: (reporterIp && reporterIp !== "unknown") ? [reporterIp] : [],
