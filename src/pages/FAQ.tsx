@@ -17,6 +17,10 @@ const faqCategories = [
         answer: "FindYourDoctor.ca is a community-driven service that helps Ontarians find family doctors accepting new patients. We provide a free, searchable directory of family practice clinics across Ontario with real-time accepting status information. Our platform is built to address the healthcare access crisis affecting approximately 2.5 million Ontarians who currently lack access to primary care physicians.",
       },
       {
+        question: "Why do you show clinics instead of individual doctors?",
+        answer: "We focus on clinics rather than individual doctors because this approach is more accurate, scalable, and easier to maintain. When you call a family practice, you're typically seeking any available doctor at that clinic, not a specific physician. By focusing on clinic-level status (whether the practice is accepting new patients), we can provide more reliable, up-to-date information without the complexity of tracking hundreds of individual doctors who may join, leave, or change their patient loads. This means you get faster, more accurate results and we can cover more of Ontario effectively.",
+      },
+      {
         question: "Are you affiliated with the government or CPSO?",
         answer: "No. We are not affiliated with, endorsed by, or connected to any government agency, the Ontario Ministry of Health, the College of Physicians and Surgeons of Ontario (CPSO), or any other healthcare authority. We are an independent service built to help Ontarians navigate the family doctor shortage more effectively.",
       },
