@@ -282,7 +282,7 @@ const ClinicMap = memo(function ClinicMap({
 
       marker.addListener("click", () => {
         setSelectedClinic(clinic);
-        onClinicSelect?.(clinic.id);
+        // Note: Removed onClinicSelect call - we only show on-map card now
       });
 
       markersRef.current.push(marker);
