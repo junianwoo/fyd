@@ -336,23 +336,19 @@ export default function Doctors() {
                   >
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
-                        {/* Status Badge - Mobile */}
-                        <div className="p-4 md:hidden">
-                          <StatusBadge status={doctor.acceptingStatus} />
-                        </div>
-
                         {/* Main Content */}
                         <div className="flex-1 p-4 md:p-6">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
+                              <div className="flex flex-col gap-2 mb-2">
+                                {/* Status Badge - Always on top */}
+                                <div>
+                                  <StatusBadge status={doctor.acceptingStatus} size="sm" />
+                                </div>
+                                {/* Doctor Name - Below status */}
                                 <h3 className="text-lg text-foreground">
                                   {doctor.fullName}
                                 </h3>
-                                {/* Status Badge - Desktop */}
-                                <div className="hidden md:block">
-                                  <StatusBadge status={doctor.acceptingStatus} size="sm" />
-                                </div>
                               </div>
                               <p className="text-muted-foreground mb-3">{doctor.clinicName}</p>
                               

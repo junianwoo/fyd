@@ -33,6 +33,29 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [mapZoom, setMapZoom] = useState<number>(12);
+  
+  // Calculate marker size category based on zoom level (to avoid recreating markers too frequently)
+  const markerSizeCategory = mapZoom >= 16 ? 'small' : mapZoom >= 13 ? 'medium' : 'large';
+  
+  // Calculate marker size based on zoom level
+  const getMarkerSize = (isSelected: boolean, zoom: number) => {
+    // Base sizes
+    const baseSize = isSelected ? 50 : 40;
+    
+    // Scale factor decreases as zoom increases (markers get smaller when zoomed in)
+    // Zoom 10-12: normal size (1.0x)
+    // Zoom 13-15: smaller (0.7x)
+    // Zoom 16+: much smaller (0.5x)
+    let scaleFactor = 1.0;
+    if (zoom >= 16) {
+      scaleFactor = 0.5;
+    } else if (zoom >= 13) {
+      scaleFactor = 0.7;
+    }
+    
+    return Math.floor(baseSize * scaleFactor);
+  };
 
   // Fetch API key - try env variable first, then edge function
   useEffect(() => {
@@ -147,6 +170,14 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
       streetViewControl: false,
       fullscreenControl: true,
     });
+
+    // Track zoom changes for responsive marker sizing
+    mapInstanceRef.current.addListener('zoom_changed', () => {
+      const zoom = mapInstanceRef.current?.getZoom();
+      if (zoom !== undefined) {
+        setMapZoom(zoom);
+      }
+    });
   }, [loading, error, userLocation]);
 
   // Update markers when doctors change
@@ -193,7 +224,8 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
       const markerColor = statusColors[doctor.acceptingStatus] || statusColors.unknown;
 
       // Create SVG icon for the marker - pin shape with medical cross
-      const size = isSelected ? 50 : 40;
+      // Size is now responsive to zoom level
+      const size = getMarkerSize(isSelected, mapZoom);
       const svgIcon = {
         url: `data:image/svg+xml,${encodeURIComponent(`
           <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size * 1.33}" viewBox="-2 -2 28 36">
@@ -287,7 +319,7 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
         window.google.maps.event.removeListener(listener);
       });
     }
-  }, [doctors, selectedDoctorId, onDoctorSelect, searchLocation, userLocation]);
+  }, [doctors, selectedDoctorId, onDoctorSelect, searchLocation, userLocation, markerSizeCategory]);
 
   if (error) {
     return (
