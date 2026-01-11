@@ -76,12 +76,24 @@ export default function AdminClinics() {
   const loadDoctors = async () => {
     setLoading(true);
     
-    // Get total count for all doctors (for stats)
-    const { count: totalCount } = await supabase
-      .from("doctors")
-      .select("*", { count: "exact", head: true });
+    // Get accurate counts for all statuses (query the full dataset, not just the limited results)
+    const [
+      { count: totalCount },
+      { count: acceptingCount },
+      { count: notAcceptingCount },
+      { count: waitlistCount },
+      { count: unknownCount },
+      { count: claimedCount }
+    ] = await Promise.all([
+      supabase.from("doctors").select("*", { count: "exact", head: true }),
+      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "accepting"),
+      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "not_accepting"),
+      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "waitlist"),
+      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "unknown"),
+      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("claimed_by_doctor", true)
+    ]);
     
-    // Build query with server-side filtering
+    // Build query with server-side filtering (for display table only)
     let query = supabase
       .from("doctors")
       .select("*", { count: "exact" })
@@ -106,11 +118,11 @@ export default function AdminClinics() {
       setDoctors(data);
       setStats({
         total: totalCount || 0,
-        accepting: data.filter(d => d.accepting_status === "accepting").length,
-        notAccepting: data.filter(d => d.accepting_status === "not_accepting").length,
-        waitlist: data.filter(d => d.accepting_status === "waitlist").length,
-        unknown: data.filter(d => d.accepting_status === "unknown").length,
-        claimed: data.filter(d => d.claimed_by_doctor).length,
+        accepting: acceptingCount || 0,
+        notAccepting: notAcceptingCount || 0,
+        waitlist: waitlistCount || 0,
+        unknown: unknownCount || 0,
+        claimed: claimedCount || 0,
       });
     }
     
