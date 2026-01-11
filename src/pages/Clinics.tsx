@@ -369,10 +369,10 @@ export default function Clinics() {
 
                             <div className="hidden md:block">
                               <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
-                                <Link to={`/clinics/${clinic.id}`}>
+                                <a href={`/clinics/${clinic.id}`} target="_blank" rel="noopener noreferrer">
                                   View Details
                                   <ExternalLink className="h-3 w-3 ml-2" />
-                                </Link>
+                                </a>
                               </Button>
                             </div>
                           </div>
@@ -381,9 +381,9 @@ export default function Clinics() {
                         {/* Mobile View Details Button */}
                         <div className="p-4 pt-0 md:hidden">
                           <Button variant="outline" className="w-full" asChild onClick={(e) => e.stopPropagation()}>
-                            <Link to={`/clinics/${clinic.id}`}>
+                            <a href={`/clinics/${clinic.id}`} target="_blank" rel="noopener noreferrer">
                               View Clinic Details
-                            </Link>
+                            </a>
                           </Button>
                         </div>
                       </div>

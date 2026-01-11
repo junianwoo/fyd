@@ -397,10 +397,10 @@ const ClinicMap = memo(function ClinicMap({
             
             <div className="flex gap-2">
               <Button size="sm" asChild className="flex-1">
-                <Link to={`/clinics/${selectedClinic.id}`}>
+                <a href={`/clinics/${selectedClinic.id}`} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-3 w-3 mr-1" />
                   View Details
-                </Link>
+                </a>
               </Button>
               <Button 
                 size="sm" 
