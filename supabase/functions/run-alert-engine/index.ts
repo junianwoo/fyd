@@ -46,35 +46,35 @@ serve(async (req) => {
   try {
     logStep("Alert engine started");
 
-    const { doctorId } = await req.json();
+    const { clinicId } = await req.json();
     
-    if (!doctorId) {
-      throw new Error("Missing doctorId");
+    if (!clinicId) {
+      throw new Error("Missing clinicId");
     }
 
-    // Get doctor details
-    const { data: doctor, error: doctorError } = await supabaseClient
-      .from("doctors")
+    // Get clinic details
+    const { data: clinic, error: clinicError } = await supabaseClient
+      .from("clinics")
       .select("*")
-      .eq("id", doctorId)
+      .eq("id", clinicId)
       .single();
 
-    if (doctorError || !doctor) {
-      throw new Error(`Doctor not found: ${doctorError?.message}`);
+    if (clinicError || !clinic) {
+      throw new Error(`Clinic not found: ${clinicError?.message}`);
     }
 
-    logStep("Doctor found", { 
-      name: doctor.full_name, 
-      status: doctor.accepting_status,
-      city: doctor.city 
+    logStep("Clinic found", { 
+      name: clinic.name, 
+      status: clinic.accepting_status,
+      city: clinic.city 
     });
 
-    // Only send alerts if doctor is accepting
-    if (doctor.accepting_status !== "accepting") {
-      logStep("Doctor not accepting, skipping alerts");
+    // Only send alerts if clinic is accepting
+    if (clinic.accepting_status !== "accepting") {
+      logStep("Clinic not accepting, skipping alerts");
       return new Response(JSON.stringify({ 
         success: true, 
-        message: "Doctor not accepting, no alerts sent",
+        message: "Clinic not accepting, no alerts sent",
         alertsSent: 0 
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -139,8 +139,8 @@ serve(async (req) => {
         const distance = calculateDistance(
           alert.latitude,
           alert.longitude,
-          Number(doctor.latitude),
-          Number(doctor.longitude)
+          Number(clinic.latitude),
+          Number(clinic.longitude)
         );
 
         const radiusKm = alert.radius_km || 25;
@@ -157,16 +157,16 @@ serve(async (req) => {
           if (alert.apply_filters) {
             let filterMatch = true;
             
-            // Language filter: doctor must have at least one of user's languages
+            // Language filter: clinic must have at least one of user's languages
             if (alert.languages && alert.languages.length > 0) {
-              const doctorLanguages = doctor.languages || [];
+              const clinicLanguages = clinic.languages || [];
               const hasMatchingLanguage = alert.languages.some((lang: string) => 
-                doctorLanguages.includes(lang)
+                clinicLanguages.includes(lang)
               );
               if (!hasMatchingLanguage) {
                 filterMatch = false;
                 logStep("Language filter mismatch", {
-                  doctorLanguages,
+                  clinicLanguages,
                   userLanguages: alert.languages
                 });
               }
@@ -174,16 +174,16 @@ serve(async (req) => {
             
             // Accessibility filters
             if (filterMatch && alert.wheelchair_accessible) {
-              const doctorAccessibility = doctor.accessibility_features || [];
-              if (!doctorAccessibility.includes('Wheelchair Accessible')) {
+              const clinicAccessibility = clinic.accessibility_features || [];
+              if (!clinicAccessibility.includes('Wheelchair Accessible')) {
                 filterMatch = false;
                 logStep("Wheelchair accessibility filter mismatch");
               }
             }
             
             if (filterMatch && alert.accessible_parking) {
-              const doctorAccessibility = doctor.accessibility_features || [];
-              if (!doctorAccessibility.includes('Accessible Parking')) {
+              const clinicAccessibility = clinic.accessibility_features || [];
+              if (!clinicAccessibility.includes('Accessible Parking')) {
                 filterMatch = false;
                 logStep("Accessible parking filter mismatch");
               }
@@ -191,8 +191,8 @@ serve(async (req) => {
             
             // Skip this alert if filters don't match
             if (!filterMatch) {
-              logStep("Doctor doesn't match user's filters, skipping", {
-                doctorId: doctor.id,
+              logStep("Clinic doesn't match user's filters, skipping", {
+                clinicId: clinic.id,
                 alertId: alert.id
               });
               continue;
@@ -202,34 +202,33 @@ serve(async (req) => {
           // Send alert email
           try {
             // Build email body content
-            const doctorCard = getCard(`
-              <h2 style="margin: 0 0 8px 0; color: #1a1a1a; font-size: 22px; font-family: Georgia, 'Times New Roman', serif;">${doctor.full_name}</h2>
-              <p style="margin: 0 0 16px 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${doctor.clinic_name}</p>
+            const clinicCard = getCard(`
+              <h2 style="margin: 0 0 16px 0; color: #1a1a1a; font-size: 22px; font-family: Georgia, 'Times New Roman', serif;">${clinic.name}</h2>
               
               <div style="margin-bottom: 20px;">
                 <p style="margin: 0 0 4px 0; font-size: 15px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                  📍 ${doctor.address}, ${doctor.city}, ${doctor.province} ${doctor.postal_code}
+                  📍 ${clinic.address}, ${clinic.city}, ${clinic.province} ${clinic.postal_code}
                 </p>
                 <p style="margin: 4px 0 0 0; font-size: 14px; color: #00A6A6; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                   📏 ~${Math.round(distance)} km from ${alert.city_postal}
                 </p>
               </div>
               
-              ${getPhoneButton(doctor.phone, doctor.phone)}
+              ${getPhoneButton(clinic.phone, clinic.phone)}
               
               <div style="margin-top: 16px;">
-                <a href="${siteUrl}/doctors/${doctor.id}" style="color: #00A6A6; font-size: 14px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <a href="${siteUrl}/clinics/${clinic.id}" style="color: #00A6A6; font-size: 14px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                   View Full Details →
                 </a>
               </div>
             `, '#2ECC71');
             
             const bodyContent = `
-              ${doctorCard}
+              ${clinicCard}
               
               <div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
                 <p style="margin: 0; font-size: 15px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                  <strong>⚡ Act fast!</strong> Doctors fill up quickly. We recommend calling as soon as possible to secure your spot.
+                  <strong>⚡ Act fast!</strong> Clinics fill up quickly. We recommend calling as soon as possible to secure your spot.
                 </p>
               </div>
               
@@ -240,7 +239,7 @@ serve(async (req) => {
             
             const html = buildEmail({
               headerTitle: '🎉 Great News!',
-              headerSubtitle: `A doctor near ${alert.city_postal} is now accepting patients`,
+              headerSubtitle: `A clinic near ${alert.city_postal} is now accepting patients`,
               bodyContent,
               siteUrl,
               includeUnsubscribe: true,
@@ -250,7 +249,7 @@ serve(async (req) => {
               from: ALERT_EMAIL_OPTIONS.from!,
               reply_to: ALERT_EMAIL_OPTIONS.replyTo!,
               to: [subscriber.email],
-              subject: `🎉 Doctor Alert: ${doctor.full_name} is now accepting patients in ${doctor.city}!`,
+              subject: `🎉 Family Doctor Alert: ${clinic.name} is now accepting patients in ${clinic.city}!`,
               html,
             });
             
@@ -263,7 +262,7 @@ serve(async (req) => {
             });
           }
 
-          // Only send one alert per subscriber per doctor
+          // Only send one alert per subscriber per clinic
           break;
         }
       }
@@ -274,8 +273,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       success: true, 
       alertsSent,
-      doctorId,
-      doctorName: doctor.full_name
+      clinicId,
+      clinicName: clinic.name
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

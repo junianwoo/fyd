@@ -50,37 +50,36 @@ serve(async (req) => {
       throw new Error("Token has expired. Please request a new verification link.");
     }
 
-    logStep("Token valid", { doctorId: verificationToken.doctor_id });
+    logStep("Token valid", { clinicId: verificationToken.clinic_id });
 
-    // Get doctor details
-    const { data: doctor, error: doctorError } = await supabaseClient
-      .from("doctors")
+    // Get clinic details
+    const { data: clinic, error: clinicError } = await supabaseClient
+      .from("clinics")
       .select("*")
-      .eq("id", verificationToken.doctor_id)
+      .eq("id", verificationToken.clinic_id)
       .single();
 
-    if (doctorError || !doctor) {
-      throw new Error("Doctor not found");
+    if (clinicError || !clinic) {
+      throw new Error("Clinic not found");
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
-      doctor: {
-        id: doctor.id,
-        fullName: doctor.full_name,
-        clinicName: doctor.clinic_name,
-        address: doctor.address,
-        city: doctor.city,
-        province: doctor.province,
-        postalCode: doctor.postal_code,
-        phone: doctor.phone,
-        email: doctor.email,
-        website: doctor.website,
-        acceptingStatus: doctor.accepting_status,
-        languages: doctor.languages,
-        accessibilityFeatures: doctor.accessibility_features,
-        ageGroupsServed: doctor.age_groups_served,
-        virtualAppointments: doctor.virtual_appointments,
+      clinic: {
+        id: clinic.id,
+        name: clinic.name,
+        address: clinic.address,
+        city: clinic.city,
+        province: clinic.province,
+        postalCode: clinic.postal_code,
+        phone: clinic.phone,
+        email: clinic.email,
+        website: clinic.website,
+        acceptingStatus: clinic.accepting_status,
+        languages: clinic.languages,
+        accessibilityFeatures: clinic.accessibility_features,
+        ageGroupsServed: clinic.age_groups_served,
+        virtualAppointments: clinic.virtual_appointments,
       },
       tokenId: verificationToken.id
     }), {

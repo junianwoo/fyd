@@ -49,21 +49,21 @@ serve(async (req) => {
       throw new Error("Token has expired. Please request a new verification link.");
     }
 
-    logStep("Token valid, updating doctor", { doctorId: verificationToken.doctor_id });
+    logStep("Token valid, updating clinic", { clinicId: verificationToken.clinic_id });
 
     // Get previous status to check for alert trigger
-    const { data: currentDoctor } = await supabaseClient
-      .from("doctors")
+    const { data: currentClinic } = await supabaseClient
+      .from("clinics")
       .select("accepting_status")
-      .eq("id", verificationToken.doctor_id)
+      .eq("id", verificationToken.clinic_id)
       .single();
 
-    const previousStatus = currentDoctor?.accepting_status;
+    const previousStatus = currentClinic?.accepting_status;
 
-    // Update doctor listing
+    // Update clinic listing
     const updateData: Record<string, any> = {
-      claimed_by_doctor: true,
-      status_verified_by: "doctor",
+      claimed_by_clinic: true,
+      status_verified_by: "clinic",
       status_last_updated_at: new Date().toISOString(),
       profile_last_updated_at: new Date().toISOString(),
     };
@@ -87,9 +87,9 @@ serve(async (req) => {
     }
 
     const { error: updateError } = await supabaseClient
-      .from("doctors")
+      .from("clinics")
       .update(updateData)
-      .eq("id", verificationToken.doctor_id);
+      .eq("id", verificationToken.clinic_id);
 
     if (updateError) {
       throw new Error(`Failed to update listing: ${updateError.message}`);
@@ -101,11 +101,11 @@ serve(async (req) => {
       .update({ used: true })
       .eq("id", verificationToken.id);
 
-    // Delete all pending updates for this doctor (doctor verification overrides community)
+    // Delete all pending updates for this clinic (clinic verification overrides community)
     await supabaseClient
       .from("pending_updates")
       .delete()
-      .eq("doctor_id", verificationToken.doctor_id);
+      .eq("clinic_id", verificationToken.clinic_id);
 
     logStep("Listing updated successfully");
 
@@ -120,7 +120,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
         },
-        body: JSON.stringify({ doctorId: verificationToken.doctor_id }),
+        body: JSON.stringify({ clinicId: verificationToken.clinic_id }),
       }).then(() => {
         logStep("Alert engine invoked");
       }).catch(err => {
