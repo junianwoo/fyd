@@ -105,7 +105,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Search Freely</h3>
               <p className="text-muted-foreground">
-                Browse all family doctors accepting patients in your area. See real-time status updates. Always free to search.
+                Browse family practice clinics accepting patients in your area. See real-time status updates. Always free to search.
               </p>
             </div>
             
@@ -115,7 +115,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Community Powered</h3>
               <p className="text-muted-foreground">
-                Real people update doctor status after calling clinics. Doctors can verify their listings. Everyone helps everyone find care faster.
+                Real people update clinic status after calling them. Clinics can verify their listings. Everyone helps everyone find care faster.
               </p>
             </div>
             
@@ -125,7 +125,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Get Instant Alerts</h3>
               <p className="text-muted-foreground mb-4">
-                Monitor up to 3 cities with optional language and accessibility filters. Get email alerts when doctors matching your preferences start accepting patients. $7.99/month.
+                Monitor up to 3 cities with optional language and accessibility filters. Get email alerts when clinics matching your preferences begin accepting patients. $7.99/month.
               </p>
               <Link 
                 to="/pricing" 
@@ -154,7 +154,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Always Up-to-Date</h3>
               <p className="text-muted-foreground">
-                Community members update doctor status after calling clinics. Information stays current because people like you keep it accurate.
+                Community members update clinic status after calling them. Information stays current because people like you keep it accurate.
               </p>
             </div>
             

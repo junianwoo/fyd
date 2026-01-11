@@ -14,27 +14,27 @@ const faqCategories = [
     faqs: [
       {
         question: "What is FindYourDoctor.ca?",
-        answer: "FindYourDoctor.ca is a community-driven service that helps Ontarians find family doctors accepting new patients. We provide a free, searchable directory of family doctors across Ontario with real-time accepting status information. Our platform is built to address the healthcare access crisis affecting approximately 2.5 million Ontarians who currently lack access to primary care physicians.",
+        answer: "FindYourDoctor.ca is a community-driven service that helps Ontarians find family doctors accepting new patients. We provide a free, searchable directory of family practice clinics across Ontario with real-time accepting status information. Our platform is built to address the healthcare access crisis affecting approximately 2.5 million Ontarians who currently lack access to primary care physicians.",
       },
       {
         question: "Are you affiliated with the government or CPSO?",
         answer: "No. We are not affiliated with, endorsed by, or connected to any government agency, the Ontario Ministry of Health, the College of Physicians and Surgeons of Ontario (CPSO), or any other healthcare authority. We are an independent service built to help Ontarians navigate the family doctor shortage more effectively.",
       },
       {
-        question: "How do you keep doctor information up-to-date?",
-        answer: "We use a community-powered model where users voluntarily update doctor status after calling clinics. When someone calls a clinic and learns whether they're accepting patients, they can share that information on FindYourDoctor to help others. Additionally, doctors can claim and verify their own listings to ensure accuracy. We display when each listing was last updated and who verified it (community or doctor) so you can assess the reliability of the information.",
+        question: "How do you keep clinic information up-to-date?",
+        answer: "We use a community-powered model where users voluntarily update clinic status after calling them. When someone calls a clinic and learns whether they're accepting patients, they can share that information on FindYourDoctor to help others. Additionally, clinics can claim and verify their own listings to ensure accuracy. We display when each listing was last updated and who verified it (community or clinic staff) so you can assess the reliability of the information.",
       },
       {
-        question: "How accurate is the doctor status information?",
-        answer: "Our accuracy depends on community participation and doctor verification. The more people who update statuses after calling clinics, the more current our information stays. We show when each status was last updated so you can decide how much to trust it. While we strive for accuracy, doctor acceptance status can change at any time, so we always recommend calling the clinic directly to confirm before making healthcare decisions.",
+        question: "How accurate is the clinic status information?",
+        answer: "Our accuracy depends on community participation and clinic verification. The more people who update statuses after calling clinics, the more current our information stays. We show when each status was last updated so you can decide how much to trust it. While we strive for accuracy, clinic acceptance status can change at any time, so we always recommend calling the clinic directly to confirm before making healthcare decisions.",
       },
       {
         question: "What if the status is wrong when I call?",
         answer: "Things can change quickly in busy medical practices. If you find incorrect information, please take 30 seconds to update the status after your call. Your update helps the next person searching and keeps our community informed. This is how we maintain current information for everyone's benefit.",
       },
       {
-        question: "Can doctors update their own listings?",
-        answer: "Yes. Healthcare providers can claim their listings through an email verification process. Once verified, they can update their practice information, accepting status, languages spoken, accessibility features, and other details directly. Listings updated by verified doctors are marked as \"verified by doctor\" to indicate direct provider confirmation.",
+        question: "Can clinics update their own listings?",
+        answer: "Yes. Clinic staff can claim their listings through an email verification process. Once verified, they can update their practice information, accepting status, languages spoken, accessibility features, and other details directly. Listings updated by verified clinics are marked as \"Clinic Verified\" to indicate direct provider confirmation.",
       },
     ],
   },
@@ -43,19 +43,19 @@ const faqCategories = [
     faqs: [
       {
         question: "Is searching really free forever?",
-        answer: "Yes. Searching our doctor directory is completely free and always will be. You can browse doctors, see who's accepting patients, view contact information, use the interactive map, and access all basic features without creating an account or paying anything. No hidden fees, no trial periods, no credit card required. We believe everyone should have access to this essential healthcare information.",
+        answer: "Yes. Searching our clinic directory is completely free and always will be. You can browse clinics, see who's accepting patients, view contact information, use the interactive map, and access all basic features without creating an account or paying anything. No hidden fees, no trial periods, no credit card required. We believe everyone should have access to this essential healthcare information.",
       },
       {
         question: "Do I need to create an account to search?",
-        answer: "No. You can search and view all doctor listings without creating an account. Just visit the site, enter your location, and start browsing doctors. An account is only needed if you want to subscribe to the Alert Service for email notifications or apply for Assisted Access.",
+        answer: "No. You can search and view all clinic listings without creating an account. Just visit the site, enter your location, and start browsing clinics. An account is only needed if you want to subscribe to the Alert Service for email notifications or apply for Assisted Access.",
       },
       {
         question: "Is there a limit to how many searches I can do?",
         answer: "No limits. Search as often as you like, for as many cities as you want. You can use the service every day without any restrictions or costs.",
       },
       {
-        question: "Can I update a doctor's status without an account?",
-        answer: "Yes! We encourage everyone to help keep listings accurate, and you don't need an account to do so. After calling a clinic, you can submit a status update for any doctor. Your 30-second update helps someone else find care faster and strengthens our community.",
+        question: "Can I update a clinic's status without an account?",
+        answer: "Yes! We encourage everyone to help keep listings accurate, and you don't need an account to do so. After calling a clinic, you can submit a status update. Your 30-second update helps someone else find care faster and strengthens our community.",
       },
       {
         question: "What if no doctors near me are accepting patients?",
@@ -68,11 +68,11 @@ const faqCategories = [
     faqs: [
       {
         question: "How does the Alert Service work?",
-        answer: "When you subscribe to Alert Service ($7.99 CAD per month), you can monitor up to 3 Ontario cities or postal code areas. Whenever a doctor in those locations changes their status to \"accepting patients\" and matches your optional filter preferences (language, accessibility features), we send you an email alert with their information within minutes. This gives you a time advantage to call before their roster fills.",
+        answer: "When you subscribe to Alert Service ($7.99 CAD per month), you can monitor up to 3 Ontario cities or postal code areas. Whenever a clinic in those locations changes their status to \"accepting patients\" and matches your optional filter preferences (language, accessibility features), we send you an email alert with their information within minutes. This gives you a time advantage to call before their roster fills.",
       },
       {
         question: "What information is included in alert emails?",
-        answer: "Each alert includes: the doctor's name and specialty, clinic name and full address, phone number to call, distance from the city centre you're monitoring, when the status was updated, and whether it was verified by the doctor or community. You'll have everything you need to call immediately.",
+        answer: "Each alert includes: the clinic name and full address, phone number to call, distance from the city centre you're monitoring, when the status was updated, and whether it was verified by the clinic or community. You'll have everything you need to call immediately.",
       },
       {
         question: "Can I monitor multiple cities?",
@@ -84,7 +84,7 @@ const faqCategories = [
       },
       {
         question: "How many alerts will I receive?",
-        answer: "This varies based on how many doctors are accepting patients in your monitored cities. Some weeks you might receive several alerts; other weeks, none. We only email when there's an actual opportunity—a doctor matching your criteria who has changed their status to accepting. You won't receive spam or unnecessary emails.",
+        answer: "This varies based on how many clinics are accepting patients in your monitored cities. Some weeks you might receive several alerts; other weeks, none. We only email when there's an actual opportunity—a clinic matching your criteria that has changed their status to accepting. You won't receive spam or unnecessary emails.",
       },
       {
         question: "Can I use alerts for multiple family members?",
@@ -92,11 +92,11 @@ const faqCategories = [
       },
       {
         question: "How are email alerts different from free search?",
-        answer: "Free search lets you browse doctors whenever you want, requiring you to check manually. Email alerts actively monitor doctors in your chosen cities 24/7 and notify you the moment one starts accepting patients. This means you can be among the first to call, significantly improving your chances of securing a spot before the roster fills.",
+        answer: "Free search lets you browse clinics whenever you want, requiring you to check manually. Email alerts actively monitor clinics in your chosen cities 24/7 and notify you the moment one starts accepting patients. This means you can be among the first to call, significantly improving your chances of securing a spot before the roster fills.",
       },
       {
         question: "Can I filter alerts by language or accessibility?",
-        answer: "Yes! Alert Service subscribers can set optional filters for languages (up to 10 languages) and accessibility features (wheelchair accessible, accessible parking). Only doctors matching your preferences will trigger alerts, saving you time and ensuring you only receive relevant notifications.",
+        answer: "Yes! Alert Service subscribers can set optional filters for languages (up to 10 languages) and accessibility features (wheelchair accessible, accessible parking). Only clinics matching your preferences will trigger alerts, saving you time and ensuring you only receive relevant notifications.",
       },
       {
         question: "How quickly do alerts go out?",

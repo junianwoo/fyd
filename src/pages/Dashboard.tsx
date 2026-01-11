@@ -369,12 +369,12 @@ export default function Dashboard() {
 
       setAlertSettings(alertData || []);
 
-      toast({
-        title: "Filters saved!",
-        description: applyFilters 
-          ? "Your alerts will now only include doctors matching your preferences." 
-          : "Filter preferences saved. Toggle 'Apply filters' to activate them.",
-      });
+        toast({
+          title: "Filters saved!",
+          description: applyFilters 
+            ? "Your alerts will now only include clinics matching your preferences." 
+            : "Filter preferences saved. Toggle 'Apply filters' to activate them.",
+        });
     } catch (error) {
       toast({
         title: "Error saving filters",
@@ -479,7 +479,7 @@ export default function Dashboard() {
                   <div>
                     <h3 className="text-foreground">Alerts Paused</h3>
                     <p className="text-sm text-muted-foreground">
-                      Subscribe to the Alert Service to receive email notifications when doctors start accepting patients.
+                      Subscribe to the Alert Service to receive email notifications when clinics begin accepting patients.
                     </p>
                   </div>
                 </div>
@@ -519,7 +519,7 @@ export default function Dashboard() {
                 </CardTitle>
                 <CardDescription>
                   {isSubscribed 
-                    ? "Add up to 3 locations to monitor for accepting doctors."
+                    ? "Add up to 3 locations to monitor for accepting clinics."
                     : "Subscribe to monitor locations and receive email alerts."}
                 </CardDescription>
               </CardHeader>
@@ -631,7 +631,7 @@ export default function Dashboard() {
                     Advanced Filters (Optional)
                   </CardTitle>
                   <CardDescription>
-                    Refine your alerts to only receive notifications for doctors matching your preferences.
+                    Refine your alerts to only receive notifications for clinics matching your preferences.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -650,7 +650,7 @@ export default function Dashboard() {
                     {applyFilters && (
                       <div className="ml-6 mt-2 p-2 bg-accent/10 rounded-md border border-accent/20">
                         <p className="text-sm text-muted-foreground">
-                          ⚠️ Only doctors matching any of these filters will trigger alerts
+                          ⚠️ Only clinics matching any of these filters will trigger alerts
                         </p>
                       </div>
                     )}
@@ -811,7 +811,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-4">
                     <p className="text-muted-foreground">
-                      Subscribe to receive email alerts when doctors start accepting patients.
+                      Subscribe to receive email alerts when clinics begin accepting patients.
                     </p>
                     <div className="flex gap-3 flex-wrap">
                       <Button onClick={handleCheckout}>
