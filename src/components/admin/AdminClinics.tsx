@@ -85,17 +85,17 @@ export default function AdminClinics() {
       { count: unknownCount },
       { count: claimedCount }
     ] = await Promise.all([
-      supabase.from("doctors").select("*", { count: "exact", head: true }),
-      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "accepting"),
-      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "not_accepting"),
-      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "waitlist"),
-      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("accepting_status", "unknown"),
-      supabase.from("doctors").select("*", { count: "exact", head: true }).eq("claimed_by_doctor", true)
+      supabase.from("clinics").select("*", { count: "exact", head: true }),
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "accepting"),
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "not_accepting"),
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "waitlist"),
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "unknown"),
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("claimed_by_doctor", true)
     ]);
     
     // Build query with server-side filtering (for display table only)
     let query = supabase
-      .from("doctors")
+      .from("clinics")
       .select("*", { count: "exact" })
       .order("clinic_name", { ascending: true });
     
@@ -171,7 +171,7 @@ export default function AdminClinics() {
     setSaving(true);
     
     const { error } = await supabase
-      .from("doctors")
+      .from("clinics")
       .update({
         ...editForm,
         status_last_updated_at: new Date().toISOString(),
