@@ -77,7 +77,8 @@ function parseCSVLine(line: string): string[] {
 }
 
 // Convert "Last, First Middle" to "First Middle Last"
-function formatName(name: string): string {
+function formatName(name: string | undefined): string | null {
+  if (!name || name === "Nan" || name === "") return null;
   if (!name.includes(",")) return name.trim();
   
   const [lastName, firstMiddle] = name.split(",").map((s) => s.trim());
