@@ -6,6 +6,7 @@ import {
   Mail, 
   Globe, 
   Calendar, 
+  Clock, 
   Languages, 
   Users, 
   Accessibility, 
@@ -184,6 +185,10 @@ export default function ClinicDetails() {
               <h1 className="text-3xl md:text-4xl text-foreground mb-2">
                 {clinic.name}
               </h1>
+              <p className="text-lg text-muted-foreground flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Family Practice Clinic
+              </p>
             </div>
             
             <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
@@ -254,7 +259,7 @@ export default function ClinicDetails() {
             <span>|</span>
             <span>
               Verified by: {clinic.statusVerifiedBy === "clinic" ? (
-                <span className="text-secondary font-medium">Clinic Verified ✓</span>
+                <span className="text-secondary font-medium">Clinic ✓</span>
               ) : (
                 "Community"
               )}
@@ -320,12 +325,12 @@ export default function ClinicDetails() {
               </CardContent>
             </Card>
 
-            {/* Clinic Information */}
+            {/* Patient Information */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-secondary" />
-                  Clinic Information
+                  Patient Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -390,7 +395,7 @@ export default function ClinicDetails() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Flag className="h-5 w-5 text-secondary" />
+                  <Clock className="h-5 w-5 text-secondary" />
                   Community Updates
                 </CardTitle>
               </CardHeader>
@@ -421,7 +426,7 @@ export default function ClinicDetails() {
                   Get Alerts for This Area
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Be notified when clinics near {clinic.city} begin accepting patients.
+                  Be notified when clinics near {clinic.city} start accepting patients.
                 </p>
                 <Button className="w-full" asChild>
                   <Link to="/pricing">See Pricing</Link>
@@ -443,20 +448,20 @@ export default function ClinicDetails() {
                   <Dialog open={claimDialogOpen} onOpenChange={setClaimDialogOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="w-full">
-                        Claim This Clinic
+                        Claim This Listing
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Claim Your Clinic</DialogTitle>
+                        <DialogTitle>Claim Your Listing</DialogTitle>
                         <DialogDescription>
                           Enter your clinic email to receive a verification link. 
-                          This helps us ensure only authorized staff can update listings.
+                          This helps us ensure only authorized clinic staff can update listings.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                          <Label htmlFor="claim-email">Work Email</Label>
+                          <Label htmlFor="claim-email">Clinic Email</Label>
                           <Input
                             id="claim-email"
                             type="email"

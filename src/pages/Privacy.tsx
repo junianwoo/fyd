@@ -26,13 +26,13 @@ export default function Privacy() {
               <div>
                 <h2 className="text-2xl text-primary mb-4">1. Introduction and Scope</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  FindYourDoctor.ca ("we," "our," "us," or the "Service") is committed to protecting the privacy and security of your personal information. This Privacy Policy explains how we collect, use, disclose, retain, and protect personal information obtained through our Service, which provides a community-driven resource to help residents of Ontario, Canada, locate family doctors accepting new patients.
+                  FindYourDoctor.ca ("we," "our," "us," or the "Service") is committed to protecting the privacy and security of your personal information. This Privacy Policy explains how we collect, use, disclose, retain, and protect personal information obtained through our Service, which provides a community-driven resource to help residents of Ontario, Canada, locate family practice clinics accepting new patients.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   Our mission is to support Ontarians in their search for healthcare access during a significant healthcare crisis affecting approximately 2.5 million residents who lack primary care physicians. We recognise the sensitivity of healthcare-related information and are committed to handling all personal information with the highest standards of privacy protection.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  This Privacy Policy applies to all users of FindYourDoctor.ca, including visitors browsing the doctor directory, registered users, Alert Service subscribers, Assisted Access programme participants, and healthcare providers who claim their listings. By using our Service, you acknowledge that you have read, understood, and agree to the practices described in this Privacy Policy.
+                  This Privacy Policy applies to all users of FindYourDoctor.ca, including visitors browsing the clinic directory, registered users, Alert Service subscribers, Assisted Access programme participants, and clinic staff who claim their listings. By using our Service, you acknowledge that you have read, understood, and agree to the practices described in this Privacy Policy.
                 </p>
               </div>
 
@@ -112,10 +112,10 @@ export default function Privacy() {
                 
                 <h3 className="text-xl text-foreground mb-3">Community Report Data</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">
-                  When you submit a Community Report about a doctor's patient acceptance status, we collect the status information you provide, any additional notes, the date and time of submission, and your IP address.
+                  When you submit a Community Report about a clinic's patient acceptance status, we collect the status information you provide, any additional notes, the date and time of submission, and your IP address.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  <strong>Purpose:</strong> To maintain current doctor information for community benefit and to prevent fraudulent or abusive reporting. IP address collection is necessary for security purposes and fraud prevention, consistent with PIPEDA's security safeguards principle.
+                  <strong>Purpose:</strong> To maintain current clinic information for community benefit and to prevent fraudulent or abusive reporting. IP address collection is necessary for security purposes and fraud prevention, consistent with PIPEDA's security safeguards principle.
                 </p>
                 
                 <h3 className="text-xl text-foreground mb-3">Doctor Claiming Data</h3>

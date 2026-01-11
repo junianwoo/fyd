@@ -37,10 +37,10 @@ export default function Terms() {
               <div>
                 <h2 className="text-2xl text-primary mb-4">2. About This Service</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  FindYourDoctor.ca is a community-driven service designed to provide public benefit to residents of Ontario, Canada, who are seeking family doctors accepting new patients. We operate in response to a significant healthcare access crisis affecting approximately 2.5 million Ontarians who currently lack access to primary care physicians.
+                  FindYourDoctor.ca is a community-driven service designed to provide public benefit to residents of Ontario, Canada, who are seeking family practice clinics accepting new patients. We operate in response to a significant healthcare access crisis affecting approximately 2.5 million Ontarians who currently lack access to primary care physicians.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Our Service provides a free, searchable directory of family doctors in Ontario, supplemented by community-reported status updates and an optional paid Alert Service for users who wish to receive email notifications when doctors in their area begin accepting new patients. We are committed to maintaining accessibility, transparency, and equity in healthcare information access.
+                  Our Service provides a free, searchable directory of family practice clinics in Ontario, supplemented by community-reported status updates and an optional paid Alert Service for users who wish to receive email notifications when clinics in their area begin accepting new patients. We are committed to maintaining accessibility, transparency, and equity in healthcare information access.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
                   FindYourDoctor.ca is an independent service and is not affiliated with, endorsed by, or connected to the Ontario Ministry of Health, the College of Physicians and Surgeons of Ontario (CPSO), any Ontario Health Team, Local Health Integration Network (LHIN), or any other government body or healthcare authority.
@@ -57,13 +57,13 @@ export default function Terms() {
                   <li><strong>"Service"</strong> means the FindYourDoctor.ca website, platform, applications, and all related services, features, content, and functionality.</li>
                   <li><strong>"User" or "you"</strong> means any individual or entity accessing or using the Service.</li>
                   <li><strong>"Account"</strong> means a registered user account created to access certain features of the Service.</li>
-                  <li><strong>"Alert Service"</strong> means the paid subscription service providing email notifications when doctors matching specified criteria begin accepting new patients.</li>
+                  <li><strong>"Alert Service"</strong> means the paid subscription service providing email notifications when clinics matching specified criteria begin accepting new patients.</li>
                   <li><strong>"Assisted Access"</strong> means the programme providing free access to the Alert Service for users facing financial barriers, offered for six-month renewable terms.</li>
-                  <li><strong>"Community Report"</strong> means user-submitted information regarding a doctor's patient acceptance status.</li>
+                  <li><strong>"Community Report"</strong> means user-submitted information regarding a clinic's patient acceptance status.</li>
                   <li><strong>"Content"</strong> means all information, text, graphics, photographs, data, and other materials available through the Service.</li>
-                  <li><strong>"Doctor Listing"</strong> means information about a family doctor displayed on the Service, including contact details, location, and acceptance status.</li>
+                  <li><strong>"Clinic Listing"</strong> means information about a family practice clinic displayed on the Service, including contact details, location, and acceptance status.</li>
                   <li><strong>"Personal Information"</strong> has the meaning ascribed to it under the Personal Information Protection and Electronic Documents Act (PIPEDA).</li>
-                  <li><strong>"Verified Doctor"</strong> means a healthcare provider who has successfully completed our claiming and verification process.</li>
+                  <li><strong>"Verified Clinic"</strong> means a healthcare clinic whose staff have successfully completed our claiming and verification process.</li>
                 </ul>
               </div>
 
@@ -74,24 +74,24 @@ export default function Terms() {
                   FindYourDoctor.ca provides the following features and services:
                 </p>
                 
-                <h3 className="text-xl text-foreground mb-3">Free Doctor Directory Search</h3>
+                <h3 className="text-xl text-foreground mb-3">Free Clinic Directory Search</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  We maintain a searchable directory of family doctors practicing in Ontario, including information about their clinic locations, contact details, languages spoken, accessibility features, age groups served, and current patient acceptance status. This core search functionality is provided free of charge and requires no account registration. No barriers exist to accessing basic directory information.
+                  We maintain a searchable directory of family practice clinics in Ontario, including information about clinic locations, contact details, languages spoken, accessibility features, age groups served, and current patient acceptance status. This core search functionality is provided free of charge and requires no account registration. No barriers exist to accessing basic directory information.
                 </p>
                 
                 <h3 className="text-xl text-foreground mb-3">Community Reporting System</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Users may voluntarily submit status updates regarding doctors' patient acceptance after contacting clinics. This collaborative, volunteer-driven system helps maintain current information for the benefit of the entire community. Community reports are subject to fraud prevention measures including IP address logging.
+                  Users may voluntarily submit status updates regarding clinics' patient acceptance status after contacting them. This collaborative, volunteer-driven system helps maintain current information for the benefit of the entire community. Community reports are subject to fraud prevention measures including IP address logging.
                 </p>
                 
-                <h3 className="text-xl text-foreground mb-3">Doctor Claiming and Verification</h3>
+                <h3 className="text-xl text-foreground mb-3">Clinic Claiming and Verification</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Healthcare providers may claim their listings through an email verification process, enabling them to update their practice information directly and verify their acceptance status. This feature provides transparency and allows providers to maintain accurate information about their practices.
+                  Healthcare clinic staff may claim their listings through an email verification process, enabling them to update their clinic information directly and verify their acceptance status. This feature provides transparency and allows clinics to maintain accurate information about their practices.
                 </p>
                 
                 <h3 className="text-xl text-foreground mb-3">Alert Service Subscription</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  For a monthly fee of $7.99 CAD, users may subscribe to receive email notifications when doctors matching their specified criteria (city, radius, language preferences, accessibility requirements) change their status to "accepting new patients." Subscribers may monitor up to three (3) Ontario cities simultaneously.
+                  For a monthly fee of $7.99 CAD, users may subscribe to receive email notifications when clinics matching their specified criteria (city, radius, language preferences, accessibility requirements) change their status to "accepting new patients." Subscribers may monitor up to three (3) Ontario cities simultaneously.
                 </p>
                 
                 <h3 className="text-xl text-foreground mb-3">Assisted Access Programme</h3>
