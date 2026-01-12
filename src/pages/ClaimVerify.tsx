@@ -28,10 +28,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-interface DoctorData {
+interface ClinicData {
   id: string;
-  fullName: string;
-  clinicName: string;
+  name: string;
   address: string;
   city: string;
   province: string;
@@ -60,7 +59,7 @@ export default function ClaimVerify() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [doctor, setDoctor] = useState<DoctorData | null>(null);
+  const [clinic, setClinic] = useState<ClinicData | null>(null);
   
   // Form state
   const [acceptingStatus, setAcceptingStatus] = useState("");
@@ -89,18 +88,18 @@ export default function ClaimVerify() {
           throw new Error(data?.error || error?.message || "Verification failed");
         }
 
-        const doctorData = data.doctor as DoctorData;
-        setDoctor(doctorData);
+        const clinicData = data.clinic as ClinicData;
+        setClinic(clinicData);
         
         // Initialize form with current values
-        setAcceptingStatus(doctorData.acceptingStatus);
-        setPhone(doctorData.phone || "");
-        setEmail(doctorData.email || "");
-        setWebsite(doctorData.website || "");
-        setLanguages(doctorData.languages || []);
-        setAccessibilityFeatures(doctorData.accessibilityFeatures || []);
-        setAgeGroupsServed(doctorData.ageGroupsServed || []);
-        setVirtualAppointments(doctorData.virtualAppointments || false);
+        setAcceptingStatus(clinicData.acceptingStatus);
+        setPhone(clinicData.phone || "");
+        setEmail(clinicData.email || "");
+        setWebsite(clinicData.website || "");
+        setLanguages(clinicData.languages || []);
+        setAccessibilityFeatures(clinicData.accessibilityFeatures || []);
+        setAgeGroupsServed(clinicData.ageGroupsServed || []);
+        setVirtualAppointments(clinicData.virtualAppointments || false);
       } catch (err: any) {
         setError(err.message || "Failed to verify token");
       } finally {
@@ -149,9 +148,9 @@ export default function ClaimVerify() {
         description: "Your changes are now live. Thank you for keeping your listing accurate.",
       });
 
-      // Redirect to doctor page after 2 seconds
+      // Redirect to clinic page after 2 seconds
       setTimeout(() => {
-        navigate(`/doctors/${doctor?.id}`);
+        navigate(`/clinics/${clinic?.id}`);
       }, 2000);
     } catch (err: any) {
       toast({
@@ -182,7 +181,7 @@ export default function ClaimVerify() {
           <XCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h1 className="text-2xl text-foreground mb-2">Verification Failed</h1>
           <p className="text-muted-foreground mb-6">{error}</p>
-          <Button onClick={() => navigate("/doctors")}>
+          <Button onClick={() => navigate("/clinics")}>
             Back to Directory
           </Button>
         </div>
@@ -205,12 +204,11 @@ export default function ClaimVerify() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{doctor?.fullName}</CardTitle>
-            <CardDescription>{doctor?.clinicName}</CardDescription>
+            <CardTitle>{clinic?.name}</CardTitle>
+            <CardDescription>
+              {clinic?.address}, {clinic?.city}, {clinic?.province} {clinic?.postalCode}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {doctor?.address}, {doctor?.city}, {doctor?.province} {doctor?.postalCode}
-          </CardContent>
         </Card>
 
         <Card>
