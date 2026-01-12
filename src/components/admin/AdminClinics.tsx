@@ -17,7 +17,8 @@ import {
   Bell,
   Languages,
   Users,
-  Accessibility
+  Accessibility,
+  Plus
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,6 +67,7 @@ export default function AdminClinics() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AcceptingStatus | "all">("all");
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+  const [creatingClinic, setCreatingClinic] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Doctor>>({});
   const [saving, setSaving] = useState(false);
   const [testingAlertId, setTestingAlertId] = useState<string | null>(null);
@@ -158,6 +160,7 @@ export default function AdminClinics() {
 
   const openEditDialog = (doctor: Doctor) => {
     setEditingDoctor(doctor);
+    setCreatingClinic(false);
     setEditForm({
       name: doctor.name,
       address: doctor.address,
@@ -172,6 +175,30 @@ export default function AdminClinics() {
       languages: doctor.languages || ["English"],
       accessibility_features: doctor.accessibility_features || [],
       age_groups_served: doctor.age_groups_served || ["Adults (18-64)"],
+      latitude: doctor.latitude,
+      longitude: doctor.longitude,
+    });
+  };
+
+  const openCreateDialog = () => {
+    setCreatingClinic(true);
+    setEditingDoctor(null);
+    setEditForm({
+      name: "",
+      address: "",
+      city: "",
+      province: "ON",
+      postal_code: "",
+      phone: "",
+      email: "",
+      website: "",
+      accepting_status: "unknown",
+      virtual_appointments: false,
+      languages: ["English"],
+      accessibility_features: [],
+      age_groups_served: ["Adults (18-64)"],
+      latitude: 0,
+      longitude: 0,
     });
   };
 
@@ -184,26 +211,61 @@ export default function AdminClinics() {
   };
 
   const handleSaveDoctor = async () => {
-    if (!editingDoctor) return;
-    
     setSaving(true);
     
-    const { error } = await supabase
-      .from("clinics")
-      .update({
-        ...editForm,
-        status_last_updated_at: new Date().toISOString(),
-        status_verified_by: "admin" as const,
-      })
-      .eq("id", editingDoctor.id);
+    // Validate required fields
+    if (!editForm.name || !editForm.address || !editForm.city || !editForm.postal_code || !editForm.phone) {
+      toast.error("Please fill in all required fields");
+      setSaving(false);
+      return;
+    }
 
-    if (error) {
-      toast.error("Failed to update clinic");
-      console.error(error);
-    } else {
-      toast.success("Clinic updated successfully");
-      setEditingDoctor(null);
-      loadDoctors();
+    // Validate latitude and longitude
+    if (editForm.latitude === undefined || editForm.longitude === undefined || 
+        editForm.latitude === 0 || editForm.longitude === 0) {
+      toast.error("Please provide valid latitude and longitude coordinates");
+      setSaving(false);
+      return;
+    }
+    
+    if (creatingClinic) {
+      // Create new clinic
+      const { error } = await supabase
+        .from("clinics")
+        .insert({
+          ...editForm,
+          status_last_updated_at: new Date().toISOString(),
+          status_verified_by: "admin" as const,
+          created_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        toast.error("Failed to create clinic");
+        console.error(error);
+      } else {
+        toast.success("Clinic created successfully");
+        setCreatingClinic(false);
+        loadDoctors();
+      }
+    } else if (editingDoctor) {
+      // Update existing clinic
+      const { error } = await supabase
+        .from("clinics")
+        .update({
+          ...editForm,
+          status_last_updated_at: new Date().toISOString(),
+          status_verified_by: "admin" as const,
+        })
+        .eq("id", editingDoctor.id);
+
+      if (error) {
+        toast.error("Failed to update clinic");
+        console.error(error);
+      } else {
+        toast.success("Clinic updated successfully");
+        setEditingDoctor(null);
+        loadDoctors();
+      }
     }
     
     setSaving(false);
@@ -342,6 +404,10 @@ export default function AdminClinics() {
               Clinic Management
             </CardTitle>
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button onClick={openCreateDialog} size="sm" className="whitespace-nowrap">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Clinic
+              </Button>
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -467,42 +533,51 @@ export default function AdminClinics() {
         </CardContent>
       </Card>
 
-      {/* Edit Clinic Dialog */}
-      <Dialog open={!!editingDoctor} onOpenChange={() => setEditingDoctor(null)}>
+      {/* Edit/Create Clinic Dialog */}
+      <Dialog open={!!editingDoctor || creatingClinic} onOpenChange={() => {
+        setEditingDoctor(null);
+        setCreatingClinic(false);
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Clinic</DialogTitle>
+            <DialogTitle>{creatingClinic ? "Create New Clinic" : "Edit Clinic"}</DialogTitle>
             <DialogDescription>
-              Update clinic information and accepting status.
+              {creatingClinic 
+                ? "Add a new clinic to the database with all pertinent information."
+                : "Update clinic information and accepting status."
+              }
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Clinic Name</Label>
+              <Label htmlFor="name">Clinic Name *</Label>
               <Input
                 id="name"
                 value={editForm.name || ""}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">Address *</Label>
               <Input
                 id="address"
                 value={editForm.address || ""}
                 onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                required
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">City *</Label>
                 <Input
                   id="city"
                   value={editForm.city || ""}
                   onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -514,22 +589,51 @@ export default function AdminClinics() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="postal_code">Postal Code</Label>
+                <Label htmlFor="postal_code">Postal Code *</Label>
                 <Input
                   id="postal_code"
                   value={editForm.postal_code || ""}
                   onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value })}
+                  required
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="latitude">Latitude *</Label>
+                <Input
+                  id="latitude"
+                  type="number"
+                  step="any"
+                  value={editForm.latitude || ""}
+                  onChange={(e) => setEditForm({ ...editForm, latitude: parseFloat(e.target.value) || 0 })}
+                  placeholder="e.g., 43.6532"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="longitude">Longitude *</Label>
+                <Input
+                  id="longitude"
+                  type="number"
+                  step="any"
+                  value={editForm.longitude || ""}
+                  onChange={(e) => setEditForm({ ...editForm, longitude: parseFloat(e.target.value) || 0 })}
+                  placeholder="e.g., -79.3832"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone *</Label>
                 <Input
                   id="phone"
                   value={editForm.phone || ""}
                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -646,7 +750,10 @@ export default function AdminClinics() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingDoctor(null)}>
+            <Button variant="outline" onClick={() => {
+              setEditingDoctor(null);
+              setCreatingClinic(false);
+            }}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
@@ -656,7 +763,7 @@ export default function AdminClinics() {
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Save Changes
+              {creatingClinic ? "Create Clinic" : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
