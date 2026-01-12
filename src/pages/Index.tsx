@@ -281,7 +281,7 @@ export default function Index() {
                 Optional: Get Alerts
               </h4>
               <p className="text-muted-foreground">
-                Want to be notified the moment a clinicstarts accepting? Set up email alerts for up to 3 cities. $7.99/month.
+                Want to be notified the moment a clinic starts accepting? Set up email alerts for up to 3 cities. $7.99/month.
               </p>
             </div>
           </div>

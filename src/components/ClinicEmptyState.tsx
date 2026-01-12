@@ -7,15 +7,9 @@ export function ClinicEmptyState() {
         <Search className="h-8 w-8 text-muted-foreground" />
       </div>
       <h3 className="text-xl text-foreground mb-2">Start Your Search</h3>
-      <p className="text-muted-foreground max-w-md mb-6">
+      <p className="text-muted-foreground max-w-md">
         Enter a city name or postal code to find family practice clinics accepting new patients in your area.
       </p>
-      <div className="text-sm text-muted-foreground space-y-1">
-        <p><strong>Try:</strong></p>
-        <p className="text-xs">• Toronto</p>
-        <p className="text-xs">• M5V 1J2</p>
-        <p className="text-xs">• Mississauga</p>
-      </div>
     </div>
   );
 }

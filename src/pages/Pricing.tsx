@@ -24,7 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { z } from "zod";
 
 const freeFeatures = [
-  "Browse all family doctors in Ontario",
+  "Browse all family doctor clinics in Ontario",
   "See real-time accepting status",
   "Access contact information",
   "View community updates",
@@ -205,7 +205,7 @@ export default function Pricing() {
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Search for free, or get alerts when doctors start accepting patients. Choose what works for you.
+            Search for free, or get alerts when clinics start accepting patients. Choose what works for you.
           </p>
         </div>
       </section>
@@ -264,7 +264,7 @@ export default function Pricing() {
                   <Bell className="h-6 w-6 text-accent" />
                 </div>
                 <CardTitle className="text-2xl">Alert Service</CardTitle>
-                <p className="text-muted-foreground">Get notified instantly when doctors start accepting</p>
+                <p className="text-muted-foreground">Get notified instantly when clinics start accepting</p>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-4xl font-bold text-foreground">
@@ -325,7 +325,7 @@ export default function Pricing() {
                 </div>
                 <h3 className="text-xl text-foreground mb-3">Time Advantage</h3>
                 <p className="text-muted-foreground">
-                  When a doctor starts accepting patients, their roster can fill within hours or days. Alert Service ensures you're notified immediately, giving you the best chance to call before spots are filled.
+                  When a clinics starts accepting patients, their roster can fill within hours or days. Alert Service ensures you're notified immediately, giving you the best chance to call before spots are filled.
                 </p>
               </div>
               
@@ -371,7 +371,7 @@ export default function Pricing() {
               Need Help Affording Alert Service?
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
-              We believe everyone deserves access to tools that help them find healthcare. If $7.99/month is a barrier for you, we offer Assisted Access.
+              We believe everyone deserves access to tools that help them find healthcare. If paying for a service every monthis a barrier for you, we offer Assisted Access.
             </p>
             
             <div className="bg-card p-8 rounded-lg border border-border text-left mb-8">
@@ -411,7 +411,7 @@ export default function Pricing() {
                   How does Alert Service work?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  When you subscribe, you choose up to 3 Ontario cities to monitor. Whenever a doctor in those cities changes their status to "Accepting," we send you an email alert with their information. You'll receive alerts within minutes of the status change, giving you time to call before their roster fills.
+                  When you subscribe, you choose up to 3 Ontario cities to monitor. Whenever a clinic in those cities changes their status to "Accepting," we send you an email alert with their information. You'll receive alerts within minutes of the status change, giving you time to call before their roster fills.
                 </AccordionContent>
               </AccordionItem>
               
@@ -423,7 +423,7 @@ export default function Pricing() {
                   What information is included in alert emails?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Each alert includes: Doctor's name and specialty, Clinic name and full address, Phone number to call, Distance from the city center you're monitoring, and When the status was updated.
+                  Each alert includes: Clinic name and full address, Phone number to call, Distance from the city center you're monitoring, and When the status was updated.
                 </AccordionContent>
               </AccordionItem>
               
@@ -447,7 +447,7 @@ export default function Pricing() {
                   How many alerts will I receive?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  This varies based on how many doctors are accepting patients in your monitored cities. Some weeks you might receive several alerts; other weeks, none. We only email when there's an actual opportunity.
+                  This varies based on how many clinics are accepting patients in your monitored cities. Some weeks you might receive several alerts; other weeks, none. We only email when there's an actual opportunity.
                 </AccordionContent>
               </AccordionItem>
               
@@ -518,7 +518,7 @@ export default function Pricing() {
                   Can I get a refund?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Refunds are available within the first 7 days of your initial subscription, unless you received a doctor alert during that time. Once you receive an alert, refunds are not available. You can cancel anytime to avoid future charges.
+                  Refunds are available within the first 7 days of your initial subscription, unless you received a clinic alert during that time. Once you receive an alert, refunds are not available. You can cancel anytime to avoid future charges.
                 </AccordionContent>
               </AccordionItem>
               
@@ -600,7 +600,7 @@ export default function Pricing() {
                   What qualifies me for Assisted Access?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  We don't set specific criteria. If $7.99/month is a financial barrier for you, you qualify. We trust you to assess your own situation.
+                  We don't set specific criteria. If paying for a monthly service is a financial barrier for you, you qualify. We trust you to assess your own situation.
                 </AccordionContent>
               </AccordionItem>
               

@@ -18,7 +18,7 @@ const faqCategories = [
       },
       {
         question: "Why do you show clinics instead of individual doctors?",
-        answer: "We focus on clinics rather than individual doctors because this approach is more accurate, scalable, and easier to maintain. When you call a family practice, you're typically seeking any available doctor at that clinic, not a specific physician. By focusing on clinic-level status (whether the practice is accepting new patients), we can provide more reliable, up-to-date information without the complexity of tracking hundreds of individual doctors who may join, leave, or change their patient loads. This means you get faster, more accurate results and we can cover more of Ontario effectively.",
+        answer: "By focusing on clinic-level status (whether the practice is accepting new patients), we can provide more reliable, up-to-date information without the complexity of tracking hundreds of individual doctors who may join, leave, or change their patient loads. This means you get faster, more accurate results and we can cover more of Ontario effectively.",
       },
       {
         question: "Are you affiliated with the government or CPSO?",

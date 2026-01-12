@@ -311,7 +311,7 @@ export default function AssistedAccess() {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-6 w-6 text-status-accepting flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">Instant email alerts when doctors start accepting patients</span>
+                  <span className="text-muted-foreground">Instant email alerts when clinics start accepting patients</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-6 w-6 text-status-accepting flex-shrink-0 mt-0.5" />
@@ -428,7 +428,7 @@ export default function AssistedAccess() {
                     onCheckedChange={(checked) => setConfirmed(checked as boolean)}
                   />
                   <Label htmlFor="confirm" className="text-sm leading-tight cursor-pointer">
-                    I confirm that $7.99/month is a financial barrier for me right now.
+                    I confirm that paying for a monthly service is a financial barrier for me right now.
                   </Label>
                 </div>
 
@@ -598,10 +598,10 @@ export default function AssistedAccess() {
             <div className="bg-card p-8 rounded-xl border border-border">
               <h3 className="text-xl text-foreground mb-3">Free Search Always Available</h3>
               <p className="text-muted-foreground mb-6">
-                Remember, searching our doctor directory is completely free and requires no signup. You can check anytime for accepting doctors without any barriers.
+                Remember, searching our clinic directory is completely free and requires no signup. You can check anytime for accepting clinics without any barriers.
               </p>
               <Button variant="outline" size="lg" asChild>
-                <Link to="/doctors">Browse Doctors for Free</Link>
+                <Link to="/doctors">Browse Clinics for Free</Link>
               </Button>
             </div>
           </div>

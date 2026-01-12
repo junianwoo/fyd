@@ -47,7 +47,7 @@ export default function HowItWorks() {
               How FindYourDoctor Makes Searching Easier
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
-              Finding a family doctor in Ontario takes persistence, but FindYourDoctor helps you search smarter. Instead of calling dozens of clinics hoping for a "yes," you can see which doctors are accepting patients before you pick up the phone.
+              Finding a family doctor in Ontario takes persistence, but FindYourDoctor helps you search smarter. Instead of calling dozens of clinics hoping for a "yes," you can see which ones are accepting patients before you pick up the phone.
             </p>
             <p className="text-lg text-muted-foreground">
               Here's how it works, and how you can be part of a community that's helping each other find care.
@@ -66,13 +66,13 @@ export default function HowItWorks() {
               </div>
               <div>
                 <span className="text-sm text-muted-foreground font-semibold">Step 01</span>
-                <h2 className="text-3xl md:text-4xl text-primary">Search for Doctors in Your Area</h2>
+                <h2 className="text-3xl md:text-4xl text-primary">Search for Clinics in Your Area</h2>
               </div>
             </div>
             
             <div className="space-y-6">
               <p className="text-lg text-muted-foreground">
-                Enter your city or postal code to browse family doctors near you. Our map and directory show each doctor's current accepting status, so you know who to call first.
+                Enter your city or postal code to browse family doctor clinics near you. Our map and directory show each clinic's current accepting status, so you know who to call first.
               </p>
               
               <div>
@@ -80,7 +80,7 @@ export default function HowItWorks() {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
-                    <span>Doctor's name and clinic location</span>
+                    <span>Clinic name and location</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
@@ -100,7 +100,7 @@ export default function HowItWorks() {
               <div className="bg-card p-6 rounded-lg border border-border">
                 <h3 className="text-lg text-foreground mb-2 font-semibold">Why This Helps:</h3>
                 <p className="text-muted-foreground">
-                  Instead of calling clinic after clinic, you can focus your time on doctors who are actually accepting patients. It's not a guarantee, but it saves you from dozens of unnecessary calls.
+                  Instead of calling clinic after clinic, you can focus your time on which ones are actually accepting patients. It's not a guarantee, but it saves you from dozens of unnecessary calls.
                 </p>
               </div>
               
@@ -130,13 +130,13 @@ export default function HowItWorks() {
             
             <div className="space-y-6">
               <p className="text-lg text-muted-foreground">
-                When you find a doctor who appears to be accepting patients, call their clinic to confirm. Ask if they're accepting new patients and whether you meet any specific requirements.
+                When you find a clinic that appears to be accepting patients, call them to confirm. Ask if they're accepting new patients and whether you meet any specific requirements.
               </p>
               
               <div className="bg-card p-6 rounded-lg border border-border">
                 <h3 className="text-lg text-foreground mb-3 font-semibold">Why You Still Need to Call:</h3>
                 <p className="text-muted-foreground">
-                  We show you which doctors are likely accepting, but clinics manage their own patient rosters. Availability can change daily, and some doctors have specific criteria (age groups, specific conditions, geographic restrictions).
+                  We show you which clinics are likely accepting, but they manage their own patient rosters. Availability can change daily, and some have specific criteria (age groups, specific conditions, geographic restrictions).
                 </p>
               </div>
               
@@ -165,7 +165,7 @@ export default function HowItWorks() {
               <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
                 <h3 className="text-lg text-foreground mb-2 font-semibold">Important Note:</h3>
                 <p className="text-muted-foreground">
-                  Even if a status shows "Not Accepting," circumstances can change. If you're nearby or the doctor specializes in something you need, it may still be worth a call to ask about waitlists.
+                  Even if a status shows "Not Accepting," circumstances can change. If you're nearby or the clinic specializes in something you need, it may still be worth a call to ask about waitlists.
                 </p>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function HowItWorks() {
               <div>
                 <h3 className="text-xl text-foreground mb-3">How to Update:</h3>
                 <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
-                  <li>Find the doctor's listing</li>
+                  <li>Find the clinic's listing</li>
                   <li>Click "Update Status"</li>
                   <li>Select the current status</li>
                   <li>Submit (no account required)</li>
@@ -236,7 +236,7 @@ export default function HowItWorks() {
             
             <div className="space-y-6">
               <p className="text-lg text-muted-foreground">
-                If you want to be notified the moment a doctor starts accepting patients, you can subscribe to our Alert Service. Get email alerts for up to 3 cities so you never miss an opportunity.
+                If you want to be notified the moment a clinic starts accepting patients, you can subscribe to our Alert Service. Get email alerts for up to 3 cities so you never miss an opportunity.
               </p>
               
               <div>
@@ -420,7 +420,7 @@ export default function HowItWorks() {
                   Accepting New Patients
                 </h3>
                 <p className="text-muted-foreground">
-                  The doctor is currently accepting new patients. Call soon. Rosters can fill quickly.
+                  The clinic is currently accepting new patients. Call soon. Rosters can fill quickly.
                 </p>
               </div>
               
@@ -430,7 +430,7 @@ export default function HowItWorks() {
                   Not Accepting Patients
                 </h3>
                 <p className="text-muted-foreground">
-                  The doctor's roster is full and they're not taking new patients right now. This can change, but it may be weeks or months.
+                  The clinic's roster is full and they're not taking new patients right now. This can change, but it may be weeks or months.
                 </p>
               </div>
               
@@ -440,7 +440,7 @@ export default function HowItWorks() {
                   Waitlist Available
                 </h3>
                 <p className="text-muted-foreground">
-                  The roster is full, but you can join a waitlist. Ask the clinic how long the wait typically is.
+                  The roster is full, but you can join a waitlist. Ask them how long the wait typically is.
                 </p>
               </div>
               
@@ -478,7 +478,7 @@ export default function HowItWorks() {
               <div className="bg-card p-6 rounded-lg border border-border">
                 <h3 className="text-xl text-foreground mb-3">Do I have to create an account to search?</h3>
                 <p className="text-muted-foreground">
-                  No. Searching is completely free and requires no signup. Just visit the site, enter your location, and start browsing doctors.
+                  No. Searching is completely free and requires no signup. Just visit the site, enter your location, and start browsing.
                 </p>
               </div>
               
@@ -556,7 +556,7 @@ export default function HowItWorks() {
               <div className="bg-card p-6 rounded-lg border border-border">
                 <h3 className="text-lg text-foreground mb-2 font-semibold">Ask About Waitlists</h3>
                 <p className="text-muted-foreground">
-                  Even if a doctor isn't accepting, ask if they have a waitlist. Some waitlists move faster than others.
+                  Even if a clinic isn't accepting, ask if they have a waitlist. Some waitlists move faster than others.
                 </p>
               </div>
               
@@ -637,7 +637,7 @@ export default function HowItWorks() {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
-                    <span>To show you relevant doctors near you</span>
+                    <span>To show you relevant clinics near you</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-status-accepting flex-shrink-0 mt-0.5" />
@@ -681,7 +681,7 @@ export default function HowItWorks() {
             <div className="bg-card p-8 rounded-xl shadow-sm border border-border text-center">
               <h3 className="text-2xl text-foreground mb-3">Start Searching Now</h3>
               <p className="text-muted-foreground mb-6">
-                Browse doctors, see who's accepting, call clinics.
+                Browse clinics, see who's accepting, call.
               </p>
               <ul className="text-left space-y-2 mb-6 text-muted-foreground">
                 <li className="flex items-center gap-2">
@@ -705,7 +705,7 @@ export default function HowItWorks() {
             <div className="bg-card p-8 rounded-xl shadow-sm border border-border text-center">
               <h3 className="text-2xl text-foreground mb-3">Get Notified Instantly</h3>
               <p className="text-muted-foreground mb-6">
-                Monitor up to 3 cities and receive alerts when doctors start accepting.
+                Monitor up to 3 cities and receive alerts when clinics start accepting.
               </p>
               <ul className="text-left space-y-2 mb-6 text-muted-foreground">
                 <li className="flex items-center gap-2">
