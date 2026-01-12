@@ -97,11 +97,11 @@ export default function AdminClinics() {
     let query = supabase
       .from("clinics")
       .select("*", { count: "exact" })
-      .order("clinic_name", { ascending: true });
+      .order("name", { ascending: true });
     
-    // Apply search filter server-side (removed full_name)
+    // Apply search filter server-side
     if (searchQuery.trim()) {
-      query = query.or(`clinic_name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
+      query = query.or(`name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
     }
     
     // Apply status filter server-side
@@ -152,7 +152,7 @@ export default function AdminClinics() {
   const openEditDialog = (doctor: Doctor) => {
     setEditingDoctor(doctor);
     setEditForm({
-      clinic_name: doctor.clinic_name,
+      name: doctor.name,
       address: doctor.address,
       city: doctor.city,
       province: doctor.province,
@@ -378,7 +378,7 @@ export default function AdminClinics() {
                   <TableRow key={doctor.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{doctor.clinic_name}</span>
+                        <span className="font-medium">{doctor.name}</span>
                         {doctor.claimed_by_doctor && (
                           <Badge variant="outline" className="text-xs">
                             <CheckCircle className="h-3 w-3 mr-1 text-blue-500" />
@@ -461,11 +461,11 @@ export default function AdminClinics() {
           
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="clinic_name">Clinic Name</Label>
+              <Label htmlFor="name">Clinic Name</Label>
               <Input
-                id="clinic_name"
-                value={editForm.clinic_name || ""}
-                onChange={(e) => setEditForm({ ...editForm, clinic_name: e.target.value })}
+                id="name"
+                value={editForm.name || ""}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
               />
             </div>
 

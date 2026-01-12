@@ -30,7 +30,7 @@ export interface Clinic {
 export function mapClinicRowToClinic(row: ClinicRow): Clinic {
   return {
     id: row.id,
-    name: row.clinic_name,
+    name: row.name,
     address: row.address,
     city: row.city,
     province: row.province,
@@ -62,7 +62,7 @@ export async function fetchClinics(): Promise<Clinic[]> {
     const { data, error } = await supabase
       .from("clinics")
       .select("*")
-      .order("clinic_name")
+      .order("name")
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
     if (error) {
@@ -211,12 +211,12 @@ export async function searchClinics(query: string): Promise<{ clinics: Clinic[];
     } else if (!postalAnalysis.isPostalCode) {
       // City/name search
       queryBuilder = queryBuilder.or(
-        `city.ilike.%${lowerQuery}%,clinic_name.ilike.%${lowerQuery}%`
+        `city.ilike.%${lowerQuery}%,name.ilike.%${lowerQuery}%`
       );
     }
     
-    const { data, error } = await queryBuilder
-      .order("clinic_name")
+    const { data, error} = await queryBuilder
+      .order("name")
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
     if (error) {
