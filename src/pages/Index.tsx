@@ -125,7 +125,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Get Instant Alerts</h3>
               <p className="text-muted-foreground mb-4">
-                Monitor up to 3 cities with optional language and accessibility filters. Get email alerts when clinics matching your preferences begin accepting patients. $7.99/month.
+                Monitor up to 3 cities across Ontario and get email alerts when clinics matching your preferences begin accepting patients. $7.99/month.
               </p>
               <Link 
                 to="/pricing" 
@@ -164,7 +164,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Covers All of Ontario</h3>
               <p className="text-muted-foreground">
-                From Toronto to Thunder Bay, we're building Ontario's most comprehensive directory of family doctors accepting new patients.
+                From Toronto to Thunder Bay, we're building Ontario's most comprehensive directory of doctor clinics accepting new patients.
               </p>
             </div>
             
@@ -242,7 +242,7 @@ export default function Index() {
               <div className="flex-1">
                 <h3 className="text-2xl text-primary mb-3">Search Your Area</h3>
                 <p className="text-lg text-muted-foreground mb-3">
-                  Enter your city or postal code. Browse family doctors in your area. Filter by location and accepting status.
+                  Enter your city or postal code. Browse doctor clinics in your area. Filter by location and accepting status.
                 </p>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function Index() {
               <div className="flex-1">
                 <h3 className="text-2xl text-primary mb-3">Call to Confirm</h3>
                 <p className="text-lg text-muted-foreground mb-3">
-                  When you find a doctor accepting patients, call their clinic directly to confirm availability and book an appointment.
+                  When you find a clinic accepting patients, call them directly to confirm availability and book an appointment.
                 </p>
               </div>
             </div>
@@ -270,7 +270,7 @@ export default function Index() {
               <div className="flex-1">
                 <h3 className="text-2xl text-primary mb-3">Help the Community</h3>
                 <p className="text-lg text-muted-foreground mb-3">
-                  After calling, update the doctor's status. Your 30-second update helps the next person searching.
+                  After calling, update the clinic's status. Your 30-second update helps the next person searching.
                 </p>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function Index() {
                 Optional: Get Alerts
               </h4>
               <p className="text-muted-foreground">
-                Want to be notified the moment a doctor starts accepting? Set up email alerts for up to 3 cities. $7.99/month.
+                Want to be notified the moment a clinicstarts accepting? Set up email alerts for up to 3 cities. $7.99/month.
               </p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function Index() {
                   Is FindYourDoctor really free?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Yes. Searching our doctor directory is completely free and always will be. You can browse doctors, see who's accepting patients, and use the map without creating an account. We offer optional email alerts ($7.99/month) for people who want to be notified immediately when doctors start accepting patients in their area.
+                  Yes. Searching our clinic directory is completely free and always will be. You can browse clinics, see who's accepting patients, and use the map without creating an account. We offer optional email alerts ($7.99/month) for people who want to be notified immediately when clinics start accepting patients in their area.
                 </AccordionContent>
               </AccordionItem>
               
@@ -316,10 +316,10 @@ export default function Index() {
                 className="bg-card border border-border rounded-lg px-6"
               >
                 <AccordionTrigger className="text-left hover:no-underline">
-                  How do you keep doctor information up-to-date?
+                  How do you keep clinic information up-to-date?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Our community of users updates doctor status after calling clinics. When someone calls a clinic and learns whether they're accepting patients, they can update that information on FindYourDoctor. Doctors can also verify and update their own listings. This community-powered approach helps keep information current and helps everyone searching find care faster.
+                  Our community of users updates clinic status after calling them. When someone calls a clinic and learns whether they're accepting patients, they can update that information on FindYourDoctor. Clinics can also verify and update their own listings. This community-powered approach helps keep information current and helps everyone searching find care faster.
                 </AccordionContent>
               </AccordionItem>
               
@@ -343,24 +343,12 @@ export default function Index() {
                   How are email alerts different from free search?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Free search lets you browse doctors whenever you want. Email alerts actively monitor doctors in your chosen cities and notify you the moment one starts accepting patients. So you can be among the first to call.
+                  Free search lets you browse whenever you want. Email alerts actively monitor clinics in your chosen cities and notify you the moment one starts accepting patients. So you can be among the first to call.
                 </AccordionContent>
               </AccordionItem>
               
               <AccordionItem 
                 value="item-4"
-                className="bg-card border border-border rounded-lg px-6"
-              >
-                <AccordionTrigger className="text-left hover:no-underline">
-                  Can I filter alerts by language or accessibility?
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  Yes! Alert Service subscribers can set optional filters for languages and accessibility features. Only doctors matching your preferences will trigger alerts, saving you time.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem 
-                value="item-5"
                 className="bg-card border border-border rounded-lg px-6"
               >
                 <AccordionTrigger className="text-left hover:no-underline">
@@ -372,14 +360,14 @@ export default function Index() {
               </AccordionItem>
               
               <AccordionItem 
-                value="item-6"
+                value="item-5"
                 className="bg-card border border-border rounded-lg px-6"
               >
                 <AccordionTrigger className="text-left hover:no-underline">
                   Can doctors update their own listings?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Yes. Doctors can search for their name, find their listing, and update it directly to ensure accuracy.
+                  Yes. Clinics can search for their name, find their listing, and update it directly to ensure accuracy.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -417,7 +405,7 @@ export default function Index() {
             <div className="bg-card p-8 rounded-xl shadow-sm border border-border text-center">
               <h3 className="text-2xl text-foreground mb-3">Start Searching Now</h3>
               <p className="text-muted-foreground mb-6">
-                Browse doctors, see who's accepting patients, and call clinics.
+                Browse clinics, see who's accepting patients, and call.
               </p>
               <ul className="text-left space-y-2 mb-6 text-muted-foreground">
                 <li className="flex items-center gap-2">
@@ -441,7 +429,7 @@ export default function Index() {
             <div className="bg-card p-8 rounded-xl shadow-sm border border-border text-center">
               <h3 className="text-2xl text-foreground mb-3">Get Notified Instantly</h3>
               <p className="text-muted-foreground mb-6">
-                Monitor up to 3 cities and receive alerts when doctors start accepting.
+                Monitor up to 3 cities and receive alerts when clinics start accepting.
               </p>
               <ul className="text-left space-y-2 mb-6 text-muted-foreground">
                 <li className="flex items-center gap-2">
