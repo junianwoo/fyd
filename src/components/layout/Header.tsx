@@ -8,9 +8,9 @@ import logoColour from "@/assets/logo-colour.png";
 const navLinks = [
   { label: "Find Doctors", href: "/clinics" },
   { label: "How It Works", href: "/how-it-works" },
-  { label: "Resources", href: "/resources" },
-  { label: "FAQ", href: "/faq" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Resources", href: "/resources" },
+  { label: "About", href: "/about" },
 ];
 
 export function Header() {

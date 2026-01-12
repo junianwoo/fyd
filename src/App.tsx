@@ -20,6 +20,7 @@ import Resources from "./pages/Resources";
 import ResourceDetail from "./pages/ResourceDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import About from "./pages/About";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -71,6 +72,7 @@ const App = () => (
                 <Route path="/resources/:slug" element={<ResourceDetail />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />

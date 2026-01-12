@@ -4,10 +4,11 @@ import logoWhite from "@/assets/logo-white.png";
 
 const footerLinks = {
   site: [
-    { label: "Find Doctors", href: "/doctors" },
+    { label: "Find Doctors", href: "/clinics" },
     { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
     { label: "Resources", href: "/resources" },
+    { label: "About", href: "/about" },
   ],
   support: [
     { label: "FAQ", href: "/faq" },
