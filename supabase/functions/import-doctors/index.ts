@@ -26,7 +26,12 @@ interface CSVDoctor {
 // Parse CSV content into array of objects
 function parseCSV(content: string): CSVDoctor[] {
   const lines = content.trim().split("\n");
-  const headers = parseCSVLine(lines[0]);
+  const rawHeaders = parseCSVLine(lines[0]);
+  
+  // Normalize headers: lowercase and trim whitespace
+  const headers = rawHeaders.map(h => h.trim().toLowerCase());
+  
+  console.log("CSV Headers detected:", headers);
   
   const doctors: CSVDoctor[] = [];
   
@@ -221,41 +226,53 @@ Deno.serve(async (req) => {
     for (let i = 0; i < csvDoctors.length; i += batchSize) {
       const batch = csvDoctors.slice(i, i + batchSize);
       
-      // Filter out duplicates in append mode
-      const filteredBatch = clearExisting 
-        ? batch 
-        : batch.filter(doc => {
-            if (doc.cpso_number && existingCpsoNumbers.has(doc.cpso_number)) {
-              skipped++;
-              return false;
-            }
-            return true;
-          });
+      // Filter out rows with missing coordinates and duplicates in append mode
+      const filteredBatch = batch.filter((doc: any) => {
+        // Skip if missing required coordinates (now using lowercase normalized field names)
+        const lat = parseFloat(doc.latitude);
+        const lng = parseFloat(doc.longitude);
+        if (!doc.latitude || !doc.longitude || isNaN(lat) || isNaN(lng)) {
+          skipped++;
+          console.log(`Skipping row: missing or invalid coordinates (lat: ${doc.latitude}, lng: ${doc.longitude})`);
+          return false;
+        }
+        
+        // Skip duplicates in append mode
+        if (!clearExisting && doc.cpso_number && existingCpsoNumbers.has(doc.cpso_number)) {
+          skipped++;
+          return false;
+        }
+        
+        return true;
+      });
       
       if (filteredBatch.length === 0) {
         continue;
       }
       
-      const transformedBatch = filteredBatch.map((doc) => ({
-        cpso_number: doc.cpso_number || null,
-        full_name: doc.full_name ? formatName(doc.full_name) : null,
-        clinic_name: doc.clinic_name || extractClinicName(doc.address, doc.full_name || ""),
-        address: doc.address,
-        city: doc.google_formatted_address ? extractCity(doc.google_formatted_address, doc.city) : doc.city,
-        province: doc.province || "ON",
-        postal_code: doc.postal_code,
-        phone: doc.phone,
-        latitude: parseFloat(doc.latitude),
-        longitude: parseFloat(doc.longitude),
-        accepting_status: "unknown" as const,
-        status_verified_by: "community" as const,
-        languages: parseLanguages(doc.languages || ""),
-        accessibility_features: [],
-        age_groups_served: ["Adults"],
-        virtual_appointments: false,
-        claimed_by_doctor: false,
-        community_report_count: 0,
-      }));
+      const transformedBatch = filteredBatch.map((doc: any) => {
+        // Access normalized (lowercase) field names
+        return {
+          cpso_number: doc.cpso_number || null,
+          full_name: doc.full_name ? formatName(doc.full_name) : null,
+          clinic_name: doc.clinic_name || extractClinicName(doc.address, doc.full_name || ""),
+          address: doc.address,
+          city: doc.google_formatted_address ? extractCity(doc.google_formatted_address, doc.city) : doc.city,
+          province: doc.province || "ON",
+          postal_code: doc.postal_code,
+          phone: doc.phone,
+          latitude: parseFloat(doc.latitude),
+          longitude: parseFloat(doc.longitude),
+          accepting_status: "unknown" as const,
+          status_verified_by: "community" as const,
+          languages: parseLanguages(doc.languages || ""),
+          accessibility_features: [],
+          age_groups_served: ["Adults"],
+          virtual_appointments: false,
+          claimed_by_doctor: false,
+          community_report_count: 0,
+        };
+      });
 
       const { data, error } = await supabase
         .from("clinics")
@@ -277,6 +294,9 @@ Deno.serve(async (req) => {
       skipped,
       total: csvDoctors.length,
       errors: errors.length > 0 ? errors : undefined,
+      message: skipped > 0 
+        ? `${inserted} clinics imported, ${skipped} rows skipped (missing coordinates or duplicates)`
+        : `${inserted} clinics imported successfully`,
     };
 
     console.log("Import complete:", result);
