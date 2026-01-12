@@ -15,7 +15,8 @@ import {
   ArrowLeft,
   Flag,
   Loader2,
-  Building2
+  Building2,
+  AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +56,12 @@ export default function ClinicDetails() {
   const [claimEmail, setClaimEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const [problemDialogOpen, setProblemDialogOpen] = useState(false);
+  const [problemFormData, setProblemFormData] = useState({
+    email: "",
+    message: "",
+  });
+  const [reportingProblem, setReportingProblem] = useState(false);
 
   useEffect(() => {
     const loadClinic = async () => {
@@ -158,6 +165,62 @@ export default function ClinicDetails() {
         description: result.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const handleReportProblem = async () => {
+    if (!problemFormData.email || !problemFormData.email.includes("@")) {
+      toast({
+        title: "Please enter a valid email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!problemFormData.message.trim()) {
+      toast({
+        title: "Please describe the problem",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setReportingProblem(true);
+
+    try {
+      const response = await fetch("/api/send-contact-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: problemFormData.email,
+          subject: `Problem Report: ${clinic.name}`,
+          message: `Clinic: ${clinic.name}\nClinic ID: ${clinic.id}\nLocation: ${clinic.city}, ${clinic.province}\n\nProblem Description:\n${problemFormData.message}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to send report");
+      }
+
+      toast({
+        title: "Report Submitted!",
+        description: "Thank you for helping us keep listings accurate.",
+      });
+
+      setProblemDialogOpen(false);
+      setProblemFormData({ email: "", message: "" });
+    } catch (error: any) {
+      toast({
+        title: "Failed to send report",
+        description: error.message || "Please try again or email us directly at support@findyourdoctor.ca",
+        variant: "destructive",
+      });
+    } finally {
+      setReportingProblem(false);
     }
   };
 
@@ -494,6 +557,71 @@ export default function ClinicDetails() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Report A Problem */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-foreground mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Report A Problem
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Does this listing need to be updated? Let us know.
+                </p>
+                <Dialog open={problemDialogOpen} onOpenChange={setProblemDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      Report Issue
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Report A Problem</DialogTitle>
+                      <DialogDescription>
+                        Let us know what needs to be corrected or updated about this listing.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="problem-email">Your Email</Label>
+                        <Input
+                          id="problem-email"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={problemFormData.email}
+                          onChange={(e) => setProblemFormData({ ...problemFormData, email: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="problem-message">Problem Description</Label>
+                        <Textarea
+                          id="problem-message"
+                          placeholder="Please describe what needs to be corrected..."
+                          value={problemFormData.message}
+                          onChange={(e) => setProblemFormData({ ...problemFormData, message: e.target.value })}
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                      <Button variant="outline" onClick={() => setProblemDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleReportProblem} disabled={reportingProblem}>
+                        {reportingProblem ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          "Submit Report"
+                        )}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
