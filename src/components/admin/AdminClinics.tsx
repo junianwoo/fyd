@@ -14,7 +14,10 @@ import {
   ExternalLink,
   Save,
   X,
-  Bell
+  Bell,
+  Languages,
+  Users,
+  Accessibility
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +52,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+
+const LANGUAGE_OPTIONS = ["English", "French", "Mandarin", "Cantonese", "Punjabi", "Hindi", "Tamil", "Arabic", "Spanish", "Portuguese", "Italian", "Korean", "Vietnamese", "Tagalog", "Urdu"];
+const ACCESSIBILITY_OPTIONS = ["Wheelchair Accessible", "Accessible Parking", "Elevator Access", "Accessible Washroom", "TTY/TDD Service"];
+const AGE_GROUP_OPTIONS = ["Children (0-12)", "Teens (13-17)", "Adults (18-64)", "Seniors (65+)"];
 
 type Doctor = Database["public"]["Tables"]["doctors"]["Row"];
 type AcceptingStatus = Database["public"]["Enums"]["accepting_status"];
@@ -162,7 +169,18 @@ export default function AdminClinics() {
       website: doctor.website,
       accepting_status: doctor.accepting_status,
       virtual_appointments: doctor.virtual_appointments,
+      languages: doctor.languages || ["English"],
+      accessibility_features: doctor.accessibility_features || [],
+      age_groups_served: doctor.age_groups_served || ["Adults (18-64)"],
     });
+  };
+
+  const toggleArrayItem = (arr: string[], item: string, setter: (arr: string[]) => void) => {
+    if (arr.includes(item)) {
+      setter(arr.filter(i => i !== item));
+    } else {
+      setter([...arr, item]);
+    }
   };
 
   const handleSaveDoctor = async () => {
@@ -566,6 +584,63 @@ export default function AdminClinics() {
                     <SelectItem value="no">No</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Languages */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <Languages className="h-4 w-4" /> Languages Spoken
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGE_OPTIONS.map((lang) => (
+                  <Badge
+                    key={lang}
+                    variant={(editForm.languages || []).includes(lang) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleArrayItem(editForm.languages || [], lang, (arr) => setEditForm({ ...editForm, languages: arr }))}
+                  >
+                    {lang}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Age Groups */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <Users className="h-4 w-4" /> Age Groups Served
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {AGE_GROUP_OPTIONS.map((group) => (
+                  <Badge
+                    key={group}
+                    variant={(editForm.age_groups_served || []).includes(group) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleArrayItem(editForm.age_groups_served || [], group, (arr) => setEditForm({ ...editForm, age_groups_served: arr }))}
+                  >
+                    {group}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Accessibility */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <Accessibility className="h-4 w-4" /> Accessibility Features
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {ACCESSIBILITY_OPTIONS.map((feature) => (
+                  <Badge
+                    key={feature}
+                    variant={(editForm.accessibility_features || []).includes(feature) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleArrayItem(editForm.accessibility_features || [], feature, (arr) => setEditForm({ ...editForm, accessibility_features: arr }))}
+                  >
+                    {feature}
+                  </Badge>
+                ))}
               </div>
             </div>
           </div>
