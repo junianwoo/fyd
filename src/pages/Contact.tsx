@@ -76,13 +76,13 @@ export default function Contact() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              {/* Direct Email */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              {/* General Inquiries & Support */}
               <div className="p-6 bg-background-alt rounded-xl">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 mb-4">
                   <Mail className="h-6 w-6 text-secondary" />
                 </div>
-                <h3 className="text-lg text-foreground mb-2">Email Us Directly</h3>
+                <h3 className="text-lg text-foreground mb-2">General Inquiries &amp; Support</h3>
                 <a 
                   href="mailto:support@findyourdoctor.ca"
                   className="text-secondary hover:text-primary transition-colors"
@@ -91,11 +91,41 @@ export default function Contact() {
                 </a>
               </div>
 
-              {/* FAQ Link */}
+              {/* Privacy Matters */}
               <div className="p-6 bg-background-alt rounded-xl">
-                <h3 className="text-lg text-foreground mb-2">Check Our FAQ</h3>
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 mb-4">
+                  <Mail className="h-6 w-6 text-secondary" />
+                </div>
+                <h3 className="text-lg text-foreground mb-2">Privacy Matters</h3>
+                <p className="text-muted-foreground text-sm mb-2">Our Privacy Officer</p>
+                <a 
+                  href="mailto:privacy@findyourdoctor.ca"
+                  className="text-secondary hover:text-primary transition-colors"
+                >
+                  privacy@findyourdoctor.ca
+                </a>
+              </div>
+
+              {/* Media Inquiries */}
+              <div className="p-6 bg-background-alt rounded-xl">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 mb-4">
+                  <Mail className="h-6 w-6 text-secondary" />
+                </div>
+                <h3 className="text-lg text-foreground mb-2">Media Inquiries</h3>
+                <p className="text-muted-foreground text-sm mb-2">Press contact</p>
+                <a 
+                  href="mailto:media@findyourdoctor.ca"
+                  className="text-secondary hover:text-primary transition-colors"
+                >
+                  media@findyourdoctor.ca
+                </a>
+              </div>
+
+              {/* Report Updates */}
+              <div className="p-6 bg-background-alt rounded-xl">
+                <h3 className="text-lg text-foreground mb-2">Report Updates</h3>
                 <p className="text-muted-foreground mb-4">
-                  Many common questions are already answered.
+                  Help keep our data current by reporting clinic status changes through our platform or by contacting support.
                 </p>
                 <Link 
                   to="/faq"

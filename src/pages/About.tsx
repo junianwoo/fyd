@@ -117,39 +117,6 @@ export default function About() {
                 </ul>
               </div>
 
-              {/* Section 6 */}
-              <div>
-                <h2 className="text-2xl text-primary mb-4">Contact Us</h2>
-                
-                <h3 className="text-xl text-foreground mb-3">General Inquiries &amp; Support</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  <a href="mailto:support@findyourdoctor.ca" className="text-secondary hover:text-primary">
-                    support@findyourdoctor.ca
-                  </a>
-                </p>
-                
-                <h3 className="text-xl text-foreground mb-3">Privacy Matters</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Our Privacy Officer:{" "}
-                  <a href="mailto:privacy@findyourdoctor.ca" className="text-secondary hover:text-primary">
-                    privacy@findyourdoctor.ca
-                  </a>
-                </p>
-                
-                <h3 className="text-xl text-foreground mb-3">Media Inquiries</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Press contact:{" "}
-                  <a href="mailto:media@findyourdoctor.ca" className="text-secondary hover:text-primary">
-                    media@findyourdoctor.ca
-                  </a>
-                </p>
-                
-                <h3 className="text-xl text-foreground mb-3">Report Updates</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Help keep our data current by reporting clinic status changes through our platform or by contacting support.
-                </p>
-              </div>
-
             </div>
           </div>
         </div>
