@@ -181,9 +181,9 @@ Deno.serve(async (req) => {
 
     // Clear existing doctors if requested (replace mode)
     if (clearExisting) {
-      console.log("Clearing existing doctors (replace mode)...");
+      console.log("Clearing existing clinics (replace mode)...");
       const { error: deleteError } = await supabase
-        .from("doctors")
+        .from("clinics")
         .delete()
         .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
 
@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
     if (!clearExisting) {
       console.log("Fetching existing CPSO numbers for duplicate detection...");
       const { data: existingDocs } = await supabase
-        .from("doctors")
+        .from("clinics")
         .select("cpso_number")
         .not("cpso_number", "is", null);
       
@@ -258,7 +258,7 @@ Deno.serve(async (req) => {
       }));
 
       const { data, error } = await supabase
-        .from("doctors")
+        .from("clinics")
         .insert(transformedBatch)
         .select("id");
 
