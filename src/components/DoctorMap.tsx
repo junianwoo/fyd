@@ -170,14 +170,21 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: true,
+      gestureHandling: 'cooperative', // Requires two-finger zoom on mobile for stability
+      minZoom: 8, // Prevent extreme zoom out to world view
+      maxZoom: 18, // Prevent extreme zoom in
     });
 
-    // Track zoom changes for responsive marker sizing
+    // Track zoom changes for responsive marker sizing (debounced to prevent interference with user gestures)
+    let zoomTimeout: NodeJS.Timeout;
     mapInstanceRef.current.addListener('zoom_changed', () => {
-      const zoom = mapInstanceRef.current?.getZoom();
-      if (zoom !== undefined) {
-        setMapZoom(zoom);
-      }
+      clearTimeout(zoomTimeout);
+      zoomTimeout = setTimeout(() => {
+        const zoom = mapInstanceRef.current?.getZoom();
+        if (zoom !== undefined) {
+          setMapZoom(zoom);
+        }
+      }, 150); // Debounce by 150ms to avoid recreating markers during active zoom gestures
     });
   }, [loading, error, userLocation]);
 
@@ -260,7 +267,7 @@ const DoctorMap = memo(function DoctorMap({ doctors, selectedDoctorId, onDoctorS
         icon: svgIcon,
         title: `${doctor.fullName} - ${doctor.acceptingStatus}`,
         zIndex,
-        optimized: false, // Better rendering for overlapping markers
+        optimized: true, // Use optimized rendering for better mobile performance
       });
 
       marker.addListener("click", () => {
