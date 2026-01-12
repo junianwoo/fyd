@@ -42,26 +42,24 @@ type PendingUpdate = Database["public"]["Tables"]["pending_updates"]["Row"];
 type CommunityReport = Database["public"]["Tables"]["community_reports"]["Row"];
 type AcceptingStatus = Database["public"]["Enums"]["accepting_status"];
 
-interface PendingUpdateWithDoctor extends PendingUpdate {
-  doctors?: {
-    full_name: string;
-    clinic_name: string;
+interface PendingUpdateWithClinic extends PendingUpdate {
+  clinics?: {
+    name: string;
     city: string;
     accepting_status: AcceptingStatus;
   };
 }
 
-interface CommunityReportWithDoctor extends CommunityReport {
-  doctors?: {
-    full_name: string;
-    clinic_name: string;
+interface CommunityReportWithClinic extends CommunityReport {
+  clinics?: {
+    name: string;
     city: string;
   };
 }
 
 export default function AdminModeration() {
-  const [pendingUpdates, setPendingUpdates] = useState<PendingUpdateWithDoctor[]>([]);
-  const [recentReports, setRecentReports] = useState<CommunityReportWithDoctor[]>([]);
+  const [pendingUpdates, setPendingUpdates] = useState<PendingUpdateWithClinic[]>([]);
+  const [recentReports, setRecentReports] = useState<CommunityReportWithClinic[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [deleteReportId, setDeleteReportId] = useState<string | null>(null);
@@ -78,9 +76,8 @@ export default function AdminModeration() {
       .from("pending_updates")
       .select(`
         *,
-        doctors (
-          full_name,
-          clinic_name,
+        clinics (
+          name,
           city,
           accepting_status
         )
@@ -89,7 +86,7 @@ export default function AdminModeration() {
       .limit(50);
 
     if (pending) {
-      setPendingUpdates(pending as PendingUpdateWithDoctor[]);
+      setPendingUpdates(pending as PendingUpdateWithClinic[]);
     }
 
     // Load recent community reports
@@ -97,9 +94,8 @@ export default function AdminModeration() {
       .from("community_reports")
       .select(`
         *,
-        doctors (
-          full_name,
-          clinic_name,
+        clinics (
+          name,
           city
         )
       `)
@@ -107,25 +103,25 @@ export default function AdminModeration() {
       .limit(50);
 
     if (reports) {
-      setRecentReports(reports as CommunityReportWithDoctor[]);
+      setRecentReports(reports as CommunityReportWithClinic[]);
     }
     
     setLoading(false);
   };
 
-  const handleApproveUpdate = async (update: PendingUpdateWithDoctor) => {
+  const handleApproveUpdate = async (update: PendingUpdateWithClinic) => {
     setActionLoading(update.id);
     
-    // Update the doctor's status
+    // Update the clinic's status
     const { error: updateError } = await supabase
-      .from("doctors")
+      .from("clinics")
       .update({
         accepting_status: update.status,
         status_last_updated_at: new Date().toISOString(),
         status_verified_by: "community" as const,
         community_report_count: update.count,
       })
-      .eq("id", update.doctor_id);
+      .eq("id", update.clinic_id);
 
     if (updateError) {
       toast.error("Failed to approve update");
@@ -295,17 +291,17 @@ export default function AdminModeration() {
                     <TableCell>
                       <div>
                         <span className="font-medium">
-                          {update.doctors?.clinic_name || "Unknown"}
+                          {update.clinics?.name || "Unknown"}
                         </span>
                         <br />
                         <span className="text-sm text-muted-foreground">
-                          {update.doctors?.city}
+                          {update.clinics?.city}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      {update.doctors?.accepting_status && 
-                        getStatusBadge(update.doctors.accepting_status)}
+                      {update.clinics?.accepting_status && 
+                        getStatusBadge(update.clinics.accepting_status)}
                     </TableCell>
                     <TableCell>{getStatusBadge(update.status)}</TableCell>
                     <TableCell>
@@ -341,7 +337,7 @@ export default function AdminModeration() {
                           <XCircle className="h-4 w-4 text-red-600" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/doctors/${update.doctor_id}`} target="_blank">
+                          <Link to={`/clinics/${update.clinic_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -393,11 +389,11 @@ export default function AdminModeration() {
                     <TableCell>
                       <div>
                         <span className="font-medium">
-                          {report.doctors?.clinic_name || "Unknown"}
+                          {report.clinics?.name || "Unknown"}
                         </span>
                         <br />
                         <span className="text-sm text-muted-foreground">
-                          {report.doctors?.city}
+                          {report.clinics?.city}
                         </span>
                       </div>
                     </TableCell>
@@ -421,7 +417,7 @@ export default function AdminModeration() {
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/doctors/${report.doctor_id}`} target="_blank">
+                          <Link to={`/clinics/${report.clinic_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>

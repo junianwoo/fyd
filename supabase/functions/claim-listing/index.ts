@@ -1,13 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { buildEmail, getButton, getCard, DEFAULT_EMAIL_OPTIONS } from "../_shared/email-templates.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -79,53 +76,63 @@ serve(async (req) => {
     const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
     const magicLink = `${siteUrl}/claim-verify?token=${token}`;
 
+    // Build email body content
+    const clinicInfoCard = getCard(`
+      <h3 style="margin: 0 0 8px 0; color: #0F4C5C; font-size: 18px; font-family: Georgia, 'Times New Roman', serif;">${clinic.name}</h3>
+      <p style="margin: 0; color: #666; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${clinic.address}, ${clinic.city}</p>
+    `, '#00A6A6');
+
+    const bodyContent = `
+      <p style="margin: 0 0 16px 0; font-size: 16px; color: #333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        Hello,
+      </p>
+      
+      <p style="margin: 0 0 24px 0; font-size: 16px; color: #333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        We received a request to claim and manage the following listing on FindYourDoctor.ca:
+      </p>
+      
+      ${clinicInfoCard}
+      
+      <p style="margin: 24px 0; font-size: 16px; color: #333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        Click the button below to verify your email and manage this listing:
+      </p>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        ${getButton('Verify & Claim Listing', magicLink, '#00A6A6')}
+      </div>
+      
+      <div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
+        <p style="margin: 0; font-size: 14px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <strong>⏰ This link will expire in 24 hours.</strong><br>
+          If you didn't request this, you can safely ignore this email.
+        </p>
+      </div>
+      
+      <div style="background: #F3FBFA; border-left: 4px solid #00A6A6; padding: 16px; border-radius: 8px; margin: 24px 0;">
+        <h3 style="margin: 0 0 8px 0; color: #0F4C5C; font-size: 16px; font-family: Georgia, 'Times New Roman', serif;">What You Can Do After Claiming</h3>
+        <ul style="margin: 8px 0 0 0; padding-left: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <li style="margin-bottom: 8px; color: #666;">Update your clinic's accepting status anytime</li>
+          <li style="margin-bottom: 8px; color: #666;">Ensure your contact information is accurate</li>
+          <li style="margin-bottom: 8px; color: #666;">Help patients find you faster</li>
+          <li style="color: #666;">Build trust with the "Verified by Clinic" badge</li>
+        </ul>
+      </div>
+    `;
+    
+    const html = buildEmail({
+      headerTitle: 'Claim Your Listing',
+      headerSubtitle: 'Verify your email to manage your clinic on FindYourDoctor',
+      bodyContent,
+      siteUrl,
+      includeUnsubscribe: false,
+    });
+
     const emailResponse = await resend.emails.send({
-      from: "FindYourDoctor <noreply@findyourdoctor.ca>",
+      from: DEFAULT_EMAIL_OPTIONS.from!,
+      replyTo: DEFAULT_EMAIL_OPTIONS.replyTo,
       to: [email],
       subject: `Verify your clinic listing: ${clinic.name}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: #00857C; padding: 30px; border-radius: 12px 12px 0 0;">
-            <h1 style="color: white; margin: 0; font-size: 24px;">Claim Your Listing</h1>
-          </div>
-          
-          <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
-            <p style="margin: 0 0 16px 0;">Hello,</p>
-            
-            <p style="margin: 0 0 16px 0;">
-              We received a request to claim and manage the following listing on FindYourDoctor.ca:
-            </p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #00857C;">
-              <h3 style="margin: 0 0 8px 0;">${clinic.name}</h3>
-              <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">${clinic.address}, ${clinic.city}</p>
-            </div>
-            
-            <p style="margin: 0 0 24px 0;">
-              Click the button below to verify your email and manage this listing:
-            </p>
-            
-            <a href="${magicLink}" style="display: inline-block; background: #00857C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-              Verify & Claim Listing
-            </a>
-            
-            <p style="margin: 24px 0 0 0; font-size: 14px; color: #666;">
-              This link will expire in 24 hours. If you didn't request this, you can safely ignore this email.
-            </p>
-          </div>
-          
-          <div style="padding: 20px; text-align: center; font-size: 12px; color: #999;">
-            <p>© ${new Date().getFullYear()} FindYourDoctor.ca</p>
-          </div>
-        </body>
-        </html>
-      `,
+      html,
     });
 
     logStep("Magic link email sent", { to: email, data: emailResponse.data });
