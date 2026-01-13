@@ -32,30 +32,40 @@ serve(async (req) => {
 
     // Get email from request body or from authenticated user
     const body = await req.json();
+    logStep("Request body parsed", { bodyKeys: Object.keys(body) });
     let email = body.email;
     let userId = null;
     let currentStatus = null;
 
     // Check if user is authenticated (optional)
     const authHeader = req.headers.get("Authorization");
+    logStep("Auth header check", { hasAuthHeader: !!authHeader });
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
-      const { data } = await supabaseClient.auth.getUser(token);
+      const { data, error: authError } = await supabaseClient.auth.getUser(token);
+      
+      if (authError) {
+        logStep("Auth error", { error: authError.message });
+      }
+      
       if (data.user) {
         userId = data.user.id;
         email = email || data.user.email;
+        logStep("User authenticated", { userId, hasEmail: !!email });
         
-        // Get current profile status (don't fail if profile doesn't exist)
+        // Get current profile status and email if needed (don't fail if profile doesn't exist)
         try {
           const { data: profile } = await supabaseClient
             .from("profiles")
-            .select("status")
+            .select("status, email")
             .eq("user_id", userId)
             .maybeSingle();
           
           currentStatus = profile?.status || null;
+          // Use profile email as fallback if user.email is not available
+          email = email || profile?.email;
         } catch (profileError) {
-          logStep("Could not fetch profile status", { error: profileError });
+          logStep("Could not fetch profile", { error: profileError });
           currentStatus = null;
         }
         
@@ -64,8 +74,11 @@ serve(async (req) => {
     }
 
     // Validate email
-    if (!email) throw new Error("Email is required");
-    logStep("Email provided", { email, authenticated: !!userId, currentStatus });
+    if (!email) {
+      logStep("ERROR: No email found", { bodyEmail: body.email, userId });
+      throw new Error("Email is required. Please ensure your account has an email address.");
+    }
+    logStep("Email validated", { email, authenticated: !!userId, currentStatus });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-11-20.acacia" });
     
