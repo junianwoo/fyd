@@ -181,7 +181,7 @@ serve(async (req) => {
             // First, check if user currently has assisted_access status
             const { data: currentProfile } = await supabase
               .from("profiles")
-              .select("status, assisted_access_end_date")
+              .select("status")
               .eq("user_id", userId)
               .single();
 
@@ -191,9 +191,8 @@ serve(async (req) => {
               status: "alert_service",
             };
 
-            // If upgrading from assisted_access, clear the end date
+            // Log if upgrading from assisted_access
             if (currentProfile?.status === "assisted_access") {
-              updateData.assisted_access_end_date = null;
               logStep("Upgrading from assisted_access to alert_service", { userId });
             }
 

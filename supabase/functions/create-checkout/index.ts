@@ -114,8 +114,7 @@ serve(async (req) => {
             .update({ 
               status: "alert_service",
               stripe_subscription_id: existingSubId,
-              stripe_customer_id: customerId,
-              assisted_access_end_date: null
+              stripe_customer_id: customerId
             })
             .eq("user_id", userId);
           
