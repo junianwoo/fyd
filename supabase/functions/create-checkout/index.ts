@@ -97,14 +97,38 @@ serve(async (req) => {
       });
 
       if (existingSubscriptions.data.length > 0) {
+        const existingSubId = existingSubscriptions.data[0].id;
         logStep("Customer already has active subscription", { 
           customerId, 
-          subscriptionId: existingSubscriptions.data[0].id 
+          subscriptionId: existingSubId,
+          currentStatus
         });
+        
+        // Special case: If user has assisted_access status but has an active subscription,
+        // this means the webhook might not have updated their status properly.
+        // Update their profile status to alert_service
+        if (currentStatus === "assisted_access" && userId) {
+          logStep("Fixing status mismatch: assisted_access user with active subscription", { userId });
+          const { error: updateError } = await supabaseClient
+            .from("profiles")
+            .update({ 
+              status: "alert_service",
+              stripe_subscription_id: existingSubId,
+              stripe_customer_id: customerId,
+              assisted_access_end_date: null
+            })
+            .eq("user_id", userId);
+          
+          if (updateError) {
+            logStep("ERROR updating profile status", { error: updateError });
+          } else {
+            logStep("Profile status updated from assisted_access to alert_service", { userId });
+          }
+        }
         
         const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
         return new Response(JSON.stringify({ 
-          error: "You already have an active subscription. Please manage your existing subscription from your dashboard.",
+          error: "You already have an active Alert Service subscription.",
           redirectUrl: `${origin}/dashboard`
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
