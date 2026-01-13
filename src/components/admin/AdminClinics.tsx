@@ -310,16 +310,57 @@ export default function AdminClinics() {
   };
 
   const handleDeleteClinic = async (clinicId: string) => {
-    const { error } = await supabase
-      .from("clinics")
-      .delete()
-      .eq("id", clinicId);
+    try {
+      console.log("Attempting to delete clinic:", clinicId);
+      
+      // First check if user has admin role
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Not authenticated");
+        return;
+      }
 
-    if (error) {
-      toast.error("Failed to delete clinic: " + error.message);
-    } else {
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .single();
+
+      console.log("User role check:", { roleData, roleError, userId: user.id });
+
+      if (roleError || !roleData) {
+        toast.error("You don't have permission to delete clinics. Admin role required.");
+        console.error("User is not admin:", roleError);
+        return;
+      }
+      
+      const { data, error, status, statusText } = await supabase
+        .from("clinics")
+        .delete()
+        .eq("id", clinicId)
+        .select(); // Add select to get returned data
+
+      console.log("Delete response:", { data, error, status, statusText });
+
+      if (error) {
+        console.error("Delete error:", error);
+        toast.error("Failed to delete clinic: " + error.message);
+        return;
+      }
+
+      // Check if anything was actually deleted
+      if (!data || data.length === 0) {
+        console.warn("No rows were deleted");
+        toast.error("Failed to delete clinic: No matching clinic found or insufficient permissions");
+        return;
+      }
+
       toast.success("Clinic deleted successfully");
-      loadClinics();
+      await loadClinics(); // Wait for reload to complete
+    } catch (err: any) {
+      console.error("Exception during delete:", err);
+      toast.error("Failed to delete clinic: " + (err.message || "Unknown error"));
     }
   };
 
