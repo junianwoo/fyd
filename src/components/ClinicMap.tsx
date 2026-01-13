@@ -51,6 +51,7 @@ const ClinicMap = memo(function ClinicMap({
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(12);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Calculate marker size category based on zoom level (to avoid recreating markers too frequently)
   const markerSizeCategory = mapZoom >= 16 ? 'small' : mapZoom >= 13 ? 'medium' : 'large';
@@ -202,6 +203,29 @@ const ClinicMap = memo(function ClinicMap({
         }
       }, 150); // Debounce by 150ms to avoid recreating markers during active zoom gestures
     });
+
+    // Listen for fullscreen changes
+    const handleFullscreenChange = () => {
+      const isFullscreenNow = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+      setIsFullscreen(isFullscreenNow);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
   }, [loading, error, userLocation]);
 
   // Update radius circle and center map on search location
@@ -383,9 +407,16 @@ const ClinicMap = memo(function ClinicMap({
     <div className="relative w-full">
       <div ref={mapRef} className={`w-full ${className}`} />
       
-      {/* Custom Info Card Overlay - uses fixed positioning to work in fullscreen mode */}
+      {/* Custom Info Card Overlay - dynamically positioned based on fullscreen state */}
       {selectedClinic && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[2147483647] w-11/12 max-w-md pointer-events-none">
+        <div 
+          className={`
+            ${isFullscreen ? 'fixed' : 'absolute'} 
+            bottom-8 left-1/2 transform -translate-x-1/2 
+            ${isFullscreen ? 'z-[2147483647]' : 'z-[1000]'} 
+            w-11/12 max-w-md pointer-events-none
+          `}
+        >
           <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1">
