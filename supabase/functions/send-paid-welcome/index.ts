@@ -77,9 +77,6 @@ serve(async (req) => {
           <span style="color: #2ECC71; font-weight: bold;">✓</span> <strong>Instant email alerts</strong> when doctors start accepting patients
         </li>
         <li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <span style="color: #2ECC71; font-weight: bold;">✓</span> Customizable alert filters (languages, accessibility)
-        </li>
-        <li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           <span style="color: #2ECC71; font-weight: bold;">✓</span> Access to full doctor database
         </li>
         <li style="padding: 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -119,7 +116,6 @@ serve(async (req) => {
         <ol style="margin: 8px 0 0 0; padding-left: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           <li style="margin-bottom: 8px; color: #666;">Sign in to your dashboard</li>
           <li style="margin-bottom: 8px; color: #666;">Add up to 3 cities you want to monitor</li>
-          <li style="margin-bottom: 8px; color: #666;">Customize your alert preferences (optional)</li>
           <li style="color: #666;">We'll email you whenever a doctor in your areas starts accepting patients!</li>
         </ol>
       </div>

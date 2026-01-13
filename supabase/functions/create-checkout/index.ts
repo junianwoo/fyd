@@ -34,6 +34,7 @@ serve(async (req) => {
     const body = await req.json();
     let email = body.email;
     let userId = null;
+    let currentStatus = null;
 
     // Check if user is authenticated (optional)
     const authHeader = req.headers.get("Authorization");
@@ -43,13 +44,22 @@ serve(async (req) => {
       if (data.user) {
         userId = data.user.id;
         email = email || data.user.email;
-        logStep("Authenticated user", { userId, email });
+        
+        // Get current profile status
+        const { data: profile } = await supabaseClient
+          .from("profiles")
+          .select("status")
+          .eq("user_id", userId)
+          .single();
+        
+        currentStatus = profile?.status;
+        logStep("Authenticated user", { userId, email, currentStatus });
       }
     }
 
     // Validate email
     if (!email) throw new Error("Email is required");
-    logStep("Email provided", { email, authenticated: !!userId });
+    logStep("Email provided", { email, authenticated: !!userId, currentStatus });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-11-20.acacia" });
     
@@ -92,6 +102,13 @@ serve(async (req) => {
     const priceId = Deno.env.get("STRIPE_PRICE_ID") || "price_1SmQomEfiuQ9vCM5ZTvlL7V3";
     logStep("Using price ID", { priceId });
 
+    // Determine success URL based on authentication and current status
+    // If user is authenticated (especially with assisted_access), send to dashboard
+    // Otherwise, send to check-email page for new users
+    const successUrl = userId 
+      ? `${origin}/dashboard`
+      : `${origin}/check-email?email=${encodeURIComponent(email)}`;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : email,
@@ -102,11 +119,12 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/check-email?email=${encodeURIComponent(email)}`,
+      success_url: successUrl,
       cancel_url: `${origin}/pricing`,
       metadata: {
         user_id: userId || "",
         email: email,
+        current_status: currentStatus || "",
       },
     });
 

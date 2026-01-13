@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, Loader2, Shield, CheckCircle, Bell, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,8 +36,6 @@ export default function AssistedAccess() {
   const [reason, setReason] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checkingEmail, setCheckingEmail] = useState(false);
-  const [emailExists, setEmailExists] = useState(false);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
@@ -81,40 +79,6 @@ export default function AssistedAccess() {
     }
   }, [recaptchaLoaded]);
 
-  // Check if email exists when user types
-  const checkEmailExists = useCallback(async (emailToCheck: string) => {
-    if (!emailToCheck || !emailToCheck.includes('@')) {
-      setEmailExists(false);
-      return;
-    }
-
-    setCheckingEmail(true);
-    try {
-      const { data } = await supabase
-        .from("profiles")
-        .select("status")
-        .eq("email", emailToCheck)
-        .maybeSingle();
-
-      setEmailExists(!!data);
-    } catch (error) {
-      console.error("Error checking email:", error);
-    } finally {
-      setCheckingEmail(false);
-    }
-  }, []);
-
-  // Debounce email check
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (email) {
-        checkEmailExists(email);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [email, checkEmailExists]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -148,32 +112,13 @@ export default function AssistedAccess() {
 
       if (existingProfile) {
         setLoading(false);
-        
-        if (existingProfile.status === "alert_service") {
-          toast({
-            title: "You already have Alert Service",
-            description: "You're currently subscribed to Alert Service. You can manage your subscription in your dashboard.",
-            variant: "destructive",
-          });
-          navigate("/dashboard");
-          return;
-        } else if (existingProfile.status === "assisted_access") {
-          toast({
-            title: "You already have Assisted Access",
-            description: "Your Assisted Access is already active. Check your email or sign in to access your dashboard.",
-            variant: "destructive",
-          });
-          navigate("/auth");
-          return;
-        } else {
-          toast({
-            title: "Account already exists",
-            description: "An account with this email already exists. Please sign in instead.",
-            variant: "destructive",
-          });
-          navigate("/auth");
-          return;
-        }
+        toast({
+          title: "Email already registered",
+          description: "This email is already registered. Please log in to your account.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
       }
 
       // Verify reCAPTCHA

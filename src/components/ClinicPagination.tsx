@@ -22,8 +22,8 @@ export function ClinicPagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <p className="text-sm text-muted-foreground">
+    <div className="flex items-center gap-4">
+      <p className="text-sm text-muted-foreground flex-1">
         Showing {startItem}-{endItem} of {totalItems} clinics
       </p>
       <div className="flex items-center gap-2">

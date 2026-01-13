@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function About() {
   return (
@@ -117,6 +118,19 @@ export default function About() {
                 </ul>
               </div>
 
+            </div>
+
+            {/* Contact CTA */}
+            <div className="mt-12 p-8 bg-background-alt rounded-xl text-center">
+              <h3 className="text-xl text-foreground mb-2">
+                Questions or Feedback?
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                We'd love to hear from you. Get in touch with our team.
+              </p>
+              <Button asChild>
+                <Link to="/contact">Contact Us</Link>
+              </Button>
             </div>
           </div>
         </div>

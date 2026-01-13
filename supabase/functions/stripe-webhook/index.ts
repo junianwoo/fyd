@@ -178,19 +178,34 @@ serve(async (req) => {
 
           // Update profile with subscription details
           if (userId) {
+            // First, check if user currently has assisted_access status
+            const { data: currentProfile } = await supabase
+              .from("profiles")
+              .select("status, assisted_access_end_date")
+              .eq("user_id", userId)
+              .single();
+
+            const updateData: any = {
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              status: "alert_service",
+            };
+
+            // If upgrading from assisted_access, clear the end date
+            if (currentProfile?.status === "assisted_access") {
+              updateData.assisted_access_end_date = null;
+              logStep("Upgrading from assisted_access to alert_service", { userId });
+            }
+
             const { error } = await supabase
               .from("profiles")
-              .update({
-                stripe_customer_id: customerId,
-                stripe_subscription_id: subscriptionId,
-                status: "alert_service",
-              })
+              .update(updateData)
               .eq("user_id", userId);
 
             if (error) {
               logStep("ERROR updating profile", { error, userId });
             } else {
-              logStep("Profile updated successfully", { userId, status: "alert_service" });
+              logStep("Profile updated successfully", { userId, status: "alert_service", wasAssistedAccess: currentProfile?.status === "assisted_access" });
             }
           }
         }

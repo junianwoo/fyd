@@ -29,14 +29,14 @@ export function Footer() {
             new patients and provides optional email alerts when doctors in your 
             area start accepting.
           </p>
-          <div className="flex items-center justify-center gap-2 text-accent">
+          <p className="text-sm font-medium text-accent flex items-center justify-center gap-2">
             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-            <p className="text-sm font-medium">
+            <span>
               IMPORTANT: We are not affiliated with or endorsed by any government 
               agency, health authority, or the College of Physicians and Surgeons 
               of Ontario (CPSO).
-            </p>
-          </div>
+            </span>
+          </p>
           <p className="text-xs text-primary-foreground/70 mt-3">
             For immediate medical care, visit a walk-in clinic or emergency department. 
             Call 911 for emergencies.

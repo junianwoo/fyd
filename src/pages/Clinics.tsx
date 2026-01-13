@@ -29,7 +29,7 @@ export default function Clinics() {
   const [activeQuery, setActiveQuery] = useState(initialQuery);
 
   const [statusFilter, setStatusFilter] = useState<ClinicStatus | "all">("all");
-  const [distanceFilter, setDistanceFilter] = useState("10"); // Default to 10km
+  const [distanceFilter, setDistanceFilter] = useState("5"); // Default to 5km
   const [languageFilter, setLanguageFilter] = useState<string[]>([]);
   const [accessibilityFilter, setAccessibilityFilter] = useState(false);
   const [virtualFilter, setVirtualFilter] = useState(false);
@@ -180,7 +180,7 @@ export default function Clinics() {
 
   const clearFilters = () => {
     setStatusFilter("all");
-    setDistanceFilter("10"); // Reset to default 10km
+    setDistanceFilter("5"); // Reset to default 5km
     setLanguageFilter([]);
     setAccessibilityFilter(false);
     setVirtualFilter(false);

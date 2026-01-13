@@ -437,7 +437,7 @@ export default function HowItWorks() {
               <div className="bg-card p-6 rounded-lg border-l-4 border-status-waitlist">
                 <h3 className="text-xl text-foreground mb-2 flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-status-waitlist"></div>
-                  Waitlist Available
+                  Waitlist Only
                 </h3>
                 <p className="text-muted-foreground">
                   The roster is full, but you can join a waitlist. Ask them how long the wait typically is.
