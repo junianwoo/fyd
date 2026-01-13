@@ -18,7 +18,8 @@ import {
   Languages,
   Users,
   Accessibility,
-  Plus
+  Plus,
+  Trash2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
