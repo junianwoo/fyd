@@ -101,51 +101,55 @@ const ClinicMap = memo(function ClinicMap({
     return `
       <div style="
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        padding: 16px;
-        min-width: 280px;
-        max-width: 350px;
+        padding: 12px;
+        width: 100%;
+        max-width: 280px;
+        box-sizing: border-box;
       ">
-        <div style="margin-bottom: 12px;">
+        <div style="margin-bottom: 10px;">
           <div style="
             display: inline-block;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             ${getStatusBadgeStyles(clinic.acceptingStatus)}
           ">
             ${getStatusText(clinic.acceptingStatus)}
           </div>
           <h3 style="
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin: 8px 0;
+            margin: 6px 0;
             color: #0F4C5C;
-            line-height: 1.4;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
           ">
             ${clinic.name}
           </h3>
         </div>
         
         <p style="
-          font-size: 14px;
+          font-size: 13px;
           color: #6b7280;
-          margin-bottom: 12px;
-          line-height: 1.5;
+          margin-bottom: 10px;
+          line-height: 1.4;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         ">
           ${clinic.address}, ${clinic.city}
         </p>
         
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
           <a 
             href="/clinics/${clinic.id}" 
             target="_blank"
             rel="noopener noreferrer"
             style="
-              flex: 1;
-              min-width: 120px;
-              padding: 8px 16px;
+              display: block;
+              padding: 10px 12px;
               background: #0F4C5C;
               color: white;
               text-decoration: none;
@@ -154,6 +158,7 @@ const ClinicMap = memo(function ClinicMap({
               font-weight: 500;
               text-align: center;
               transition: background 0.2s;
+              box-sizing: border-box;
             "
             onmouseover="this.style.background='#00A6A6'"
             onmouseout="this.style.background='#0F4C5C'"
@@ -163,18 +168,21 @@ const ClinicMap = memo(function ClinicMap({
           <a 
             href="tel:${clinic.phone.replace(/[^0-9]/g, '')}"
             style="
-              padding: 8px 16px;
+              display: block;
+              padding: 10px 12px;
               border: 1.5px solid #0F4C5C;
               border-radius: 6px;
               color: #0F4C5C;
               text-decoration: none;
               font-size: 14px;
               font-weight: 500;
+              text-align: center;
               transition: all 0.2s;
-              white-space: nowrap;
+              box-sizing: border-box;
+              background: white;
             "
             onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='#00A6A6'"
-            onmouseout="this.style.background='transparent'; this.style.borderColor='#0F4C5C'"
+            onmouseout="this.style.background='white'; this.style.borderColor='#0F4C5C'"
           >
             Call Clinic
           </a>
@@ -302,7 +310,7 @@ const ClinicMap = memo(function ClinicMap({
 
     // Initialize InfoWindow once
     infoWindowRef.current = new window.google.maps.InfoWindow({
-      maxWidth: 350,
+      maxWidth: 280,
       disableAutoPan: false,
     });
 
