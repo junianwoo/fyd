@@ -284,7 +284,7 @@ export default function Clinics() {
           </aside>
 
           {/* Right Column - Results */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 w-full max-w-full">
             {/* Header with pagination - only show when there are results */}
             {hasSearched && (
               <div className="flex items-center justify-end mb-6">
@@ -327,7 +327,7 @@ export default function Clinics() {
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
                         {/* Main Content */}
-                        <div className="flex-1 p-4 md:p-6">
+                        <div className="flex-1 p-4 md:p-6 min-w-0">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                               <div className="flex flex-col gap-2 mb-2">
@@ -344,7 +344,7 @@ export default function Clinics() {
                               <div className="flex flex-col gap-2 text-sm">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <MapPin className="h-4 w-4 flex-shrink-0" />
-                                  <span>{clinic.address}, {clinic.city}, {clinic.province} {clinic.postalCode}</span>
+                                  <span className="break-words">{clinic.address}, {clinic.city}, {clinic.province} {clinic.postalCode}</span>
                                 </div>
                                 <a 
                                   href={`tel:${clinic.phone.replace(/[^0-9]/g, "")}`}
@@ -352,7 +352,7 @@ export default function Clinics() {
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <Phone className="h-4 w-4 flex-shrink-0" />
-                                  <span>{clinic.phone}</span>
+                                  <span className="break-all">{clinic.phone}</span>
                                 </a>
                               </div>
 

@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState, memo } from "react";
-import { createPortal } from "react-dom";
 import { Clinic } from "@/lib/clinics";
-import { Loader2, MapPin, ExternalLink, X } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 
 interface ClinicMapProps {
   clinics: Clinic[];
@@ -44,15 +40,13 @@ const ClinicMap = memo(function ClinicMap({
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const circleRef = useRef<google.maps.Circle | null>(null);
-  const infoCardRef = useRef<HTMLDivElement | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const shouldFitBoundsRef = useRef<boolean>(true); // Track if we should auto-fit bounds
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(12);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Calculate marker size category based on zoom level (to avoid recreating markers too frequently)
   const markerSizeCategory = mapZoom >= 16 ? 'small' : mapZoom >= 13 ? 'medium' : 'large';
@@ -74,6 +68,119 @@ const ClinicMap = memo(function ClinicMap({
     }
     
     return Math.floor(baseSize * scaleFactor);
+  };
+
+  // Helper function to get status badge styling
+  const getStatusBadgeStyles = (status: string): string => {
+    switch (status) {
+      case 'accepting':
+        return 'background: #dcfce7; color: #166534;';
+      case 'not_accepting':
+        return 'background: #fee2e2; color: #991b1b;';
+      case 'waitlist':
+        return 'background: #fef3c7; color: #92400e;';
+      case 'unknown':
+      default:
+        return 'background: #f3f4f6; color: #374151;';
+    }
+  };
+
+  // Helper function to get formatted status text
+  const getStatusText = (status: string): string => {
+    const statusMap: Record<string, string> = {
+      'accepting': 'Accepting Patients',
+      'not_accepting': 'Not Accepting',
+      'waitlist': 'Waitlist',
+      'unknown': 'Unknown'
+    };
+    return statusMap[status] || 'Unknown';
+  };
+
+  // Create branded InfoWindow content
+  const createInfoWindowContent = (clinic: Clinic): string => {
+    return `
+      <div style="
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        padding: 16px;
+        min-width: 280px;
+        max-width: 350px;
+      ">
+        <div style="margin-bottom: 12px;">
+          <div style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            ${getStatusBadgeStyles(clinic.acceptingStatus)}
+          ">
+            ${getStatusText(clinic.acceptingStatus)}
+          </div>
+          <h3 style="
+            font-size: 18px;
+            font-weight: 600;
+            margin: 8px 0;
+            color: #0F4C5C;
+            line-height: 1.4;
+          ">
+            ${clinic.name}
+          </h3>
+        </div>
+        
+        <p style="
+          font-size: 14px;
+          color: #6b7280;
+          margin-bottom: 12px;
+          line-height: 1.5;
+        ">
+          ${clinic.address}, ${clinic.city}
+        </p>
+        
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <a 
+            href="/clinics/${clinic.id}" 
+            target="_blank"
+            rel="noopener noreferrer"
+            style="
+              flex: 1;
+              min-width: 120px;
+              padding: 8px 16px;
+              background: #0F4C5C;
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;
+              font-size: 14px;
+              font-weight: 500;
+              text-align: center;
+              transition: background 0.2s;
+            "
+            onmouseover="this.style.background='#00A6A6'"
+            onmouseout="this.style.background='#0F4C5C'"
+          >
+            View Details
+          </a>
+          <a 
+            href="tel:${clinic.phone.replace(/[^0-9]/g, '')}"
+            style="
+              padding: 8px 16px;
+              border: 1.5px solid #0F4C5C;
+              border-radius: 6px;
+              color: #0F4C5C;
+              text-decoration: none;
+              font-size: 14px;
+              font-weight: 500;
+              transition: all 0.2s;
+              white-space: nowrap;
+            "
+            onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='#00A6A6'"
+            onmouseout="this.style.background='transparent'; this.style.borderColor='#0F4C5C'"
+          >
+            Call Clinic
+          </a>
+        </div>
+      </div>
+    `;
   };
 
   // Fetch API key - try env variable first, then edge function
@@ -193,6 +300,12 @@ const ClinicMap = memo(function ClinicMap({
       maxZoom: 18, // Prevent extreme zoom in
     });
 
+    // Initialize InfoWindow once
+    infoWindowRef.current = new window.google.maps.InfoWindow({
+      maxWidth: 350,
+      disableAutoPan: false,
+    });
+
     // Track zoom changes for responsive marker sizing (debounced to prevent interference with user gestures)
     let zoomTimeout: NodeJS.Timeout;
     mapInstanceRef.current.addListener('zoom_changed', () => {
@@ -204,64 +317,6 @@ const ClinicMap = memo(function ClinicMap({
         }
       }, 150); // Debounce by 150ms to avoid recreating markers during active zoom gestures
     });
-
-    // Listen for both browser and Google Maps fullscreen changes
-    const handleFullscreenChange = () => {
-      // Check browser fullscreen API
-      const browserFullscreen = !!(
-        document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
-      );
-      
-      // Check if map container or any parent has fullscreen-related attributes
-      const mapContainer = mapRef.current;
-      const mapDiv = mapContainer?.querySelector('.gm-style');
-      const hasFullscreenControl = !!mapContainer?.querySelector('[aria-label*="fullscreen"]');
-      
-      // Check for various fullscreen indicators
-      const gmFullscreen = 
-        mapContainer?.classList.contains('gm-style-fullscreen') || 
-        mapDiv?.classList.contains('gm-style-fullscreen') ||
-        !!document.querySelector('.gm-style-fullscreen') ||
-        // Check if viewport dimensions match screen (mobile fullscreen)
-        (window.innerHeight === screen.height && window.innerWidth === screen.width);
-      
-      const isFullscreenNow = browserFullscreen || gmFullscreen;
-      
-      // Only log when state changes to reduce console spam
-      if (isFullscreenNow !== isFullscreen) {
-        console.log('Fullscreen state changed:', { browserFullscreen, gmFullscreen, isFullscreenNow, screenHeight: screen.height, windowHeight: window.innerHeight });
-        setIsFullscreen(isFullscreenNow);
-      }
-    };
-
-    // Listen to browser fullscreen events
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-    // Listen to Google Maps fullscreen control clicks
-    const fullscreenListener = google.maps.event.addListener(
-      mapInstanceRef.current, 
-      'isfullscreen_changed', 
-      handleFullscreenChange
-    );
-
-    // Check once initially
-    handleFullscreenChange();
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
-      if (fullscreenListener) {
-        google.maps.event.removeListener(fullscreenListener);
-      }
-    };
   }, [loading, error, userLocation]);
 
   // Update radius circle and center map on search location
@@ -381,12 +436,18 @@ const ClinicMap = memo(function ClinicMap({
       });
 
       marker.addListener("click", () => {
-        setSelectedClinic(clinic);
-        // Center map on clicked marker with smooth animation
-        if (mapInstanceRef.current) {
+        // Open InfoWindow with branded content
+        if (infoWindowRef.current && mapInstanceRef.current) {
+          const content = createInfoWindowContent(clinic);
+          infoWindowRef.current.setContent(content);
+          infoWindowRef.current.open({
+            anchor: marker,
+            map: mapInstanceRef.current,
+          });
+          
+          // Pan map to show marker and InfoWindow
           mapInstanceRef.current.panTo(position);
         }
-        // Note: Removed onClinicSelect call - we only show on-map card now
       });
 
       markersRef.current.push(marker);
@@ -404,18 +465,6 @@ const ClinicMap = memo(function ClinicMap({
     shouldFitBoundsRef.current = true;
   }, [clinics, searchLocation]);
 
-  // Close info card when clicking on map
-  useEffect(() => {
-    if (!mapInstanceRef.current || !window.google?.maps) return;
-
-    const listener = window.google.maps.event.addListener(mapInstanceRef.current, "click", () => {
-      setSelectedClinic(null);
-    });
-
-    return () => {
-      window.google.maps.event.removeListener(listener);
-    };
-  }, []);
 
   if (error) {
     return (
@@ -439,85 +488,9 @@ const ClinicMap = memo(function ClinicMap({
     );
   }
 
-  // Render the info card
-  const renderInfoCard = () => {
-    if (!selectedClinic) return null;
-
-    const cardContent = (
-      <div 
-        key={`clinic-card-${isFullscreen ? 'fullscreen' : 'normal'}`}
-        className={`
-          ${isFullscreen ? 'fixed' : 'absolute'} 
-          bottom-8 left-1/2 
-          ${isFullscreen ? 'z-[2147483647]' : 'z-[1000]'} 
-          w-11/12 max-w-md pointer-events-none
-        `}
-        style={{
-          transform: 'translateX(-50%)',
-          position: isFullscreen ? 'fixed' : 'absolute'
-        }}
-      >
-        <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-foreground mb-1">
-                {selectedClinic.name}
-              </h3>
-              <StatusBadge status={selectedClinic.acceptingStatus} size="sm" />
-            </div>
-            <button
-              onClick={() => setSelectedClinic(null)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          
-          <p className="text-sm text-muted-foreground mb-3">
-            {selectedClinic.address}, {selectedClinic.city}
-          </p>
-          
-          <div className="flex gap-2">
-            <Button size="sm" asChild className="flex-1">
-              <a href={`/clinics/${selectedClinic.id}`} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3 w-3 mr-1" />
-                View Details
-              </a>
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              asChild
-            >
-              <a href={`tel:${selectedClinic.phone.replace(/[^0-9]/g, "")}`}>
-                Call Clinic
-              </a>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-
-    // If in fullscreen, portal to the fullscreen element
-    if (isFullscreen) {
-      const fullscreenElement = document.fullscreenElement || 
-                                (document as any).webkitFullscreenElement || 
-                                (document as any).mozFullScreenElement ||
-                                (document as any).msFullscreenElement ||
-                                mapRef.current;
-      
-      if (fullscreenElement) {
-        return createPortal(cardContent, fullscreenElement as Element);
-      }
-    }
-
-    return cardContent;
-  };
-
   return (
     <div className="relative w-full">
       <div ref={mapRef} className={`w-full ${className}`} />
-      {renderInfoCard()}
     </div>
   );
 });
