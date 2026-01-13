@@ -735,7 +735,7 @@ export default function Pricing() {
                 Not sure if you need alerts? Start with free search and upgrade later if you want.
               </p>
               <Button size="lg" className="w-full" asChild>
-                <Link to="/doctors">Start Searching for Free</Link>
+                <Link to="/clinics">Start Searching for Free</Link>
               </Button>
             </div>
             

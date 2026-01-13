@@ -292,7 +292,7 @@ export default function Resources() {
                 Use our free search to find family doctors accepting patients near you.
               </p>
               <Link 
-                to="/doctors"
+                to="/clinics"
                 className="inline-flex items-center text-secondary hover:text-primary transition-colors font-semibold"
               >
                 Start Searching <ArrowRight className="h-4 w-4 ml-1" />

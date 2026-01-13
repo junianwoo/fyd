@@ -247,7 +247,7 @@ serve(async (req) => {
           
           <div style="background: #F3FBFA; padding: 16px; border-radius: 8px; margin: 24px 0;">
             <p style="margin: 0; font-size: 14px; color: #666; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              <strong>Always Free:</strong> Search our doctor database anytime at <a href="${siteUrl}/doctors" style="color: #00A6A6; text-decoration: none;">findyourdoctor.ca/doctors</a>
+              <strong>Always Free:</strong> Search our clinic database anytime at <a href="${siteUrl}/clinics" style="color: #00A6A6; text-decoration: none;">findyourdoctor.ca/clinics</a>
             </p>
           </div>
           

@@ -322,6 +322,10 @@ const ClinicMap = memo(function ClinicMap({
 
       marker.addListener("click", () => {
         setSelectedClinic(clinic);
+        // Center map on clicked marker with smooth animation
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.panTo(position);
+        }
         // Note: Removed onClinicSelect call - we only show on-map card now
       });
 
@@ -379,10 +383,10 @@ const ClinicMap = memo(function ClinicMap({
     <div className="relative w-full">
       <div ref={mapRef} className={`w-full ${className}`} />
       
-      {/* Custom Info Card Overlay */}
+      {/* Custom Info Card Overlay - positioned to work in both normal and fullscreen mode */}
       {selectedClinic && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[1000] w-11/12 max-w-md pointer-events-none">
+          <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">

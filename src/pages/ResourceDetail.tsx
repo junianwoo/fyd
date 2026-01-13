@@ -188,7 +188,7 @@ export default function ResourceDetail() {
                 Use our free search to find family doctors accepting patients near you.
               </p>
               <Button asChild>
-                <Link to="/doctors">Search Doctors</Link>
+                <Link to="/clinics">Search Clinics</Link>
               </Button>
             </div>
           </div>

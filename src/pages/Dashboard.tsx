@@ -45,7 +45,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { analyzePostalCode } from "@/lib/doctors";
+import { analyzePostalCode } from "@/lib/clinics";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   assisted_reason?: string | null;

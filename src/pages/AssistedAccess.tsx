@@ -532,7 +532,7 @@ export default function AssistedAccess() {
                 Remember, searching our clinic directory is completely free and requires no signup. You can check anytime for accepting clinics without any barriers.
               </p>
               <Button variant="outline" size="lg" asChild>
-                <Link to="/doctors">Browse Clinics for Free</Link>
+                <Link to="/clinics">Browse Clinics for Free</Link>
               </Button>
             </div>
           </div>

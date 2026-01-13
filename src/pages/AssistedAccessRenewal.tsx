@@ -134,7 +134,7 @@ export default function AssistedAccessRenewal() {
                   <Link to="/dashboard">Go to Dashboard</Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1">
-                  <Link to="/doctors">Search Doctors</Link>
+                  <Link to="/clinics">Search Clinics</Link>
                 </Button>
               </div>
 

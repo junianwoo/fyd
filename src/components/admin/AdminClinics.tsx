@@ -511,7 +511,7 @@ export default function AdminClinics() {
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/doctors/${doctor.id}`} target="_blank">
+                          <Link to={`/clinics/${doctor.id}`} target="_blank">
                             <ExternalLink className="h-4 w-4" />
                           </Link>
                         </Button>

@@ -15,8 +15,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 interface AlertEmailRequest {
-  doctorId: string;
-  doctorName: string;
+  clinicId: string;
   clinicName: string;
   city: string;
   phone: string;
@@ -34,8 +33,7 @@ serve(async (req) => {
     logStep("Function started");
 
     const { 
-      doctorId, 
-      doctorName, 
+      clinicId, 
       clinicName, 
       city, 
       phone, 
@@ -44,14 +42,14 @@ serve(async (req) => {
       recipientCity 
     }: AlertEmailRequest = await req.json();
 
-    logStep("Sending alert email", { recipientEmail, doctorName, city });
+    logStep("Sending alert email", { recipientEmail, clinicName, city });
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://findyourdoctor.ca";
     
     // Build email body content
-    const doctorCard = getCard(`
-      <h2 style="margin: 0 0 8px 0; color: #1a1a1a; font-size: 22px; font-family: Georgia, 'Times New Roman', serif;">${doctorName}</h2>
-      <p style="margin: 0 0 16px 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${clinicName}</p>
+    const clinicCard = getCard(`
+      <h2 style="margin: 0 0 8px 0; color: #1a1a1a; font-size: 22px; font-family: Georgia, 'Times New Roman', serif;">${clinicName}</h2>
+      <p style="margin: 0 0 16px 0; color: #666; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Family Practice Clinic</p>
       
       <div style="margin-bottom: 20px;">
         <p style="margin: 0 0 4px 0; font-size: 15px; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -62,18 +60,18 @@ serve(async (req) => {
       ${getPhoneButton(phone, phone)}
       
       <div style="margin-top: 16px;">
-        <a href="${siteUrl}/doctors/${doctorId}" style="color: #00A6A6; font-size: 14px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <a href="${siteUrl}/clinics/${clinicId}" style="color: #00A6A6; font-size: 14px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           View Full Details →
         </a>
       </div>
     `, '#2ECC71');
     
     const bodyContent = `
-      ${doctorCard}
+      ${clinicCard}
       
       <div style="background: #FEF3C7; border-left: 4px solid #F4A261; padding: 16px; border-radius: 8px; margin: 24px 0;">
         <p style="margin: 0; font-size: 15px; color: #92400E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <strong>⚡ Act fast!</strong> Doctors fill up quickly. We recommend calling as soon as possible to secure your spot.
+          <strong>⚡ Act fast!</strong> Clinics fill up quickly. We recommend calling as soon as possible to secure your spot.
         </p>
       </div>
       
@@ -84,7 +82,7 @@ serve(async (req) => {
     
     const html = buildEmail({
       headerTitle: '🎉 Great News!',
-      headerSubtitle: `A doctor near ${recipientCity} is now accepting patients`,
+      headerSubtitle: `A clinic near ${recipientCity} is now accepting patients`,
       bodyContent,
       siteUrl,
       includeUnsubscribe: true,
@@ -94,7 +92,7 @@ serve(async (req) => {
       from: ALERT_EMAIL_OPTIONS.from!,
       reply_to: ALERT_EMAIL_OPTIONS.replyTo!,
       to: [recipientEmail],
-      subject: `🎉 Doctor Alert: ${doctorName} is now accepting patients in ${city}!`,
+      subject: `🎉 Clinic Alert: ${clinicName} is now accepting patients in ${city}!`,
       html,
     });
 

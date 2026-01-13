@@ -169,7 +169,7 @@ export default function Auth() {
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          <Link to="/doctors" className="text-secondary hover:underline">
+          <Link to="/clinics" className="text-secondary hover:underline">
             ← Back to doctor search
           </Link>
         </p>
