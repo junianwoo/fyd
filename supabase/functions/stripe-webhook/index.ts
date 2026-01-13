@@ -191,9 +191,11 @@ serve(async (req) => {
               status: "alert_service",
             };
 
-            // Log if upgrading from assisted_access
+            // If upgrading from assisted_access, clear assisted access fields
             if (currentProfile?.status === "assisted_access") {
-              logStep("Upgrading from assisted_access to alert_service", { userId });
+              logStep("Upgrading from assisted_access to alert_service - clearing assisted fields", { userId });
+              updateData.assisted_reason = null;
+              updateData.assisted_expires_at = null;
             }
 
             const { error } = await supabase
@@ -204,7 +206,7 @@ serve(async (req) => {
             if (error) {
               logStep("ERROR updating profile", { error, userId });
             } else {
-              logStep("Profile updated successfully", { userId, status: "alert_service", wasAssistedAccess: currentProfile?.status === "assisted_access" });
+              logStep("Profile updated successfully", { userId, status: "alert_service", wasAssistedAccess: currentProfile?.status === "assisted_access", clearedAssistedFields: currentProfile?.status === "assisted_access" });
             }
           }
         }

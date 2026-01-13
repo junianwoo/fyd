@@ -82,6 +82,87 @@ export type Database = {
           },
         ]
       }
+      clinics: {
+        Row: {
+          accepting_status: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features: string[] | null
+          address: string
+          age_groups_served: string[] | null
+          city: string
+          claimed_by_clinic: boolean | null
+          name: string
+          community_report_count: number | null
+          created_at: string | null
+          email: string | null
+          id: string
+          languages: string[] | null
+          latitude: number
+          longitude: number
+          phone: string
+          postal_code: string
+          profile_last_updated_at: string | null
+          province: string
+          status_last_updated_at: string | null
+          status_verified_by:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments: boolean | null
+          website: string | null
+        }
+        Insert: {
+          accepting_status?: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features?: string[] | null
+          address: string
+          age_groups_served?: string[] | null
+          city: string
+          claimed_by_clinic?: boolean | null
+          name: string
+          community_report_count?: number | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          languages?: string[] | null
+          latitude: number
+          longitude: number
+          phone: string
+          postal_code: string
+          profile_last_updated_at?: string | null
+          province?: string
+          status_last_updated_at?: string | null
+          status_verified_by?:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          accepting_status?: Database["public"]["Enums"]["accepting_status"]
+          accessibility_features?: string[] | null
+          address?: string
+          age_groups_served?: string[] | null
+          city?: string
+          claimed_by_clinic?: boolean | null
+          name?: string
+          community_report_count?: number | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          languages?: string[] | null
+          latitude?: number
+          longitude?: number
+          phone?: string
+          postal_code?: string
+          profile_last_updated_at?: string | null
+          province?: string
+          status_last_updated_at?: string | null
+          status_verified_by?:
+            | Database["public"]["Enums"]["verification_source"]
+            | null
+          virtual_appointments?: boolean | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
           accepting_status: Database["public"]["Enums"]["accepting_status"]

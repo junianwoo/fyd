@@ -23,7 +23,7 @@ export function ClinicPagination({
 
   return (
     <div className="flex items-center gap-4">
-      <p className="text-sm text-muted-foreground flex-1">
+      <p className="text-sm text-muted-foreground whitespace-nowrap">
         Showing {startItem}-{endItem} of {totalItems} clinics
       </p>
       <div className="flex items-center gap-2">

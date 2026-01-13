@@ -50,6 +50,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
@@ -58,17 +69,17 @@ const LANGUAGE_OPTIONS = ["English", "French", "Mandarin", "Cantonese", "Punjabi
 const ACCESSIBILITY_OPTIONS = ["Wheelchair Accessible", "Accessible Parking", "Elevator Access", "Accessible Washroom", "TTY/TDD Service"];
 const AGE_GROUP_OPTIONS = ["Children (0-12)", "Teens (13-17)", "Adults (18-64)", "Seniors (65+)"];
 
-type Doctor = Database["public"]["Tables"]["doctors"]["Row"];
+type Clinic = Database["public"]["Tables"]["clinics"]["Row"];
 type AcceptingStatus = Database["public"]["Enums"]["accepting_status"];
 
 export default function AdminClinics() {
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AcceptingStatus | "all">("all");
-  const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+  const [editingClinic, setEditingClinic] = useState<Clinic | null>(null);
   const [creatingClinic, setCreatingClinic] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Doctor>>({});
+  const [editForm, setEditForm] = useState<Partial<Clinic>>({});
   const [saving, setSaving] = useState(false);
   const [testingAlertId, setTestingAlertId] = useState<string | null>(null);
   const [stats, setStats] = useState({
@@ -82,7 +93,7 @@ export default function AdminClinics() {
 
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const loadDoctors = async () => {
+  const loadClinics = async () => {
     setLoading(true);
     
     // Get accurate counts for all statuses (query the full dataset, not just the limited results)
@@ -110,7 +121,8 @@ export default function AdminClinics() {
     
     // Apply search filter server-side
     if (searchQuery.trim()) {
-      query = query.or(`name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,postal_code.ilike.%${searchQuery}%`);
+      const searchTerm = searchQuery.trim();
+      query = query.or(`name.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%,postal_code.ilike.%${searchTerm}%`);
     }
     
     // Apply status filter server-side
@@ -123,8 +135,13 @@ export default function AdminClinics() {
     
     const { data, error, count } = await query;
 
+    if (error) {
+      console.error("Error loading clinics:", error);
+      toast.error("Failed to load clinics: " + error.message);
+    }
+
     if (!error && data) {
-      setDoctors(data);
+      setClinics(data);
       setStats({
         total: totalCount || 0,
         accepting: acceptingCount || 0,
@@ -147,7 +164,7 @@ export default function AdminClinics() {
     
     // Set new timeout for debounced search
     searchTimeoutRef.current = setTimeout(() => {
-      loadDoctors();
+      loadClinics();
     }, 300);
     
     // Cleanup on unmount
@@ -158,31 +175,31 @@ export default function AdminClinics() {
     };
   }, [searchQuery, statusFilter]);
 
-  const openEditDialog = (doctor: Doctor) => {
-    setEditingDoctor(doctor);
+  const openEditDialog = (clinic: Clinic) => {
+    setEditingClinic(clinic);
     setCreatingClinic(false);
     setEditForm({
-      name: doctor.name,
-      address: doctor.address,
-      city: doctor.city,
-      province: doctor.province,
-      postal_code: doctor.postal_code,
-      phone: doctor.phone,
-      email: doctor.email,
-      website: doctor.website,
-      accepting_status: doctor.accepting_status,
-      virtual_appointments: doctor.virtual_appointments,
-      languages: doctor.languages || ["English"],
-      accessibility_features: doctor.accessibility_features || [],
-      age_groups_served: doctor.age_groups_served || ["Adults (18-64)"],
-      latitude: doctor.latitude,
-      longitude: doctor.longitude,
+      name: clinic.name,
+      address: clinic.address,
+      city: clinic.city,
+      province: clinic.province,
+      postal_code: clinic.postal_code,
+      phone: clinic.phone,
+      email: clinic.email,
+      website: clinic.website,
+      accepting_status: clinic.accepting_status,
+      virtual_appointments: clinic.virtual_appointments,
+      languages: clinic.languages || ["English"],
+      accessibility_features: clinic.accessibility_features || [],
+      age_groups_served: clinic.age_groups_served || ["Adults (18-64)"],
+      latitude: clinic.latitude,
+      longitude: clinic.longitude,
     });
   };
 
   const openCreateDialog = () => {
     setCreatingClinic(true);
-    setEditingDoctor(null);
+    setEditingClinic(null);
     setEditForm({
       name: "",
       address: "",
@@ -210,7 +227,7 @@ export default function AdminClinics() {
     }
   };
 
-  const handleSaveDoctor = async () => {
+  const handleSaveClinic = async () => {
     setSaving(true);
     
     // Validate required fields
@@ -245,9 +262,9 @@ export default function AdminClinics() {
       } else {
         toast.success("Clinic created successfully");
         setCreatingClinic(false);
-        loadDoctors();
+        loadClinics();
       }
-    } else if (editingDoctor) {
+    } else if (editingClinic) {
       // Update existing clinic
       const { error } = await supabase
         .from("clinics")
@@ -256,27 +273,27 @@ export default function AdminClinics() {
           status_last_updated_at: new Date().toISOString(),
           status_verified_by: "admin" as const,
         })
-        .eq("id", editingDoctor.id);
+        .eq("id", editingClinic.id);
 
       if (error) {
         toast.error("Failed to update clinic");
         console.error(error);
       } else {
         toast.success("Clinic updated successfully");
-        setEditingDoctor(null);
-        loadDoctors();
+        setEditingClinic(null);
+        loadClinics();
       }
     }
     
     setSaving(false);
   };
 
-  const handleTestAlert = async (doctorId: string) => {
-    setTestingAlertId(doctorId);
+  const handleTestAlert = async (clinicId: string) => {
+    setTestingAlertId(clinicId);
     
     try {
       const { data, error } = await supabase.functions.invoke('run-alert-engine', {
-        body: { doctorId }
+        body: { doctorId: clinicId }  // Keep doctorId param name for backward compatibility with edge function
       });
       
       if (error) {
@@ -291,8 +308,22 @@ export default function AdminClinics() {
     }
   };
 
-  // Server-side filtering is now handled in loadDoctors, so filteredDoctors = doctors
-  const filteredDoctors = doctors;
+  const handleDeleteClinic = async (clinicId: string) => {
+    const { error } = await supabase
+      .from("clinics")
+      .delete()
+      .eq("id", clinicId);
+
+    if (error) {
+      toast.error("Failed to delete clinic: " + error.message);
+    } else {
+      toast.success("Clinic deleted successfully");
+      loadClinics();
+    }
+  };
+
+  // Server-side filtering is now handled in loadClinics, so filteredClinics = clinics
+  const filteredClinics = clinics;
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "—";
@@ -440,7 +471,7 @@ export default function AdminClinics() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-secondary" />
             </div>
-          ) : filteredDoctors.length === 0 ? (
+          ) : filteredClinics.length === 0 ? (
             <div className="text-center py-8">
               <Stethoscope className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">No clinics found</p>
@@ -458,12 +489,12 @@ export default function AdminClinics() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredDoctors.map((doctor) => (
-                  <TableRow key={doctor.id}>
+                {filteredClinics.map((clinic) => (
+                  <TableRow key={clinic.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{doctor.name}</span>
-                        {doctor.claimed_by_doctor && (
+                        <span className="font-medium">{clinic.name}</span>
+                        {clinic.claimed_by_clinic && (
                           <Badge variant="outline" className="text-xs">
                             <CheckCircle className="h-3 w-3 mr-1 text-blue-500" />
                             Claimed
@@ -474,29 +505,29 @@ export default function AdminClinics() {
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm">
                         <MapPin className="h-3 w-3 text-muted-foreground" />
-                        {doctor.city}, {doctor.province}
+                        {clinic.city}, {clinic.province}
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(doctor.accepting_status)}</TableCell>
+                    <TableCell>{getStatusBadge(clinic.accepting_status)}</TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground capitalize">
-                        {doctor.status_verified_by || "—"}
+                        {clinic.status_verified_by || "—"}
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(doctor.status_last_updated_at)}
+                      {formatDate(clinic.status_last_updated_at)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-2">
-                        {doctor.accepting_status === "accepting" && (
+                        {clinic.accepting_status === "accepting" && (
                           <Button 
                             variant="ghost" 
                             size="icon"
-                            onClick={() => handleTestAlert(doctor.id)}
-                            disabled={testingAlertId === doctor.id}
+                            onClick={() => handleTestAlert(clinic.id)}
+                            disabled={testingAlertId === clinic.id}
                             title="Test alert emails"
                           >
-                            {testingAlertId === doctor.id ? (
+                            {testingAlertId === clinic.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                               <Bell className="h-4 w-4" />
@@ -506,15 +537,40 @@ export default function AdminClinics() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={() => openEditDialog(doctor)}
+                          onClick={() => openEditDialog(clinic)}
+                          title="Edit clinic"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/clinics/${doctor.id}`} target="_blank">
+                        <Button variant="ghost" size="icon" asChild title="View clinic">
+                          <Link to={`/clinics/${clinic.id}`} target="_blank">
                             <ExternalLink className="h-4 w-4" />
                           </Link>
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" title="Delete clinic">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Clinic</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete "{clinic.name}"? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteClinic(clinic.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -522,11 +578,11 @@ export default function AdminClinics() {
               </TableBody>
             </Table>
           )}
-          {!loading && filteredDoctors.length > 0 && (
+          {!loading && filteredClinics.length > 0 && (
             <p className="text-sm text-muted-foreground mt-4 text-center">
               {searchQuery || statusFilter !== "all" 
-                ? `Showing ${filteredDoctors.length} matching clinics (of ${stats.total} total)`
-                : `Showing ${filteredDoctors.length} clinics (of ${stats.total} total) - Use search to find specific clinics`
+                ? `Showing ${filteredClinics.length} matching clinics (of ${stats.total} total)`
+                : `Showing ${filteredClinics.length} clinics (of ${stats.total} total) - Use search to find specific clinics`
               }
             </p>
           )}
@@ -534,8 +590,8 @@ export default function AdminClinics() {
       </Card>
 
       {/* Edit/Create Clinic Dialog */}
-      <Dialog open={!!editingDoctor || creatingClinic} onOpenChange={() => {
-        setEditingDoctor(null);
+      <Dialog open={!!editingClinic || creatingClinic} onOpenChange={() => {
+        setEditingClinic(null);
         setCreatingClinic(false);
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -751,13 +807,13 @@ export default function AdminClinics() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => {
-              setEditingDoctor(null);
+              setEditingClinic(null);
               setCreatingClinic(false);
             }}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSaveDoctor} disabled={saving}>
+            <Button onClick={handleSaveClinic} disabled={saving}>
               {saving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (

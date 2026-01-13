@@ -287,7 +287,7 @@ export default function Clinics() {
           <div className="flex-1 min-w-0">
             {/* Header with pagination - only show when there are results */}
             {hasSearched && (
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-end mb-6">
                 {loading ? (
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
