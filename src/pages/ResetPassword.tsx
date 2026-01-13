@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import logoColour from "@/assets/logo-colour.png";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -117,9 +116,6 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <Link to="/" className="inline-block mx-auto mb-4">
-            <img src={logoColour} alt="Find Your Doctor" className="h-12" />
-          </Link>
           <CardTitle className="text-2xl">Set Your Password</CardTitle>
           <CardDescription>
             Create a secure password for your account

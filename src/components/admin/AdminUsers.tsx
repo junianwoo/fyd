@@ -7,11 +7,14 @@ import {
   Calendar,
   CreditCard,
   Heart,
-  User as UserIcon
+  User as UserIcon,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -27,8 +30,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type UserStatus = Database["public"]["Enums"]["user_status"];
@@ -38,6 +61,10 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [editUser, setEditUser] = useState<Profile | null>(null);
+  const [editStatus, setEditStatus] = useState<UserStatus>("free");
+  const [actionLoading, setActionLoading] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     alertService: 0,
@@ -110,6 +137,51 @@ export default function AdminUsers() {
       return <Badge className="bg-yellow-100 text-yellow-800">Canceling</Badge>;
     }
     return <span className="text-muted-foreground text-sm">—</span>;
+  };
+
+  const handleEditUser = (profile: Profile) => {
+    setEditUser(profile);
+    setEditStatus(profile.status);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editUser) return;
+    
+    setActionLoading(true);
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({ status: editStatus })
+      .eq("id", editUser.id);
+
+    if (error) {
+      toast.error(`Failed to update user: ${error.message}`);
+    } else {
+      toast.success("User updated successfully");
+      loadProfiles();
+      setEditUser(null);
+    }
+    
+    setActionLoading(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteUserId) return;
+    
+    setActionLoading(true);
+    
+    // Delete from auth.users (this will cascade to profiles via trigger)
+    const { error } = await supabase.auth.admin.deleteUser(deleteUserId);
+
+    if (error) {
+      toast.error(`Failed to delete user: ${error.message}`);
+    } else {
+      toast.success("User deleted successfully");
+      loadProfiles();
+    }
+    
+    setActionLoading(false);
+    setDeleteUserId(null);
   };
 
   return (
@@ -217,6 +289,7 @@ export default function AdminUsers() {
                   <TableHead>Assisted Reason</TableHead>
                   <TableHead>Expires</TableHead>
                   <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -252,6 +325,26 @@ export default function AdminUsers() {
                     <TableCell className="text-muted-foreground">
                       {formatDate(profile.created_at)}
                     </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditUser(profile)}
+                          title="Edit user"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => setDeleteUserId(profile.user_id)}
+                          title="Delete user"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -259,6 +352,87 @@ export default function AdminUsers() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit User Dialog */}
+      <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update the account status for {editUser?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-status">Account Status</Label>
+              <Select 
+                value={editStatus} 
+                onValueChange={(value) => setEditStatus(value as UserStatus)}
+              >
+                <SelectTrigger id="edit-status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="alert_service">Alert Service</SelectItem>
+                  <SelectItem value="assisted_access">Assisted Access</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setEditUser(null)}
+              disabled={actionLoading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveEdit}
+              disabled={actionLoading}
+            >
+              {actionLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <AlertDialog open={!!deleteUserId} onOpenChange={() => setDeleteUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this user and all their data. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={actionLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {actionLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

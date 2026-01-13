@@ -72,7 +72,7 @@ export default function AdminModeration() {
     setLoading(true);
     
     // Load pending updates
-    const { data: pending } = await supabase
+    const { data: pending, error: pendingError } = await supabase
       .from("pending_updates")
       .select(`
         *,
@@ -85,12 +85,16 @@ export default function AdminModeration() {
       .order("updated_at", { ascending: false })
       .limit(50);
 
-    if (pending) {
+    if (pendingError) {
+      console.error("Error loading pending updates:", pendingError);
+      toast.error(`Failed to load pending updates: ${pendingError.message}`);
+    } else if (pending) {
+      console.log("Loaded pending updates:", pending);
       setPendingUpdates(pending as PendingUpdateWithClinic[]);
     }
 
     // Load recent community reports
-    const { data: reports } = await supabase
+    const { data: reports, error: reportsError } = await supabase
       .from("community_reports")
       .select(`
         *,
@@ -102,7 +106,11 @@ export default function AdminModeration() {
       .order("reported_at", { ascending: false })
       .limit(50);
 
-    if (reports) {
+    if (reportsError) {
+      console.error("Error loading community reports:", reportsError);
+      toast.error(`Failed to load community reports: ${reportsError.message}`);
+    } else if (reports) {
+      console.log("Loaded community reports:", reports);
       setRecentReports(reports as CommunityReportWithClinic[]);
     }
     

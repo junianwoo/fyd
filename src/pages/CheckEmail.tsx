@@ -4,7 +4,6 @@ import { Mail, CheckCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import logoColour from "@/assets/logo-colour.png";
 
 export default function CheckEmail() {
   const [searchParams] = useSearchParams();
@@ -41,9 +40,6 @@ export default function CheckEmail() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="max-w-lg w-full">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <img src={logoColour} alt="Find Your Doctor" className="h-12" />
-          </div>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center">
               <Mail className="h-8 w-8 text-accent" />
