@@ -313,25 +313,11 @@ export default function AssistedAccess() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={emailExists ? "border-destructive" : ""}
                     required
                   />
                   <p className="text-sm text-muted-foreground">
                     We'll send your Alert Service access to this email.
                   </p>
-                  {checkingEmail && (
-                    <p className="text-xs text-muted-foreground">Checking email...</p>
-                  )}
-                  {emailExists && !checkingEmail && (
-                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 mt-2">
-                      <p className="text-sm text-destructive font-semibold">
-                        This email already has an account
-                      </p>
-                      <p className="text-xs text-destructive/80 mt-1">
-                        If you already have Alert Service or Assisted Access, please <a href="/auth" className="underline font-semibold">sign in</a> instead.
-                      </p>
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2">
