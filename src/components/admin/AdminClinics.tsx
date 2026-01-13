@@ -111,7 +111,7 @@ export default function AdminClinics() {
       supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "not_accepting"),
       supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "waitlist"),
       supabase.from("clinics").select("*", { count: "exact", head: true }).eq("accepting_status", "unknown"),
-      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("claimed_by_doctor", true)
+      supabase.from("clinics").select("*", { count: "exact", head: true }).eq("claimed_by_clinic", true)
     ]);
     
     // Build query with server-side filtering (for display table only)
