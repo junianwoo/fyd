@@ -214,15 +214,26 @@ const ClinicMap = memo(function ClinicMap({
         (document as any).msFullscreenElement
       );
       
-      // Check if map container has fullscreen class (Google Maps adds this)
+      // Check if map container or any parent has fullscreen-related attributes
       const mapContainer = mapRef.current;
-      const gmFullscreen = mapContainer?.classList.contains('gm-style-fullscreen') || 
-                          mapContainer?.parentElement?.classList.contains('gm-style-fullscreen') ||
-                          !!mapContainer?.closest('.gm-style-fullscreen');
+      const mapDiv = mapContainer?.querySelector('.gm-style');
+      const hasFullscreenControl = !!mapContainer?.querySelector('[aria-label*="fullscreen"]');
+      
+      // Check for various fullscreen indicators
+      const gmFullscreen = 
+        mapContainer?.classList.contains('gm-style-fullscreen') || 
+        mapDiv?.classList.contains('gm-style-fullscreen') ||
+        !!document.querySelector('.gm-style-fullscreen') ||
+        // Check if viewport dimensions match screen (mobile fullscreen)
+        (window.innerHeight === screen.height && window.innerWidth === screen.width);
       
       const isFullscreenNow = browserFullscreen || gmFullscreen;
-      console.log('Fullscreen state:', { browserFullscreen, gmFullscreen, isFullscreenNow });
-      setIsFullscreen(isFullscreenNow);
+      
+      // Only log when state changes to reduce console spam
+      if (isFullscreenNow !== isFullscreen) {
+        console.log('Fullscreen state changed:', { browserFullscreen, gmFullscreen, isFullscreenNow, screenHeight: screen.height, windowHeight: window.innerHeight });
+        setIsFullscreen(isFullscreenNow);
+      }
     };
 
     // Listen to browser fullscreen events
@@ -231,18 +242,24 @@ const ClinicMap = memo(function ClinicMap({
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
-    // Listen to Google Maps fullscreen events
-    google.maps.event.addListener(mapInstanceRef.current, 'isfullscreen_changed', handleFullscreenChange);
+    // Listen to Google Maps fullscreen control clicks
+    const fullscreenListener = google.maps.event.addListener(
+      mapInstanceRef.current, 
+      'isfullscreen_changed', 
+      handleFullscreenChange
+    );
 
-    // Also poll for changes (fallback for cases where events don't fire)
-    const pollInterval = setInterval(handleFullscreenChange, 500);
+    // Check once initially
+    handleFullscreenChange();
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
-      clearInterval(pollInterval);
+      if (fullscreenListener) {
+        google.maps.event.removeListener(fullscreenListener);
+      }
     };
   }, [loading, error, userLocation]);
 
