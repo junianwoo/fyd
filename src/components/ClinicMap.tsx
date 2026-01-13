@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, memo } from "react";
+import { createPortal } from "react-dom";
 import { Clinic } from "@/lib/clinics";
 import { Loader2, MapPin, ExternalLink, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -438,60 +439,81 @@ const ClinicMap = memo(function ClinicMap({
     );
   }
 
+  // Render the info card
+  const renderInfoCard = () => {
+    if (!selectedClinic) return null;
+
+    const cardContent = (
+      <div 
+        className={`
+          ${isFullscreen ? 'fixed' : 'absolute'} 
+          bottom-8 left-1/2 transform -translate-x-1/2 
+          ${isFullscreen ? 'z-[2147483647]' : 'z-[1000]'} 
+          w-11/12 max-w-md pointer-events-none
+        `}
+        style={isFullscreen ? { position: 'fixed' } : {}}
+      >
+        <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-foreground mb-1">
+                {selectedClinic.name}
+              </h3>
+              <StatusBadge status={selectedClinic.acceptingStatus} size="sm" />
+            </div>
+            <button
+              onClick={() => setSelectedClinic(null)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          <p className="text-sm text-muted-foreground mb-3">
+            {selectedClinic.address}, {selectedClinic.city}
+          </p>
+          
+          <div className="flex gap-2">
+            <Button size="sm" asChild className="flex-1">
+              <a href={`/clinics/${selectedClinic.id}`} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-3 w-3 mr-1" />
+                View Details
+              </a>
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              asChild
+            >
+              <a href={`tel:${selectedClinic.phone.replace(/[^0-9]/g, "")}`}>
+                Call Clinic
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+
+    // If in fullscreen, portal to the fullscreen element
+    if (isFullscreen) {
+      const fullscreenElement = document.fullscreenElement || 
+                                (document as any).webkitFullscreenElement || 
+                                (document as any).mozFullScreenElement ||
+                                (document as any).msFullscreenElement ||
+                                mapRef.current;
+      
+      if (fullscreenElement) {
+        return createPortal(cardContent, fullscreenElement as Element);
+      }
+    }
+
+    return cardContent;
+  };
+
   return (
     <div className="relative w-full">
       <div ref={mapRef} className={`w-full ${className}`} />
-      
-      {/* Custom Info Card Overlay - dynamically positioned based on fullscreen state */}
-      {selectedClinic && (
-        <div 
-          className={`
-            ${isFullscreen ? 'fixed' : 'absolute'} 
-            bottom-8 left-1/2 transform -translate-x-1/2 
-            ${isFullscreen ? 'z-[2147483647]' : 'z-[1000]'} 
-            w-11/12 max-w-md pointer-events-none
-          `}
-        >
-          <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-foreground mb-1">
-                  {selectedClinic.name}
-                </h3>
-                <StatusBadge status={selectedClinic.acceptingStatus} size="sm" />
-              </div>
-              <button
-                onClick={() => setSelectedClinic(null)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <p className="text-sm text-muted-foreground mb-3">
-              {selectedClinic.address}, {selectedClinic.city}
-            </p>
-            
-            <div className="flex gap-2">
-              <Button size="sm" asChild className="flex-1">
-                <a href={`/clinics/${selectedClinic.id}`} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  View Details
-                </a>
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                asChild
-              >
-                <a href={`tel:${selectedClinic.phone.replace(/[^0-9]/g, "")}`}>
-                  Call Clinic
-                </a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderInfoCard()}
     </div>
   );
 });
