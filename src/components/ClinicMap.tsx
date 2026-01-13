@@ -445,13 +445,17 @@ const ClinicMap = memo(function ClinicMap({
 
     const cardContent = (
       <div 
+        key={`clinic-card-${isFullscreen ? 'fullscreen' : 'normal'}`}
         className={`
           ${isFullscreen ? 'fixed' : 'absolute'} 
-          bottom-8 left-1/2 transform -translate-x-1/2 
+          bottom-8 left-1/2 
           ${isFullscreen ? 'z-[2147483647]' : 'z-[1000]'} 
           w-11/12 max-w-md pointer-events-none
         `}
-        style={isFullscreen ? { position: 'fixed' } : {}}
+        style={{
+          transform: 'translateX(-50%)',
+          position: isFullscreen ? 'fixed' : 'absolute'
+        }}
       >
         <div className="bg-background border-2 border-secondary rounded-lg shadow-2xl p-4 pointer-events-auto">
           <div className="flex items-start justify-between gap-3 mb-3">
