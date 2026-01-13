@@ -149,13 +149,24 @@ export default function AdminUsers() {
     
     setActionLoading(true);
     
-    const { error } = await supabase
-      .from("profiles")
-      .update({ status: editStatus })
-      .eq("id", editUser.id);
+    console.log("Invoking admin-user-operations for update", { 
+      userId: editUser.user_id, 
+      status: editStatus 
+    });
+    
+    const { data, error } = await supabase.functions.invoke("admin-user-operations", {
+      body: { 
+        action: "update",
+        userId: editUser.user_id,
+        status: editStatus
+      }
+    });
 
-    if (error) {
-      toast.error(`Failed to update user: ${error.message}`);
+    console.log("Function response:", { data, error });
+
+    if (error || !data?.success) {
+      console.error("Update failed:", error);
+      toast.error(`Failed to update user: ${error?.message || data?.error || "Unknown error"}`);
     } else {
       toast.success("User updated successfully");
       loadProfiles();
@@ -170,11 +181,20 @@ export default function AdminUsers() {
     
     setActionLoading(true);
     
-    // Delete from auth.users (this will cascade to profiles via trigger)
-    const { error } = await supabase.auth.admin.deleteUser(deleteUserId);
+    console.log("Invoking admin-user-operations for delete", { userId: deleteUserId });
+    
+    const { data, error } = await supabase.functions.invoke("admin-user-operations", {
+      body: { 
+        action: "delete",
+        userId: deleteUserId
+      }
+    });
 
-    if (error) {
-      toast.error(`Failed to delete user: ${error.message}`);
+    console.log("Function response:", { data, error });
+
+    if (error || !data?.success) {
+      console.error("Delete failed:", error);
+      toast.error(`Failed to delete user: ${error?.message || data?.error || "Unknown error"}`);
     } else {
       toast.success("User deleted successfully");
       loadProfiles();

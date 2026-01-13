@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.send-paid-welcome]
 verify_jwt = false
+
+[functions.admin-user-operations]
+verify_jwt = false
