@@ -204,27 +204,45 @@ const ClinicMap = memo(function ClinicMap({
       }, 150); // Debounce by 150ms to avoid recreating markers during active zoom gestures
     });
 
-    // Listen for fullscreen changes
+    // Listen for both browser and Google Maps fullscreen changes
     const handleFullscreenChange = () => {
-      const isFullscreenNow = !!(
+      // Check browser fullscreen API
+      const browserFullscreen = !!(
         document.fullscreenElement ||
         (document as any).webkitFullscreenElement ||
         (document as any).mozFullScreenElement ||
         (document as any).msFullscreenElement
       );
+      
+      // Check if map container has fullscreen class (Google Maps adds this)
+      const mapContainer = mapRef.current;
+      const gmFullscreen = mapContainer?.classList.contains('gm-style-fullscreen') || 
+                          mapContainer?.parentElement?.classList.contains('gm-style-fullscreen') ||
+                          !!mapContainer?.closest('.gm-style-fullscreen');
+      
+      const isFullscreenNow = browserFullscreen || gmFullscreen;
+      console.log('Fullscreen state:', { browserFullscreen, gmFullscreen, isFullscreenNow });
       setIsFullscreen(isFullscreenNow);
     };
 
+    // Listen to browser fullscreen events
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Listen to Google Maps fullscreen events
+    google.maps.event.addListener(mapInstanceRef.current, 'isfullscreen_changed', handleFullscreenChange);
+
+    // Also poll for changes (fallback for cases where events don't fire)
+    const pollInterval = setInterval(handleFullscreenChange, 500);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+      clearInterval(pollInterval);
     };
   }, [loading, error, userLocation]);
 
