@@ -45,14 +45,20 @@ serve(async (req) => {
         userId = data.user.id;
         email = email || data.user.email;
         
-        // Get current profile status
-        const { data: profile } = await supabaseClient
-          .from("profiles")
-          .select("status")
-          .eq("user_id", userId)
-          .single();
+        // Get current profile status (don't fail if profile doesn't exist)
+        try {
+          const { data: profile } = await supabaseClient
+            .from("profiles")
+            .select("status")
+            .eq("user_id", userId)
+            .maybeSingle();
+          
+          currentStatus = profile?.status || null;
+        } catch (profileError) {
+          logStep("Could not fetch profile status", { error: profileError });
+          currentStatus = null;
+        }
         
-        currentStatus = profile?.status;
         logStep("Authenticated user", { userId, email, currentStatus });
       }
     }
