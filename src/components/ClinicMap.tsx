@@ -289,14 +289,17 @@ const ClinicMap = memo(function ClinicMap({
   useEffect(() => {
     if (loading || error || !mapRef.current || !window.google?.maps) return;
 
-    // Use user location if available, otherwise default to Toronto
+    // Use user location if available, otherwise default to center of Ontario
     const defaultCenter = userLocation 
       ? { lat: userLocation.lat, lng: userLocation.lng }
-      : { lat: 43.65107, lng: -79.347015 };
+      : { lat: 44.0, lng: -79.5 };
+    
+    // Default zoom shows Ontario province view (no search yet)
+    const defaultZoom = clinics.length > 0 ? 10 : 6;
     
     mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
       center: defaultCenter,
-      zoom: userLocation ? 12 : 10,
+      zoom: defaultZoom,
       styles: brandMapStyles,
       disableDefaultUI: false,
       zoomControl: true,
@@ -304,7 +307,7 @@ const ClinicMap = memo(function ClinicMap({
       streetViewControl: false,
       fullscreenControl: true,
       gestureHandling: 'cooperative', // Requires two-finger zoom on mobile for stability
-      minZoom: 8, // Prevent extreme zoom out to world view
+      minZoom: 6, // Allow viewing all of Ontario
       maxZoom: 18, // Prevent extreme zoom in
     });
 

@@ -8,7 +8,6 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ClinicMap } from "@/components/ClinicMap";
 import { MapLegend } from "@/components/MapLegend";
 import { ClinicFilters } from "@/components/ClinicFilters";
-import { LocationPrompt } from "@/components/LocationPrompt";
 import { ClinicPagination } from "@/components/ClinicPagination";
 import { ClinicEmptyState } from "@/components/ClinicEmptyState";
 import { searchClinics, Clinic, ClinicStatus } from "@/lib/clinics";
@@ -21,7 +20,8 @@ export default function Clinics() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("search") || "";
   
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  // Default to center of Ontario (southern Ontario where most population lives)
+  const [userLocation] = useState<{ lat: number; lng: number }>({ lat: 44.0, lng: -79.5 });
   const [searchLocation, setSearchLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // We keep input separate from the "active" query to avoid firing searches on every keystroke
@@ -64,8 +64,6 @@ export default function Clinics() {
   }, [initialQuery]);
 
   useEffect(() => {
-    if (!userLocation) return;
-
     // Only search when there's a query - show empty state otherwise
     if (!activeQuery.trim()) {
       setClinics([]);
@@ -89,7 +87,7 @@ export default function Clinics() {
     };
 
     loadClinics();
-  }, [activeQuery, userLocation]);
+  }, [activeQuery]);
 
   // Use search location when a search is performed, otherwise use user location
   const filterCenter = activeQuery.trim() && searchLocation ? searchLocation : userLocation;
@@ -188,16 +186,6 @@ export default function Clinics() {
 
   // Show all filtered clinics on map (no limit)
   const mapClinics = filteredClinics;
-
-  // Show location prompt if user hasn't shared location yet
-  if (!userLocation) {
-    return (
-      <div className="min-h-screen bg-background">
-        <LocationPrompt onLocationGranted={setUserLocation} />
-      </div>
-    );
-  }
-
   const hasSearched = activeQuery.trim().length > 0;
   
   // Get radius in km as number for map circle
