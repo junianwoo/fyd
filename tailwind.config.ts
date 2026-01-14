@@ -109,16 +109,34 @@ export default {
         DEFAULT: {
           css: {
             maxWidth: 'none',
-            color: 'hsl(var(--foreground))',
+            color: 'hsl(var(--muted-foreground))',
+            lineHeight: '1.75',
+            p: {
+              color: 'hsl(var(--muted-foreground))',
+              lineHeight: '1.75',
+              marginTop: '1em',
+              marginBottom: '1em',
+            },
             a: {
               color: 'hsl(var(--secondary))',
+              textDecoration: 'underline',
               '&:hover': {
                 color: 'hsl(var(--primary))',
               },
             },
             h2: {
-              color: 'hsl(var(--foreground))',
+              color: 'hsl(var(--primary))',
+              fontSize: '1.5rem',
               fontWeight: '600',
+              marginTop: '2em',
+              marginBottom: '1rem',
+            },
+            h3: {
+              color: 'hsl(var(--foreground))',
+              fontSize: '1.25rem',
+              fontWeight: '500',
+              marginTop: '1.5em',
+              marginBottom: '0.75rem',
             },
             strong: {
               color: 'hsl(var(--foreground))',
@@ -126,15 +144,26 @@ export default {
             },
             ul: {
               listStyleType: 'disc',
+              paddingLeft: '1.5rem',
+              color: 'hsl(var(--muted-foreground))',
             },
             ol: {
               listStyleType: 'decimal',
+              paddingLeft: '1.5rem',
+              color: 'hsl(var(--muted-foreground))',
             },
             'ul > li': {
               paddingLeft: '0.5em',
+              marginTop: '0.5em',
+              marginBottom: '0.5em',
             },
             'ol > li': {
               paddingLeft: '0.5em',
+              marginTop: '0.5em',
+              marginBottom: '0.5em',
+            },
+            li: {
+              color: 'hsl(var(--muted-foreground))',
             },
           },
         },

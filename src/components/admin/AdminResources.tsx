@@ -46,7 +46,7 @@ const getCategoryStyles = (category: string): string => {
     case "Success Stories":
       return "bg-accent text-accent-foreground"; // Warm Orange
     case "Product Updates":
-      return "bg-muted text-muted-foreground"; // Neutral gray
+      return "bg-accent text-accent-foreground"; // Neutral gray
     case "General Topics":
       return "bg-primary/80 text-primary-foreground"; // Deep Teal variant
     default:
