@@ -105,7 +105,44 @@ export default {
         "fade-in-up": "fade-in-up 0.6s ease-out",
         "pulse-gentle": "pulse-gentle 2s ease-in-out infinite",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            color: 'hsl(var(--foreground))',
+            a: {
+              color: 'hsl(var(--secondary))',
+              '&:hover': {
+                color: 'hsl(var(--primary))',
+              },
+            },
+            h2: {
+              color: 'hsl(var(--foreground))',
+              fontWeight: '600',
+            },
+            strong: {
+              color: 'hsl(var(--foreground))',
+              fontWeight: '600',
+            },
+            ul: {
+              listStyleType: 'disc',
+            },
+            ol: {
+              listStyleType: 'decimal',
+            },
+            'ul > li': {
+              paddingLeft: '0.5em',
+            },
+            'ol > li': {
+              paddingLeft: '0.5em',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+  ],
 } satisfies Config;

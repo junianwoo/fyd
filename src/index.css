@@ -141,17 +141,31 @@
   pointer-events: none;
 }
 
+.ProseMirror p {
+  margin: 0.75em 0;
+}
+
+.ProseMirror p:first-child {
+  margin-top: 0;
+}
+
 .ProseMirror h2 {
   font-size: 1.5em;
   font-weight: 600;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  line-height: 1.3;
+}
+
+.ProseMirror h2:first-child {
+  margin-top: 0;
 }
 
 .ProseMirror ul,
 .ProseMirror ol {
-  padding-left: 1.5em;
+  padding-left: 1.5rem;
   margin: 1em 0;
+  list-style-position: outside;
 }
 
 .ProseMirror ul {
@@ -163,6 +177,11 @@
 }
 
 .ProseMirror li {
+  margin: 0.5em 0;
+  padding-left: 0.25em;
+}
+
+.ProseMirror li p {
   margin: 0.25em 0;
 }
 
@@ -186,4 +205,12 @@
 
 .ProseMirror u {
   text-decoration: underline;
+}
+
+/* Ensure proper spacing for nested lists */
+.ProseMirror ul ul,
+.ProseMirror ol ul,
+.ProseMirror ul ol,
+.ProseMirror ol ol {
+  margin: 0.5em 0;
 }
