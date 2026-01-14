@@ -353,7 +353,7 @@ export default function AdminUsers() {
                     <TableCell>{getStatusBadge(profile.status)}</TableCell>
                     <TableCell>{getSubscriptionStatus(profile)}</TableCell>
                     <TableCell>
-                      {profile.assisted_reason ? (
+                      {profile.status === "assisted_access" && profile.assisted_reason ? (
                         <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
                           {profile.assisted_reason}
                         </span>
@@ -362,7 +362,7 @@ export default function AdminUsers() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {profile.assisted_expires_at ? (
+                      {profile.status === "assisted_access" && profile.assisted_expires_at ? (
                         <div className="flex items-center gap-1 text-sm">
                           <Calendar className="h-3 w-3" />
                           {formatDate(profile.assisted_expires_at)}
