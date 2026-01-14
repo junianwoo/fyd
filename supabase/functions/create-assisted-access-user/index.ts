@@ -81,26 +81,29 @@ serve(async (req) => {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 6);
 
-    // Create profile with assisted_access status
+    // Wait a moment for the trigger to create the basic profile
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Update the profile with assisted_access details
+    // Note: The profile is created automatically by the on_auth_user_created trigger
     const { error: profileError } = await supabase
       .from("profiles")
-      .insert({
-        user_id: userId,
-        email: email,
+      .update({
         status: "assisted_access",
         assisted_expires_at: expiryDate.toISOString(),
         assisted_reason: reason,
         assisted_renewed_count: 0,
-      });
+      })
+      .eq("user_id", userId);
 
     if (profileError) {
-      logStep("ERROR creating profile", { error: profileError, userId });
-      // Try to clean up the auth user if profile creation failed
+      logStep("ERROR updating profile", { error: profileError, userId });
+      // Try to clean up the auth user if profile update failed
       await supabase.auth.admin.deleteUser(userId);
-      throw new Error("Failed to create user profile");
+      throw new Error("Failed to update user profile");
     }
 
-    logStep("Profile created successfully", { userId, status: "assisted_access", expiresAt: expiryDate });
+    logStep("Profile updated successfully", { userId, status: "assisted_access", expiresAt: expiryDate });
 
     // Send branded welcome email with password setup link
     try {
