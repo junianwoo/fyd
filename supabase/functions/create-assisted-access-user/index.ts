@@ -45,10 +45,61 @@ serve(async (req) => {
 
     if (existingProfile) {
       logStep("User already exists", { email, status: existingProfile.status });
-      throw new Error("This email is already registered. Please log in to your account.");
+      
+      // Allow existing FREE users to apply for assisted access
+      if (existingProfile.status === "free") {
+        logStep("Existing free user applying for assisted access", { userId: existingProfile.user_id });
+        
+        // Calculate expiry date (6 months from now)
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + 6);
+        
+        // Update their profile to assisted_access
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({
+            status: "assisted_access",
+            assisted_expires_at: expiryDate.toISOString(),
+            assisted_reason: reason,
+            assisted_renewed_count: 0,
+          })
+          .eq("user_id", existingProfile.user_id);
+        
+        if (updateError) {
+          logStep("ERROR updating existing user to assisted access", { error: updateError });
+          throw new Error("Failed to update your account to assisted access");
+        }
+        
+        logStep("Existing user upgraded to assisted access", { userId: existingProfile.user_id });
+        
+        // Send welcome email
+        try {
+          await supabase.functions.invoke("send-assisted-access-welcome", {
+            body: {
+              email,
+              userId: existingProfile.user_id,
+            },
+          });
+          logStep("Welcome email sent to existing user");
+        } catch (emailError: any) {
+          logStep("ERROR sending welcome email", { error: emailError.message });
+        }
+        
+        return new Response(JSON.stringify({ 
+          success: true,
+          userId: existingProfile.user_id,
+          message: "Your account has been upgraded to assisted access",
+        }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      } else {
+        // User has alert_service or assisted_access already
+        throw new Error("This email is already registered with an active subscription. Please log in to your account.");
+      }
     }
 
-    logStep("Creating user with admin.createUser", { email });
+    logStep("Creating new user with admin.createUser", { email });
 
     // Generate a secure temporary password
     const temporaryPassword = crypto.randomUUID() + 'Aa1!_';
