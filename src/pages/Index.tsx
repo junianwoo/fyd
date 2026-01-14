@@ -164,7 +164,7 @@ export default function Index() {
               </div>
               <h3 className="text-xl text-foreground mb-3">Covers All of Ontario</h3>
               <p className="text-muted-foreground">
-                From Toronto to Thunder Bay, we're building Ontario's most comprehensive directory of doctor clinics accepting new patients.
+                Across all 14 health regions: we're building Ontario's most comprehensive directory of doctor clinics accepting new patients.
               </p>
             </div>
             
