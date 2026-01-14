@@ -4,7 +4,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -119,7 +119,8 @@ export default function AdminResourceEditor() {
     
     // Auto-generate excerpt from content (first 150 chars)
     const generateExcerpt = (content: string) => {
-      const plainText = content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/https?:\/\/[^\s]+/g, '');
+      // Strip HTML tags to get plain text
+      const plainText = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       return plainText.slice(0, 150).trim() + (plainText.length > 150 ? '...' : '');
     };
     
@@ -263,13 +264,14 @@ export default function AdminResourceEditor() {
                 ) : (
                   <div className="space-y-2">
                     <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                      placeholder="Full article content (supports markdown links)"
-                      rows={15}
+                    <RichTextEditor
+                      content={formData.content || ""}
+                      onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                      placeholder="Write your article content..."
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Use the toolbar to format text with bold, italic, lists, and more.
+                    </p>
                   </div>
                 )}
               </CardContent>

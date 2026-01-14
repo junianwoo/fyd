@@ -168,15 +168,10 @@ export default function ResourceDetail() {
           <div className="max-w-3xl mx-auto">
             {/* Main Content */}
             {resource.content && (
-              <div className="prose prose-lg max-w-none">
-                {resource.content.split('\n').map((paragraph, index) => (
-                  paragraph.trim() && (
-                    <p key={index} className="text-foreground mb-4 leading-relaxed">
-                      {parseLinks(paragraph)}
-                    </p>
-                  )
-                ))}
-              </div>
+              <div 
+                className="prose prose-lg max-w-none text-foreground"
+                dangerouslySetInnerHTML={{ __html: resource.content }}
+              />
             )}
 
             {/* CTA */}
