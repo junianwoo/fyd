@@ -141,15 +141,26 @@ serve(async (req) => {
         hasActiveSub = true;
         logStep("Active subscription found", { subscriptionId, endDate: subscriptionEnd });
         
+        // Prepare update data
+        const updateData: any = {
+          status: "alert_service",
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscriptionId,
+          subscription_status: "active"
+        };
+        
+        // If upgrading from assisted_access, clear assisted access fields
+        if (profile?.status === "assisted_access") {
+          logStep("Upgrading from assisted_access to alert_service - clearing assisted fields", { userId: user.id });
+          updateData.assisted_reason = null;
+          updateData.assisted_expires_at = null;
+          updateData.assisted_renewed_count = null;
+        }
+        
         // Update profile to alert_service status
         await supabaseClient
           .from("profiles")
-          .update({ 
-            status: "alert_service",
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
-            subscription_status: "active"
-          })
+          .update(updateData)
           .eq("user_id", user.id);
       }
     }
