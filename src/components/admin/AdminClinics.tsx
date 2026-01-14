@@ -123,7 +123,9 @@ export default function AdminClinics() {
     // Apply search filter server-side
     if (searchQuery.trim()) {
       const searchTerm = searchQuery.trim();
-      query = query.or(`name.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%,postal_code.ilike.%${searchTerm}%`);
+      // Also search postal code without spaces for better matching
+      const postalSearchTerm = searchTerm.replace(/\s/g, '');
+      query = query.or(`name.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%,postal_code.ilike.%${searchTerm}%,postal_code.ilike.%${postalSearchTerm}%`);
     }
     
     // Apply status filter server-side
@@ -484,7 +486,7 @@ export default function AdminClinics() {
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search clinic name, city..."
+                  placeholder="Search name, city, postal code..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
