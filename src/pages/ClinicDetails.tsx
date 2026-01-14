@@ -485,7 +485,7 @@ export default function ClinicDetails() {
             {/* CTA Card */}
             <Card className="bg-background-alt border-secondary/20">
               <CardContent className="p-6">
-                <h3 className="text-foreground mb-2">
+                <h3 className="text-foreground font-semibold mb-2">
                   Get Alerts for This Area
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -499,10 +499,10 @@ export default function ClinicDetails() {
 
             {/* Clinic Claiming */}
             {!clinic.claimedByClinic && (
-              <Card>
+              <Card className="bg-background-alt border-secondary/20">
                 <CardContent className="p-6">
-                  <h3 className="text-foreground mb-2 flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
+                  <h3 className="text-foreground font-semibold mb-2 flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-secondary" />
                     Is this your clinic?
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
@@ -559,10 +559,10 @@ export default function ClinicDetails() {
             )}
 
             {/* Report A Problem */}
-            <Card>
+            <Card className="bg-background-alt border-secondary/20">
               <CardContent className="p-6">
-                <h3 className="text-foreground mb-2 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
+                <h3 className="text-foreground font-semibold mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-secondary" />
                   Report A Problem
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
