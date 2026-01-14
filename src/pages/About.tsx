@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import coupleFooterImage from "@/assets/couple-footer.png";
 
 export default function About() {
   return (
@@ -119,18 +121,35 @@ export default function About() {
               </div>
 
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Contact CTA */}
-            <div className="mt-12 p-8 bg-background-alt rounded-xl text-center">
-              <h3 className="text-xl text-foreground mb-2">
+      {/* Contact CTA */}
+      <section className="bg-background-alt pt-8 md:pt-12 overflow-visible">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-end justify-center gap-8">
+            <div className="text-center md:text-left mb-8 md:mb-0 self-center">
+              <h2 className="text-2xl text-primary mb-4">
                 Questions or Feedback?
-              </h3>
+              </h2>
               <p className="text-muted-foreground mb-6">
                 We'd love to hear from you. Get in touch with our team.
               </p>
-              <Button asChild>
-                <Link to="/contact">Contact Us</Link>
-              </Button>
+              <Link 
+                to="/contact"
+                className="inline-flex items-center text-secondary hover:text-primary transition-colors font-semibold"
+              >
+                Contact Us <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            {/* Image at bottom, flush with no bottom padding */}
+            <div className="flex justify-end flex-shrink-0">
+              <img 
+                src={coupleFooterImage} 
+                alt="Community connecting" 
+                className="w-full max-w-2xl h-auto"
+              />
             </div>
           </div>
         </div>

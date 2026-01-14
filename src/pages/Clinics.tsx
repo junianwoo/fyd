@@ -328,46 +328,46 @@ export default function Clinics() {
                       <div className="flex flex-col md:flex-row">
                         {/* Main Content */}
                         <div className="flex-1 p-4 md:p-6 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
+                          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                            <div className="flex-1 min-w-0">
                               <div className="flex flex-col gap-2 mb-2">
                                 {/* Status Badge - Always on top */}
                                 <div>
                                   <StatusBadge status={clinic.acceptingStatus} size="sm" />
                                 </div>
                                 {/* Clinic Name - Below status */}
-                                <h3 className="text-lg text-foreground font-semibold">
+                                <h3 className="text-lg text-foreground font-semibold break-words">
                                   {clinic.name}
                                 </h3>
                               </div>
                               
                               <div className="flex flex-col gap-2 text-sm">
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                                <div className="flex items-start gap-2 text-muted-foreground">
+                                  <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5" />
                                   <span className="break-words">{clinic.address}, {clinic.city}, {clinic.province} {clinic.postalCode}</span>
                                 </div>
                                 <a 
                                   href={`tel:${clinic.phone.replace(/[^0-9]/g, "")}`}
-                                  className="flex items-center gap-2 text-secondary hover:text-primary transition-colors"
+                                  className="flex items-start gap-2 text-secondary hover:text-primary transition-colors"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <Phone className="h-4 w-4 flex-shrink-0" />
-                                  <span className="break-all">{clinic.phone}</span>
+                                  <Phone className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                                  <span className="break-words">{clinic.phone}</span>
                                 </a>
                               </div>
 
-                              <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" />
-                                  <span>Updated {formatDate(clinic.statusLastUpdatedAt)}</span>
+                                  <Calendar className="h-3 w-3 flex-shrink-0" />
+                                  <span className="break-words">Updated {formatDate(clinic.statusLastUpdatedAt)}</span>
                                 </div>
-                                <span>
+                                <span className="break-words">
                                   Verified by {clinic.statusVerifiedBy === "clinic" ? "Clinic ✓" : "Community"}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="hidden md:block">
+                            <div className="hidden md:block flex-shrink-0">
                               <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
                                 <a href={`/clinics/${clinic.id}`} target="_blank" rel="noopener noreferrer">
                                   View Details

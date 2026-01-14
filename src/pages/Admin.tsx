@@ -81,16 +81,16 @@ export default function Admin() {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="min-w-0">
               <h1 className="text-2xl text-foreground">Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Manage users, clinics, and content</p>
+              <p className="text-sm text-muted-foreground hidden md:block">Manage users, clinics, and content</p>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">{user.email}</span>
+            <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+              <span className="text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">{user.email}</span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                <LogOut className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Logout</span>
               </Button>
             </div>
           </div>

@@ -521,12 +521,9 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <Button onClick={handleCheckout}>
+                <div className="flex-shrink-0">
+                  <Button onClick={handleCheckout} className="w-full md:w-auto">
                     Subscribe - $7.99/mo
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link to="/assisted-access">Apply for Free Access</Link>
                   </Button>
                 </div>
               </div>
@@ -851,14 +848,9 @@ export default function Dashboard() {
                     <p className="text-muted-foreground">
                       Subscribe to receive email alerts when clinics begin accepting patients.
                     </p>
-                    <div className="flex gap-3 flex-wrap">
-                      <Button onClick={handleCheckout}>
-                        Subscribe - $7.99/mo
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <Link to="/assisted-access">Apply for Free Access</Link>
-                      </Button>
-                    </div>
+                    <Button onClick={handleCheckout}>
+                      Subscribe - $7.99/mo
+                    </Button>
                   </div>
                 )}
               </CardContent>
