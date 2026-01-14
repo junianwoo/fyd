@@ -1,5 +1,12 @@
 # Deployment Checklist - Bug Fixes
 
+## 🚨 CRITICAL: Before Going Live
+- [ ] **Switch to Live Stripe Payments** - See [STRIPE_LIVE_MODE_SETUP.md](./STRIPE_LIVE_MODE_SETUP.md)
+  - Replace test Stripe keys with live keys
+  - Create live product/price in Stripe
+  - Update webhook endpoint
+  - Test with real payment
+
 ## Pre-Deployment
 
 ### 1. Code Review
@@ -18,10 +25,11 @@
 Verify these are set in Supabase:
 - [ ] `SUPABASE_URL`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] `STRIPE_SECRET_KEY`
+- [ ] `STRIPE_SECRET_KEY` ⚠️ **Must be LIVE key (sk_live_) for production**
+- [ ] `STRIPE_WEBHOOK_SECRET` ⚠️ **Must be LIVE webhook secret**
+- [ ] `STRIPE_PRICE_ID` ⚠️ **Must be LIVE price ID**
 - [ ] `RESEND_API_KEY`
 - [ ] `SITE_URL`
-- [ ] `STRIPE_PRICE_ID` (for Alert Service)
 
 ---
 
