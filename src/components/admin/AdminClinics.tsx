@@ -296,7 +296,7 @@ export default function AdminClinics() {
     
     try {
       const { data, error } = await supabase.functions.invoke('run-alert-engine', {
-        body: { doctorId: clinicId }  // Keep doctorId param name for backward compatibility with edge function
+        body: { clinicId: clinicId }
       });
       
       if (error) {
