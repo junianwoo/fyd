@@ -120,43 +120,67 @@ serve(async (req) => {
       limit: 1,
     });
     
-    const hasActiveSub = subscriptions.data.length > 0;
+    let hasActiveSub = false;
     let subscriptionEnd = null;
     let subscriptionId = null;
 
-    if (hasActiveSub) {
+    if (subscriptions.data.length > 0) {
       const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      subscriptionId = subscription.id;
-      logStep("Active subscription found", { subscriptionId, endDate: subscriptionEnd });
       
-      // Update profile to alert_service status
-      await supabaseClient
-        .from("profiles")
-        .update({ 
-          status: "alert_service",
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId,
-          subscription_status: "active"
-        })
-        .eq("user_id", user.id);
-    } else {
-      logStep("No active subscription found");
+      // Check if subscription is truly active or just canceled and waiting to expire
+      if (subscription.cancel_at_period_end) {
+        logStep("Found canceled subscription (active until period end)", { 
+          subscriptionId: subscription.id,
+          cancelAtPeriodEnd: true 
+        });
+        hasActiveSub = false; // Treat as inactive
+      } else {
+        // Subscription is truly active
+        subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        subscriptionId = subscription.id;
+        hasActiveSub = true;
+        logStep("Active subscription found", { subscriptionId, endDate: subscriptionEnd });
+        
+        // Update profile to alert_service status
+        await supabaseClient
+          .from("profiles")
+          .update({ 
+            status: "alert_service",
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            subscription_status: "active"
+          })
+          .eq("user_id", user.id);
+      }
+    }
+    
+    if (!hasActiveSub) {
+      logStep("No truly active subscription found");
       
-      // Update profile to free status
-      await supabaseClient
-        .from("profiles")
-        .update({ 
-          status: "free",
-          stripe_customer_id: customerId,
-          subscription_status: null
-        })
-        .eq("user_id", user.id);
+      // Only downgrade to free if they're not assisted_access
+      if (profile?.status !== "assisted_access") {
+        await supabaseClient
+          .from("profiles")
+          .update({ 
+            status: "free",
+            stripe_customer_id: customerId,
+            subscription_status: null
+          })
+          .eq("user_id", user.id);
+      }
+    }
+
+    // Determine final status
+    let finalStatus = "free";
+    if (hasActiveSub) {
+      finalStatus = "alert_service";
+    } else if (profile?.status === "assisted_access") {
+      finalStatus = "assisted_access";
     }
 
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
-      status: hasActiveSub ? "alert_service" : "free",
+      status: finalStatus,
       subscription_end: subscriptionEnd,
       subscription_id: subscriptionId
     }), {
