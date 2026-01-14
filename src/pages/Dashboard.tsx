@@ -403,10 +403,16 @@ export default function Dashboard() {
         body: { priceId: "alert_service_monthly" },
       });
 
-      if (error) throw error;
+      console.log("[CHECKOUT] Response:", { data, error });
+
+      if (error) {
+        console.error("[CHECKOUT] Error:", error);
+        throw error;
+      }
       
       // Check if user already has a subscription
       if (data?.error) {
+        console.log("[CHECKOUT] Data error:", data.error);
         toast({
           title: "Already subscribed",
           description: data.error,
