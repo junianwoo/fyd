@@ -9,7 +9,8 @@ import {
   Heart,
   User as UserIcon,
   Edit,
-  Trash2
+  Trash2,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,6 +75,25 @@ export default function AdminUsers() {
 
   useEffect(() => {
     loadProfiles();
+    
+    // Set up real-time subscription for profile changes
+    const channel = supabase
+      .channel('admin-profiles-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        (payload) => {
+          console.log('Profile changed:', payload);
+          // Reload profiles when any change occurs
+          loadProfiles();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadProfiles = async () => {
@@ -286,6 +306,15 @@ export default function AdminUsers() {
                   <SelectItem value="free">Free</SelectItem>
                 </SelectContent>
               </Select>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={loadProfiles}
+                disabled={loading}
+                title="Refresh user list"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
           </div>
         </CardHeader>
