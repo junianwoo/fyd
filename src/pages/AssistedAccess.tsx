@@ -103,24 +103,6 @@ export default function AssistedAccess() {
     setLoading(true);
 
     try {
-      // Check if email already exists
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("status, email")
-        .eq("email", email)
-        .maybeSingle();
-
-      if (existingProfile) {
-        setLoading(false);
-        toast({
-          title: "Email already registered",
-          description: "This email is already registered. Please log in to your account.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
-
       // Verify reCAPTCHA
       const { data: recaptchaResult, error: recaptchaError } = await supabase.functions.invoke("verify-recaptcha", {
         body: { token: recaptchaToken },
@@ -138,44 +120,26 @@ export default function AssistedAccess() {
         return;
       }
 
-      // Create account with a temporary password
-      // User will receive confirmation email with link to set their password
-      const temporaryPassword = crypto.randomUUID() + 'Aa1!_';
-      
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password: temporaryPassword,
-        options: {
-          emailRedirectTo: `${window.location.origin}/reset-password`,
-          data: {
-            applying_for_assisted_access: true,
-            assisted_reason: reason,
-            city: city,
-          }
+      // Create assisted access user via edge function
+      // This uses admin.createUser with email_confirm: true to avoid duplicate emails
+      const { data, error: createError } = await supabase.functions.invoke("create-assisted-access-user", {
+        body: {
+          email,
+          city,
+          reason,
+          recaptchaToken,
         },
       });
 
-      if (signUpError) throw signUpError;
-
-      if (!signUpData.user) {
-        throw new Error("Failed to create account");
+      if (createError) {
+        throw new Error(createError.message || "Failed to create account");
       }
 
-      console.log("Account created:", signUpData.user.id);
-
-      // Send branded welcome email with password setup link
-      try {
-        await supabase.functions.invoke("send-assisted-access-welcome", {
-          body: {
-            email,
-            userId: signUpData.user.id,
-          },
-        });
-        console.log("Welcome email sent successfully");
-      } catch (emailError) {
-        console.error("Error sending welcome email:", emailError);
-        // Don't fail the entire flow if email fails
+      if (data?.error) {
+        throw new Error(data.error);
       }
+
+      console.log("Assisted access account created:", data?.userId);
 
       // Success! Redirect to confirmation page
       toast({

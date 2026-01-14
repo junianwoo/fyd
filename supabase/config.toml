@@ -59,3 +59,6 @@ verify_jwt = false
 
 [functions.admin-user-operations]
 verify_jwt = false
+
+[functions.create-assisted-access-user]
+verify_jwt = false

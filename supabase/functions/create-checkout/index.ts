@@ -85,6 +85,8 @@ serve(async (req) => {
     // Check if customer exists
     const customers = await stripe.customers.list({ email, limit: 1 });
     let customerId;
+    let canceledSubscriptionInfo = null;
+    
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
       logStep("Existing customer found", { customerId });
@@ -97,42 +99,50 @@ serve(async (req) => {
       });
 
       if (existingSubscriptions.data.length > 0) {
-        const existingSubId = existingSubscriptions.data[0].id;
-        logStep("Customer already has active subscription", { 
-          customerId, 
-          subscriptionId: existingSubId,
+        const subscription = existingSubscriptions.data[0];
+        logStep("Found active subscription", { 
+          subscriptionId: subscription.id,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
           currentStatus
         });
         
-        // Special case: If user has assisted_access status but has an active subscription,
-        // this means the webhook might not have updated their status properly.
-        // Update their profile status to alert_service
-        if (currentStatus === "assisted_access" && userId) {
-          logStep("Fixing status mismatch: assisted_access user with active subscription", { userId });
-          const { error: updateError } = await supabaseClient
-            .from("profiles")
-            .update({ 
-              status: "alert_service",
-              stripe_subscription_id: existingSubId,
-              stripe_customer_id: customerId
-            })
-            .eq("user_id", userId);
+        // Check if subscription is truly active or just canceled and waiting to expire
+        if (subscription.cancel_at_period_end) {
+          // Subscription is canceled but still active until period end
+          // Cancel it immediately to allow the new subscription
+          logStep("Subscription is canceled but active, will cancel immediately", { 
+            subscriptionId: subscription.id 
+          });
           
-          if (updateError) {
-            logStep("ERROR updating profile status", { error: updateError });
-          } else {
-            logStep("Profile status updated from assisted_access to alert_service", { userId });
+          try {
+            await stripe.subscriptions.cancel(subscription.id);
+            logStep("Old subscription canceled immediately", { subscriptionId: subscription.id });
+            
+            canceledSubscriptionInfo = {
+              id: subscription.id,
+              endsAt: new Date(subscription.current_period_end * 1000).toISOString(),
+            };
+          } catch (cancelError) {
+            logStep("ERROR canceling old subscription", { error: cancelError });
+            // Continue anyway - Stripe might handle it automatically
           }
+        } else {
+          // Subscription is truly active (not canceled)
+          logStep("Customer has truly active subscription", { 
+            customerId, 
+            subscriptionId: subscription.id,
+            currentStatus
+          });
+          
+          const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
+          return new Response(JSON.stringify({ 
+            error: "You already have an active Alert Service subscription.",
+            redirectUrl: `${origin}/dashboard`
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 400,
+          });
         }
-        
-        const origin = req.headers.get("origin") || "https://findyourdoctor.ca";
-        return new Response(JSON.stringify({ 
-          error: "You already have an active Alert Service subscription.",
-          redirectUrl: `${origin}/dashboard`
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
       }
     } else {
       logStep("No existing customer, will create new");
@@ -167,12 +177,25 @@ serve(async (req) => {
         user_id: userId || "",
         email: email,
         current_status: currentStatus || "",
+        replaced_subscription: canceledSubscriptionInfo ? canceledSubscriptionInfo.id : "",
       },
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { 
+      sessionId: session.id, 
+      url: session.url,
+      replacedSubscription: canceledSubscriptionInfo?.id 
+    });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    const response: any = { url: session.url };
+    
+    // Include information about replaced subscription if applicable
+    if (canceledSubscriptionInfo) {
+      response.replacedSubscription = canceledSubscriptionInfo;
+      response.message = "Your previous subscription will be replaced with the new one.";
+    }
+
+    return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

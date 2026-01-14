@@ -98,6 +98,14 @@ export default function Dashboard() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [wheelchairAccessible, setWheelchairAccessible] = useState(false);
   const [accessibleParking, setAccessibleParking] = useState(false);
+  
+  // Subscription replacement dialog
+  const [showReplacementDialog, setShowReplacementDialog] = useState(false);
+  const [replacementInfo, setReplacementInfo] = useState<{
+    checkoutUrl: string;
+    subscriptionId: string;
+    endsAt: string;
+  } | null>(null);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -410,7 +418,22 @@ export default function Dashboard() {
         return;
       }
       
-      if (data?.url) {
+      // Check if a subscription will be replaced
+      if (data?.replacedSubscription && data?.url) {
+        // Show confirmation dialog
+        setReplacementInfo({
+          checkoutUrl: data.url,
+          subscriptionId: data.replacedSubscription.id,
+          endsAt: data.replacedSubscription.endsAt,
+        });
+        setShowReplacementDialog(true);
+        
+        toast({
+          title: "Subscription replacement",
+          description: data.message || "Your previous subscription will be replaced.",
+        });
+      } else if (data?.url) {
+        // No replacement needed, proceed directly
         window.location.href = data.url;
       }
     } catch (error) {
@@ -419,6 +442,12 @@ export default function Dashboard() {
         description: "Please try again later.",
         variant: "destructive",
       });
+    }
+  };
+  
+  const handleConfirmReplacement = () => {
+    if (replacementInfo?.checkoutUrl) {
+      window.location.href = replacementInfo.checkoutUrl;
     }
   };
 
@@ -831,6 +860,39 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Subscription Replacement Confirmation Dialog */}
+      <AlertDialog open={showReplacementDialog} onOpenChange={setShowReplacementDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace Existing Subscription?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                You have a canceled subscription that is still active until{" "}
+                {replacementInfo?.endsAt && 
+                  new Date(replacementInfo.endsAt).toLocaleDateString("en-CA", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                  })
+                }.
+              </p>
+              <p className="font-medium">If you continue:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Your current subscription will end immediately</li>
+                <li>The new subscription will start right away</li>
+                <li>You will be charged $7.99/month for the new subscription</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReplacement}>
+              Continue to Checkout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

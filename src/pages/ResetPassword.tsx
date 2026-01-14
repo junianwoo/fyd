@@ -74,7 +74,7 @@ export default function ResetPassword() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({
+    const { data: updateData, error } = await supabase.auth.updateUser({
       password: password,
     });
 
@@ -86,6 +86,17 @@ export default function ResetPassword() {
       });
       setLoading(false);
       return;
+    }
+
+    // Verify email is confirmed after password update
+    if (updateData?.user) {
+      console.log("[PASSWORD-RESET] Password updated for user:", updateData.user.id);
+      console.log("[PASSWORD-RESET] Email confirmed:", updateData.user.email_confirmed_at ? "YES" : "NO");
+      
+      // When updating password via recovery link, email should be automatically confirmed
+      if (!updateData.user.email_confirmed_at) {
+        console.warn("[PASSWORD-RESET] Warning: Email not confirmed after password reset");
+      }
     }
 
     // Success!
