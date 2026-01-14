@@ -244,7 +244,7 @@ export default function Resources() {
                             {isExternalNews ? (
                               <span className="text-xs text-secondary">{extractDomain(resource.content!)}</span>
                             ) : (
-                              resource.content?.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/https?:\/\/[^\s]+/g, '').slice(0, 150) + (resource.content && resource.content.length > 150 ? '...' : '')
+                              resource.excerpt
                             )}
                           </p>
                           <div className="flex items-center justify-between">
