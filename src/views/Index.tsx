@@ -383,7 +383,7 @@ export default function Index() {
               Trusted by Ontarians Searching for Care
             </h2>
             <p className="text-muted-foreground text-lg">
-              3,200+ clinics tracked &nbsp;·&nbsp; 4,800+ community updates submitted &nbsp;·&nbsp; Used across Ontario
+              2,300+ clinics tracked &nbsp;·&nbsp; All 14 Ontario health regions &nbsp;·&nbsp; Always free to search
             </p>
           </div>
         </div>
