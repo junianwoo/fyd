@@ -87,10 +87,10 @@ export default function Resources() {
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl text-foreground mb-4">
-            Resources
+            Ontario's Healthcare Knowledge Hub
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Helpful articles and guides about finding healthcare in Ontario
+            Articles, data, and guides for the 2.5 million Ontarians searching for a family doctor
           </p>
         </div>
       </section>

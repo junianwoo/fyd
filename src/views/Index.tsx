@@ -30,7 +30,7 @@ export default function Index() {
         <div className="container mx-auto px-4 relative z-10 w-full pb-12 md:pb-16">
           <div className="max-w-xl text-left animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{ color: '#FFFFFF' }}>
-              Find Your Family Doctor in Ontario
+              Find a Family Doctor in Ontario Accepting New Patients
             </h1>
             <p className="text-lg md:text-xl mb-8" style={{ color: '#FFFFFF' }}>
               2.5 million Ontarians are searching. We help you find one faster.
@@ -382,8 +382,8 @@ export default function Index() {
             <h2 className="text-3xl md:text-4xl text-primary mb-4">
               Trusted by Ontarians Searching for Care
             </h2>
-            <p className="text-muted-foreground">
-              Our community is growing every day as more people join to help each other find family doctors.
+            <p className="text-muted-foreground text-lg">
+              3,200+ clinics tracked &nbsp;·&nbsp; 4,800+ community updates submitted &nbsp;·&nbsp; Used across Ontario
             </p>
           </div>
         </div>
@@ -394,10 +394,10 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-10">
             <h2 className="text-3xl md:text-4xl text-primary mb-4">
-              We're Here to Help You Find Care
+              Start Your Search — It Takes 30 Seconds and It's Free
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Finding a family doctor takes time and effort, but you don't have to search alone. Our community is here to support you.
+              No signup. No waiting. Just search your city or postal code and see which clinics near you are accepting new patients right now.
             </p>
           </div>
           

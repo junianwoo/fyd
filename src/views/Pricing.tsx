@@ -268,9 +268,12 @@ export default function Pricing() {
                 <p className="text-muted-foreground">Get notified instantly when clinics start accepting</p>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-4xl font-bold text-foreground">
-                  $7.99
-                  <span className="text-lg font-normal text-muted-foreground">/month</span>
+                <div>
+                  <div className="text-4xl font-bold text-foreground">
+                    $7.99
+                    <span className="text-lg font-normal text-muted-foreground">/month</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Less than $0.27/day</p>
                 </div>
                 
                 <div>
@@ -326,7 +329,7 @@ export default function Pricing() {
                 </div>
                 <h3 className="text-xl text-foreground mb-3">Time Advantage</h3>
                 <p className="text-muted-foreground">
-                  When a clinics starts accepting patients, their roster can fill within hours or days. Alert Service ensures you're notified immediately, giving you the best chance to call before spots are filled.
+                  When a clinic opens spots, they typically fill within 24–48 hours. Alert Service ensures you're among the first to know — and the first to call.
                 </p>
               </div>
               

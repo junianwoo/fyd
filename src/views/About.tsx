@@ -12,8 +12,8 @@ export default function About() {
           <h1 className="text-4xl md:text-5xl text-foreground mb-4">
             About FindYourDoctor.ca
           </h1>
-          <p className="text-muted-foreground">
-            FindYourDoctor.ca is a community-driven platform connecting Ontarians with family doctors and nurse practitioners accepting new patients.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            We started FindYourDoctor.ca because finding a family doctor in Ontario feels like a full-time job — and most people don't have time for that.
           </p>
         </div>
       </section>
@@ -100,6 +100,20 @@ export default function About() {
                 <h3 className="text-xl text-foreground mb-3">Community-Focused</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Built to serve Ontarians navigating the healthcare system.
+                </p>
+              </div>
+
+              {/* Who Built This */}
+              <div>
+                <h2 className="text-2xl text-primary mb-4">Who Built This</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  FindYourDoctor.ca was built by a small team in Ontario who got tired of watching friends and family members spend weeks calling clinics, being put on waitlists, and still coming up empty.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We're not a government agency, a healthcare company, or a startup with venture funding. We're people who saw a real problem — 2.5 million Ontarians without a family doctor — and decided to do something useful about it.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  The idea is simple: if everyone who calls a clinic shares what they find out, we all spend less time on hold and more time with a doctor. That's it. That's the whole product.
                 </p>
               </div>
 
