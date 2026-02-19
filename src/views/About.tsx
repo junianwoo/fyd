@@ -107,13 +107,13 @@ export default function About() {
               <div>
                 <h2 className="text-2xl text-primary mb-4">Who Built This</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  FindYourDoctor.ca was built by a small team in Ontario who got tired of watching friends and family members spend weeks calling clinics, being put on waitlists, and still coming up empty.
+                  FindYourDoctor.ca was built by a hospital worker in Ontario who spent four years on the Health Care Connect registry without ever being matched with a family doctor.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  We're not a government agency, a healthcare company, or a startup with venture funding. We're people who saw a real problem — 2.5 million Ontarians without a family doctor — and decided to do something useful about it.
+                  I'm not a software engineer, a startup founder, or a government agency. I'm someone who works inside the healthcare system, watched my own parents move provinces and lose access to a family doctor, and decided to build something useful — even if it meant teaching myself to code to do it.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  The idea is simple: if everyone who calls a clinic shares what they find out, we all spend less time on hold and more time with a doctor. That's it. That's the whole product.
+                  The idea is simple: 2,699 family medicine clinics across Ontario, organized in one place, updated by the community. If everyone who calls a clinic shares what they find, we all spend less time on hold and more time getting care. That's it. That's the whole product.
                 </p>
               </div>
 
