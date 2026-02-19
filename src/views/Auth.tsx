@@ -34,7 +34,7 @@ export default function Auth() {
     if (user) {
       router.push("/dashboard");
     }
-  }, [user, navigate]);
+  }, [user, router]);
 
   const validateForm = () => {
     try {

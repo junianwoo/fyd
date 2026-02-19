@@ -50,7 +50,7 @@ export default function ResetPassword() {
     };
 
     checkSession();
-  }, [navigate, toast]);
+  }, [router, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

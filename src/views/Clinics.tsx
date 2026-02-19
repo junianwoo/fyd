@@ -13,6 +13,7 @@ import { ClinicFilters } from "@/components/ClinicFilters";
 import { ClinicPagination } from "@/components/ClinicPagination";
 import { ClinicEmptyState } from "@/components/ClinicEmptyState";
 import { searchClinics, Clinic, ClinicStatus } from "@/lib/clinics";
+import { ClinicSubmissionForm } from "@/components/ClinicSubmissionForm";
 import { useUserStatus } from "@/hooks/useUserStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -191,20 +192,23 @@ export default function Clinics() {
   const radiusKm = distanceFilter !== "any" ? parseInt(distanceFilter, 10) : 50; // Default to 50km if "any"
 
   const FiltersContent = (
-    <ClinicFilters
-      statusFilter={statusFilter}
-      onStatusFilterChange={setStatusFilter}
-      distanceFilter={distanceFilter}
-      onDistanceFilterChange={setDistanceFilter}
-      languageFilter={languageFilter}
-      onLanguageFilterChange={setLanguageFilter}
-      accessibilityFilter={accessibilityFilter}
-      onAccessibilityFilterChange={setAccessibilityFilter}
-      virtualFilter={virtualFilter}
-      onVirtualFilterChange={setVirtualFilter}
-      onClearFilters={clearFilters}
-      isPaidUser={isPaidUser}
-    />
+    <div className="space-y-4">
+      <ClinicFilters
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        distanceFilter={distanceFilter}
+        onDistanceFilterChange={setDistanceFilter}
+        languageFilter={languageFilter}
+        onLanguageFilterChange={setLanguageFilter}
+        accessibilityFilter={accessibilityFilter}
+        onAccessibilityFilterChange={setAccessibilityFilter}
+        virtualFilter={virtualFilter}
+        onVirtualFilterChange={setVirtualFilter}
+        onClearFilters={clearFilters}
+        isPaidUser={isPaidUser}
+      />
+      <ClinicSubmissionForm />
+    </div>
   );
 
   return (
