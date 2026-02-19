@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import logoWhite from "@/assets/logo-white.png";
 
@@ -25,20 +25,20 @@ export function Footer() {
       <div className="border-b border-primary-foreground/20">
         <div className="container mx-auto px-4 py-8 max-w-3xl text-center">
           <p className="text-sm text-primary-foreground/90 mb-4">
-            FindYourDoctor.ca helps Ontarians search for family doctors accepting 
-            new patients and provides optional email alerts when doctors in your 
+            FindYourDoctor.ca helps Ontarians search for family doctors accepting
+            new patients and provides optional email alerts when doctors in your
             area start accepting.
           </p>
           <p className="text-sm font-medium text-accent flex items-center justify-center gap-2">
             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
             <span>
-              IMPORTANT: We are not affiliated with or endorsed by any government 
-              agency, health authority, or the College of Physicians and Surgeons 
+              IMPORTANT: We are not affiliated with or endorsed by any government
+              agency, health authority, or the College of Physicians and Surgeons
               of Ontario (CPSO).
             </span>
           </p>
           <p className="text-xs text-primary-foreground/70 mt-3">
-            For immediate medical care, visit a walk-in clinic or emergency department. 
+            For immediate medical care, visit a walk-in clinic or emergency department.
             Call 911 for emergencies.
           </p>
         </div>
@@ -49,15 +49,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description */}
           <div className="md:col-span-2">
-            <Link to="/" className="inline-block mb-4">
-              <img 
-                src={logoWhite} 
-                alt="FindYourDoctor.ca" 
+            <Link href="/" className="inline-block mb-4">
+              <img
+                src={logoWhite.src}
+                alt="FindYourDoctor.ca"
                 className="h-8 w-auto"
               />
             </Link>
             <p className="text-sm text-primary-foreground/80 max-w-sm">
-              Helping Ontarians find family doctors accepting new patients. 
+              Helping Ontarians find family doctors accepting new patients.
               Community-powered, always up-to-date.
             </p>
             <p className="text-sm text-primary-foreground/60 mt-4">
@@ -72,7 +72,7 @@ export function Footer() {
               {footerLinks.site.map((link) => (
                 <li key={link.href}>
                   <Link
-                    to={link.href}
+                    href={link.href}
                     className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
@@ -89,7 +89,7 @@ export function Footer() {
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link
-                    to={link.href}
+                    href={link.href}
                     className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}

@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from "react";
 import {
   DollarSign,
@@ -49,15 +50,16 @@ export default function AdminAnalytics() {
       .select("status, subscription_status, created_at");
 
     if (profiles) {
-      const totalUsers = profiles.length;
-      const alertServiceUsers = profiles.filter(p => p.status === "alert_service").length;
-      const assistedAccessUsers = profiles.filter(p => p.status === "assisted_access").length;
+      const profileList = profiles as any[];
+      const totalUsers = profileList.length;
+      const alertServiceUsers = profileList.filter(p => p.status === "alert_service").length;
+      const assistedAccessUsers = profileList.filter(p => p.status === "assisted_access").length;
       const paidUsers = alertServiceUsers + assistedAccessUsers;
       const conversionRate = totalUsers > 0 ? (paidUsers / totalUsers) * 100 : 0;
 
       // Group signups by month
       const monthlyMap = new Map<string, number>();
-      profiles.forEach(p => {
+      profileList.forEach(p => {
         if (p.created_at) {
           const date = new Date(p.created_at);
           const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -80,7 +82,7 @@ export default function AdminAnalytics() {
 
       // Subscription breakdown
       const subscriptionBreakdown = [
-        { status: "Free", count: profiles.filter(p => p.status === "free").length },
+        { status: "Free", count: profileList.filter(p => p.status === "free").length },
         { status: "Alert Service", count: alertServiceUsers },
         { status: "Assisted Access", count: assistedAccessUsers },
       ];

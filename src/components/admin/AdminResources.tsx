@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { 
   Plus, 
   FileText, 
@@ -160,7 +161,7 @@ export default function AdminResources() {
               Resources
             </CardTitle>
             <Button asChild>
-              <Link to="/admin/resources/new">
+              <Link href="/admin/resources/new">
                 <Plus className="h-4 w-4 mr-2" />
                 New Resource
               </Link>
@@ -177,7 +178,7 @@ export default function AdminResources() {
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground mb-4">No resources yet</p>
               <Button asChild>
-                <Link to="/admin/resources/new">Create your first resource</Link>
+                <Link href="/admin/resources/new">Create your first resource</Link>
               </Button>
             </div>
           ) : (
@@ -240,7 +241,7 @@ export default function AdminResources() {
                           )}
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/admin/resources/${resource.id}`}>
+                          <Link href={`/admin/resources/${resource.id}`}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>

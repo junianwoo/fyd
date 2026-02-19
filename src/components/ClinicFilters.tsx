@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+'use client'
+import Link from 'next/link';
 import { ClinicStatus } from "@/lib/clinics";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -202,7 +203,7 @@ export function ClinicFilters({
                 Filter by language, accessibility, and virtual appointments with Alert Service.
               </p>
               <Button variant="outline" size="sm" className="w-full" asChild>
-                <Link to="/pricing">Upgrade to Unlock</Link>
+                <Link href="/pricing">Upgrade to Unlock</Link>
               </Button>
             </div>
           )}

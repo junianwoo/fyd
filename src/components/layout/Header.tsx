@@ -1,5 +1,7 @@
+'use client'
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,17 +17,17 @@ const navLinks = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
   const { user, loading } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img 
-            src={logoColour} 
-            alt="FindYourDoctor.ca" 
+        <Link href="/" className="flex items-center">
+          <img
+            src={logoColour.src}
+            alt="FindYourDoctor.ca"
             className="h-7 md:h-9 w-auto"
           />
         </Link>
@@ -35,9 +37,9 @@ export function Header() {
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              to={link.href}
+              href={link.href}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === link.href
+                pathname === link.href
                   ? "text-primary"
                   : "text-muted-foreground"
               }`}
@@ -51,14 +53,14 @@ export function Header() {
         <div className="hidden md:flex items-center gap-3">
           {loading ? null : user ? (
             <Button asChild>
-              <Link to="/dashboard">
+              <Link href="/dashboard">
                 <User className="h-4 w-4 mr-2" />
                 Dashboard
               </Link>
             </Button>
           ) : (
             <Button variant="ghost" asChild>
-              <Link to="/auth">Sign In</Link>
+              <Link href="/auth">Sign In</Link>
             </Button>
           )}
         </div>
@@ -84,9 +86,9 @@ export function Header() {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                to={link.href}
+                href={link.href}
                 className={`py-2 text-sm font-medium transition-colors ${
-                  location.pathname === link.href
+                  pathname === link.href
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
@@ -98,14 +100,14 @@ export function Header() {
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               {user ? (
                 <Button asChild>
-                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <User className="h-4 w-4 mr-2" />
                     Dashboard
                   </Link>
                 </Button>
               ) : (
                 <Button variant="ghost" asChild className="justify-start">
-                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
                     Sign In
                   </Link>
                 </Button>

@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect, useRef } from "react";
 import { AdminClinicImport } from "./AdminClinicImport";
 import {
@@ -21,7 +22,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -587,7 +588,7 @@ export default function AdminClinics() {
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild title="View clinic">
-                          <Link to={`/clinics/${clinic.id}`} target="_blank">
+                          <Link href={`/clinics/${clinic.id}`} target="_blank">
                             <ExternalLink className="h-4 w-4" />
                           </Link>
                         </Button>
