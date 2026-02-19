@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from "react";
 import { 
   AlertTriangle, 
@@ -12,7 +13,7 @@ import {
   Check,
   RotateCcw
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -345,7 +346,7 @@ export default function AdminModeration() {
                           <XCircle className="h-4 w-4 text-red-600" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/clinics/${update.clinic_id}`} target="_blank">
+                          <Link href={`/clinics/${update.clinic_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -425,7 +426,7 @@ export default function AdminModeration() {
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/clinics/${report.clinic_id}`} target="_blank">
+                          <Link href={`/clinics/${report.clinic_id}`} target="_blank">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>

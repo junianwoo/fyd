@@ -1,5 +1,6 @@
+'use client'
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,14 +12,14 @@ interface SearchBarProps {
 
 export function SearchBar({ size = "default", className = "" }: SearchBarProps) {
   const [query, setQuery] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/clinics?search=${encodeURIComponent(query.trim())}`);
+      router.push(`/clinics?search=${encodeURIComponent(query.trim())}`);
     } else {
-      navigate("/clinics");
+      router.push("/clinics");
     }
   };
 

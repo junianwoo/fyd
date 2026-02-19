@@ -1,3 +1,4 @@
+'use client'
 import { useState } from "react";
 import { Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,36 +36,20 @@ export function ClinicSubmissionForm() {
   });
 
   const handleSubmit = async () => {
-    // Validate required fields
     if (!formData.clinicName.trim()) {
-      toast({
-        title: "Please enter a clinic name",
-        variant: "destructive",
-      });
+      toast({ title: "Please enter a clinic name", variant: "destructive" });
       return;
     }
-
     if (!formData.address.trim()) {
-      toast({
-        title: "Please enter an address",
-        variant: "destructive",
-      });
+      toast({ title: "Please enter an address", variant: "destructive" });
       return;
     }
-
     if (!formData.phone.trim()) {
-      toast({
-        title: "Please enter a phone number",
-        variant: "destructive",
-      });
+      toast({ title: "Please enter a phone number", variant: "destructive" });
       return;
     }
-
     if (!formData.status) {
-      toast({
-        title: "Please select a status",
-        variant: "destructive",
-      });
+      toast({ title: "Please select a status", variant: "destructive" });
       return;
     }
 
@@ -73,9 +58,7 @@ export function ClinicSubmissionForm() {
     try {
       const response = await fetch("/api/send-contact-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: "no-reply@findyourdoctor.ca",
           subject: "New Clinic Submission",
@@ -104,14 +87,7 @@ ${formData.additionalInfo || "N/A"}
         description: "Thank you! We'll review and add this clinic to our listings.",
       });
 
-      // Reset form
-      setFormData({
-        clinicName: "",
-        address: "",
-        phone: "",
-        status: "",
-        additionalInfo: "",
-      });
+      setFormData({ clinicName: "", address: "", phone: "", status: "", additionalInfo: "" });
       setDialogOpen(false);
     } catch (error: any) {
       toast({
@@ -138,7 +114,7 @@ ${formData.additionalInfo || "N/A"}
             </p>
           </div>
         </div>
-        
+
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="w-full">
@@ -163,7 +139,6 @@ ${formData.additionalInfo || "N/A"}
                   onChange={(e) => setFormData({ ...formData, clinicName: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="clinic-address">Address *</Label>
                 <Input
@@ -174,7 +149,6 @@ ${formData.additionalInfo || "N/A"}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="clinic-phone">Phone Number *</Label>
                 <Input
@@ -185,7 +159,6 @@ ${formData.additionalInfo || "N/A"}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="clinic-status">Patient Acceptance Status *</Label>
                 <Select
@@ -203,7 +176,6 @@ ${formData.additionalInfo || "N/A"}
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="additional-info">Additional Information (Optional)</Label>
                 <Textarea

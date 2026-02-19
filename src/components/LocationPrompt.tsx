@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from "react";
 import { MapPin, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";

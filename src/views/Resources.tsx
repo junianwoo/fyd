@@ -1,0 +1,315 @@
+'use client'
+import { useState, useEffect } from "react";
+import Link from 'next/link';
+import { ArrowRight, Clock, Search, Loader2, ExternalLink } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { fetchResources, Resource } from "@/lib/resources";
+import coupleFooterImage from "@/assets/couple-footer.png";
+
+const categories = [
+  "All Resources",
+  "How-To Guides",
+  "Success Stories",
+  "Healthcare News",
+  "Product Updates",
+  "General Topics",
+];
+
+// Category color mapping using brand colors
+const getCategoryStyles = (category: string): string => {
+  switch (category) {
+    case "Healthcare News":
+      return "bg-secondary text-secondary-foreground"; // Bright Teal
+    case "How-To Guides":
+      return "bg-primary text-primary-foreground"; // Deep Teal
+    case "Success Stories":
+      return "bg-accent text-accent-foreground"; // Warm Orange
+    case "Product Updates":
+      return "bg-accent text-accent-foreground"; // Warm Orange
+    case "General Topics":
+      return "bg-primary/80 text-primary-foreground"; // Deep Teal variant
+    default:
+      return "bg-secondary text-secondary-foreground";
+  }
+};
+
+export default function Resources() {
+  const [selectedCategory, setSelectedCategory] = useState("All Resources");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadResources();
+  }, []);
+
+  const loadResources = async () => {
+    setLoading(true);
+    const data = await fetchResources(false); // Only fetch published resources
+    setResources(data);
+    setLoading(false);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-CA", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const extractDomain = (url: string): string => {
+    try {
+      const hostname = new URL(url).hostname;
+      return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+    } catch {
+      return url;
+    }
+  };
+
+  const filteredResources = resources.filter((resource) => {
+    const matchesCategory = selectedCategory === "All Resources" || resource.category === selectedCategory;
+    const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const recentResources = [...resources].sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  ).slice(0, 5);
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero */}
+      <section className="bg-background py-16 md:py-24">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl text-foreground mb-4">
+            Resources
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Helpful articles and guides about finding healthcare in Ontario
+          </p>
+        </div>
+      </section>
+
+      {/* Main Content - Two Column Layout */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+            
+            {/* Left Sidebar - 30% */}
+            <aside className="lg:w-72 flex-shrink-0">
+              <div className="lg:sticky lg:top-24 space-y-8">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search resources..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                {/* Categories */}
+                <div>
+                  <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Categories</h3>
+                  <nav className="space-y-1">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                          selectedCategory === category
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+
+                {/* Recent Resources - Desktop Only */}
+                {recentResources.length > 0 && (
+                  <div className="hidden lg:block">
+                    <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Recent</h3>
+                    <div className="space-y-3">
+                      {recentResources.map((resource) => (
+                        resource.category === "Healthcare News" && resource.content ? (
+                          <a
+                            key={resource.id}
+                            href={resource.content}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
+                          >
+                            {resource.title}
+                          </a>
+                        ) : (
+                          <Link
+                            key={resource.id}
+                            href={`/resources/${resource.slug}`}
+                            className="block text-sm text-muted-foreground hover:text-foreground transition-colors line-clamp-2"
+                          >
+                            {resource.title}
+                          </Link>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </aside>
+
+            {/* Main Content Area - 70% */}
+            <div className="flex-1">
+              {/* Results Count */}
+              <p className="text-muted-foreground mb-6">
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading resources...
+                  </span>
+                ) : (
+                  <>
+                    Showing <span className="font-semibold text-foreground">{filteredResources.length}</span> resources
+                    {selectedCategory !== "All Resources" && ` in ${selectedCategory}`}
+                  </>
+                )}
+              </p>
+
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+                </div>
+              ) : filteredResources.length === 0 ? (
+                <div className="text-center py-16">
+                  <p className="text-lg text-muted-foreground mb-4">
+                    {resources.length === 0 
+                      ? "No resources available yet. Check back soon!"
+                      : "No resources found matching your criteria."
+                    }
+                  </p>
+                  {resources.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory("All Resources");
+                        setSearchQuery("");
+                      }}
+                      className="text-secondary hover:text-primary transition-colors"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid gap-6 md:grid-cols-2">
+                  {filteredResources.map((resource) => {
+                    const isExternalNews = resource.category === "Healthcare News" && resource.content;
+                    
+                    return (
+                      <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Badge className={getCategoryStyles(resource.category)}>{resource.category}</Badge>
+                            {isExternalNews ? (
+                              <span className="flex items-center text-xs text-muted-foreground">
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                External
+                              </span>
+                            ) : (
+                              <span className="flex items-center text-xs text-muted-foreground">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {resource.read_time}
+                              </span>
+                            )}
+                          </div>
+                          <h2 className="text-lg text-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
+                            {isExternalNews ? (
+                              <a href={resource.content!} target="_blank" rel="noopener noreferrer">
+                                {resource.title}
+                              </a>
+                            ) : (
+                              <Link href={`/resources/${resource.slug}`}>
+                                {resource.title}
+                              </Link>
+                            )}
+                          </h2>
+                          <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                            {isExternalNews ? (
+                              <span className="text-xs text-secondary">{extractDomain(resource.content!)}</span>
+                            ) : (
+                              resource.excerpt
+                            )}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(resource.published_at || resource.created_at)}
+                            </span>
+                            {isExternalNews ? (
+                              <a 
+                                href={resource.content!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
+                              >
+                                Read Article <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            ) : (
+                              <Link 
+                                href={`/resources/${resource.slug}`}
+                                className="inline-flex items-center text-secondary hover:text-primary transition-colors text-sm"
+                              >
+                                Read More <ArrowRight className="h-3 w-3 ml-1" />
+                              </Link>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-background-alt pt-8 md:pt-12 overflow-visible">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-end justify-center gap-8">
+            <div className="text-center md:text-left mb-8 md:mb-0 self-center">
+              <h2 className="text-2xl text-primary mb-4">
+                Ready to Find Your Doctor?
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Use our free search to find family doctors accepting patients near you.
+              </p>
+              <Link 
+                href="/clinics"
+                className="inline-flex items-center text-secondary hover:text-primary transition-colors font-semibold"
+              >
+                Start Searching <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            {/* Image at bottom, flush with no bottom padding */}
+            <div className="flex justify-end flex-shrink-0">
+              <img 
+                src={coupleFooterImage.src} 
+                alt="Community connecting" 
+                className="w-full max-w-2xl h-auto"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

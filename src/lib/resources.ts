@@ -21,7 +21,7 @@ export type ResourceUpdate = Partial<ResourceInsert>;
 
 export async function fetchResources(includeUnpublished: boolean = false): Promise<Resource[]> {
   let query = supabase.from("resources").select("*").order("created_at", { ascending: false });
-  
+
   if (!includeUnpublished) {
     query = query.eq("published", true);
   }
@@ -29,7 +29,7 @@ export async function fetchResources(includeUnpublished: boolean = false): Promi
   const { data, error } = await query;
 
   if (error) {
-    console.error("Error fetching resources:", error);
+    console.error("Error fetching resources:", error.message, error.details, error.hint);
     return [];
   }
 
