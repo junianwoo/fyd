@@ -113,7 +113,7 @@ export default function About() {
                   I'm not a software engineer, a startup founder, or a government agency. I'm someone who works inside the healthcare system, watched my own parents move provinces and lose access to a family doctor, and decided to build something useful — even if it meant teaching myself to code to do it.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  The idea is simple: 2,699 family medicine clinics across Ontario, organized in one place, updated by the community. If everyone who calls a clinic shares what they find, we all spend less time on hold and more time getting care. That's it. That's the whole product.
+                  The idea is simple: 2,300+ family medicine clinics across Ontario, organized in one place, updated by the community. If everyone who calls a clinic shares what they find, we all spend less time on hold and more time getting care. That's it. That's the whole product.
                 </p>
               </div>
 
