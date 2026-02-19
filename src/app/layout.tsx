@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@FindYourDoctorCA',
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

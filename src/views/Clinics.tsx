@@ -14,7 +14,6 @@ import { ClinicPagination } from "@/components/ClinicPagination";
 import { ClinicEmptyState } from "@/components/ClinicEmptyState";
 import { ClinicSubmissionForm } from "@/components/ClinicSubmissionForm";
 import { searchClinics, Clinic, ClinicStatus } from "@/lib/clinics";
-import { ClinicSubmissionForm } from "@/components/ClinicSubmissionForm";
 import { useUserStatus } from "@/hooks/useUserStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
